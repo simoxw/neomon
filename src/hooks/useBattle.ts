@@ -70,6 +70,37 @@ export const useBattle = (playerId: string, opponentId: string) => {
   const handleAction = useCallback(async (actionType: 'move' | 'rest' | 'switch', moveId?: string) => {
     if (!playerMon || !opponentMon || isTurnInProgress || status !== 'fighting') return;
 
+    // SWITCH: cambia il Neo-Mon in campo senza turno di attacco del giocatore
+    if (actionType === 'switch' && moveId) {
+      setIsTurnInProgress(true);
+      const team = await db.team.toArray();
+      const newMon = team.find(m => m.id === moveId);
+      if (newMon) {
+        const stats = newMon.currentStats || newMon.baseStats;
+        setPlayerMon({
+          ...newMon,
+          currentHp: stats.hp,
+          currentStamina: stats.stamina
+        });
+        addLog(`Vai ${newMon.name}! Cambiato in campo!`);
+        // L'avversario attacca durante il cambio
+        const aiAction = BattleEngine.getBestMoveAI(opponentMon, { ...newMon, currentHp: stats.hp, currentStamina: stats.stamina } as any, allMoves);
+        const oClone = JSON.parse(JSON.stringify(opponentMon));
+        oClone.currentHp = opponentMon.currentHp;
+        oClone.currentStamina = opponentMon.currentStamina;
+        const newMonClone = { ...newMon, currentHp: stats.hp, currentStamina: stats.stamina };
+        // Applica danno AI al nuovo Neo-Mon
+        await new Promise(resolve => setTimeout(resolve, 800));
+        if (aiAction.move) {
+          addLog(`${opponentMon.name} usa ${aiAction.move.name}!`);
+          const dmg = Math.max(1, Math.floor((oClone.currentStats?.potenza || oClone.baseStats.potenza) * 0.5));
+          setPlayerMon(prev => prev ? { ...prev, currentHp: Math.max(0, prev.currentHp - dmg) } : null);
+        }
+      }
+      setIsTurnInProgress(false);
+      return;
+    }
+
     setIsTurnInProgress(true);
 
     // 1. Prepara Azione Giocatore

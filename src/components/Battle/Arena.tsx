@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useBattle } from '../../hooks/useBattle';
-import { Zap, RefreshCw, Package } from 'lucide-react';
+import { Zap, RefreshCw, Package, Users } from 'lucide-react';
 import { useStore } from '../../context/useStore';
 import { clsx, type ClassValue } from 'clsx';
 import { twMerge } from 'tailwind-merge';
@@ -60,8 +60,10 @@ const Arena: React.FC = () => {
   const { setScreen, captureNeoMon } = useStore();
   const { playerMon, opponentMon, battleLog, isTurnInProgress, status, allMoves, handleAction } = useBattle("p-01", "o-01");
   const [showPrisms, setShowPrisms] = useState(false);
+  const [showSwitch, setShowSwitch] = useState(false);
   const [inventoryPrisms, setInventoryPrisms] = useState<any[]>([]);
   const [catchAttempt, setCatchAttempt] = useState<{success: boolean, shakes: number} | null>(null);
+  const { team } = useStore();
 
   useEffect(() => {
     const loadInventory = async () => {
@@ -189,10 +191,17 @@ const Arena: React.FC = () => {
            </div>
 
            {/* Comandi Rapidi: Riga Orizzontale Dedicata */}
-           <div className="flex gap-4 h-12">
+           <div className="flex gap-2 h-12">
               <button onClick={() => handleAction('rest')} disabled={isTurnInProgress || status !== 'fighting'} className="flex-1 bg-amber-900/20 border border-amber-500/40 text-amber-500 text-[11px] font-black uppercase rounded-xl hover:bg-amber-500 hover:text-black transition-all active:scale-95 shadow-md">Riposo</button>
+              <button
+                onClick={() => setShowSwitch(true)}
+                disabled={isTurnInProgress || status !== 'fighting' || team.filter(m => m.id !== playerMon?.id).length === 0}
+                className="flex-1 bg-purple-900/40 border border-purple-500/30 text-purple-400 text-[11px] font-black uppercase rounded-xl hover:bg-purple-500 hover:text-white transition-all flex items-center justify-center gap-1.5 active:scale-95 shadow-md disabled:opacity-30"
+              >
+                <Users className="w-3.5 h-3.5" /> Switch
+              </button>
               <button onClick={() => setShowPrisms(true)} disabled={isTurnInProgress || status !== 'fighting'} className="flex-1 bg-emerald-900/40 border border-emerald-500/30 text-emerald-400 text-[11px] font-black uppercase rounded-xl hover:bg-emerald-500 hover:text-black transition-all flex items-center justify-center text-center active:scale-95 px-2 shadow-md">
-                 Sincronia (Cattura)
+                 Prisma
               </button>
            </div>
         </div>
@@ -217,6 +226,50 @@ const Arena: React.FC = () => {
                    ))}
                 </div>
              </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Switch Overlay */}
+      <AnimatePresence>
+        {showSwitch && (
+          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="absolute inset-0 z-[400] bg-black/95 backdrop-blur-xl flex flex-col justify-end">
+            <div className="p-8 pb-32">
+              <div className="flex justify-between items-center mb-6">
+                <div>
+                  <h3 className="text-3xl font-black italic uppercase text-white">Cambio</h3>
+                  <p className="text-[9px] text-white/30 uppercase font-mono tracking-widest mt-0.5">Seleziona il sostituto — costerà il turno</p>
+                </div>
+                <button onClick={() => setShowSwitch(false)} className="text-xs font-black text-white/40 uppercase hover:text-white transition-colors">Annulla</button>
+              </div>
+              <div className="flex flex-col gap-3">
+                {team
+                  .filter(m => m.id !== playerMon?.id)
+                  .map(m => {
+                    const hp = m.currentStats?.hp || m.baseStats.hp;
+                    const hpPercent = 100; // al massimo fuori campo
+                    return (
+                      <button
+                        key={m.id}
+                        onClick={() => { handleAction('switch', m.id); setShowSwitch(false); }}
+                        className="w-full flex items-center gap-4 p-4 bg-white/5 border border-white/10 rounded-2xl hover:border-purple-400 hover:bg-purple-900/20 transition-all active:scale-95 group"
+                      >
+                        <div className="w-12 h-12 bg-white/5 rounded-xl flex items-center justify-center overflow-hidden shrink-0">
+                          <img src={getCreatureSprite(m.id)} alt="" className="w-10 h-10 object-contain" />
+                        </div>
+                        <div className="flex-1 text-left">
+                          <div className="text-sm font-black uppercase text-white tracking-tight">{m.name}</div>
+                          <div className="text-[8px] font-mono text-white/30 uppercase">LV.{m.level} • {m.types.join('/')}</div>
+                          <div className="mt-1.5 h-1 w-full bg-black/40 rounded-full overflow-hidden">
+                            <div className="h-full bg-rose-500 rounded-full" style={{ width: `${hpPercent}%` }} />
+                          </div>
+                        </div>
+                        <Users className="w-4 h-4 text-purple-400/40 group-hover:text-purple-400 transition-colors shrink-0" />
+                      </button>
+                    );
+                  })}
+              </div>
+            </div>
           </motion.div>
         )}
       </AnimatePresence>
