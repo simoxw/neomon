@@ -1,0 +1,84 @@
+@import "tailwindcss/base";
+@import "tailwindcss/components";
+@import "tailwindcss/utilities";
+
+@layer base {
+  :root {
+    --background: #05070a;
+    --foreground: #f8fafc;
+    --neon-cyan: rgba(34, 211, 238, 1);
+    --neon-magenta: rgba(236, 72, 153, 1);
+  }
+
+  * {
+    -webkit-tap-highlight-color: transparent;
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    outline: none;
+  }
+
+  body {
+    background-color: var(--background);
+    color: var(--foreground);
+    overflow: hidden;
+    margin: 0;
+    padding: 0;
+    font-family: ui-sans-serif, system-ui, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    overscroll-behavior-y: contain; /* Impedisce il pull-to-refresh */
+    background-image: 
+      radial-gradient(circle at 50% 50%, #111827 0%, #05070a 100%);
+    background-attachment: fixed;
+  }
+}
+
+@layer utilities {
+  /* ... (bordi neon rimasti uguali) */
+  .border-neon {
+    border: 1px solid rgba(34, 211, 238, 0.4);
+    box-shadow: 0 0 10px rgba(34, 211, 238, 0.2), inset 0 0 5px rgba(34, 211, 238, 0.1);
+  }
+  
+  .border-neon-magenta {
+    border: 1px solid rgba(236, 72, 153, 0.4);
+    box-shadow: 0 0 10px rgba(236, 72, 153, 0.2), inset 0 0 5px rgba(236, 72, 153, 0.1);
+  }
+
+  .text-glow-cyan {
+    text-shadow: 0 0 8px rgba(34, 211, 238, 0.6);
+  }
+
+  .text-glow-magenta {
+    text-shadow: 0 0 8px rgba(236, 72, 153, 0.6);
+  }
+  
+  .bg-glass {
+    backdrop-filter: blur(12px);
+    background-color: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+  }
+
+  .fade-enter {
+    opacity: 0;
+    transform: scale(0.98);
+  }
+  .fade-enter-active {
+    opacity: 1;
+    transform: scale(1);
+    transition: opacity 300ms ease-in, transform 300ms ease-out;
+  }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.4s ease-out forwards;
+}

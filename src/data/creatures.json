@@ -1,0 +1,302 @@
+[
+  {
+    "id": "n-001",
+    "name": "Floris",
+    "types": ["Bio"],
+    "baseStats": { "hp": 55, "stamina": 100, "potenza": 45, "resistenza": 50, "sintonia": 60, "spirito": 55, "flusso": 45 },
+    "evolutionLevel": 20,
+    "evolvesTo": "n-002",
+    "moves_learned": [
+      { "level": 1, "moveId": "m-bio-01" },
+      { "level": 10, "moveId": "m-bio-03" },
+      { "level": 20, "moveId": "m-bio-09" },
+      { "level": 30, "moveId": "m-bio-05" },
+      { "level": 40, "moveId": "m-bio-07" }
+    ]
+  },
+  {
+    "id": "n-002",
+    "name": "Floragile",
+    "types": ["Bio"],
+    "baseStats": { "hp": 75, "stamina": 100, "potenza": 60, "resistenza": 65, "sintonia": 85, "spirito": 80, "flusso": 65 },
+    "evolutionLevel": 40,
+    "evolvesTo": "n-003",
+    "moves_learned": [
+      { "level": 1, "moveId": "m-bio-01" },
+      { "level": 10, "moveId": "m-bio-03" },
+      { "level": 20, "moveId": "m-bio-06" },
+      { "level": 30, "moveId": "m-bio-04" },
+      { "level": 40, "moveId": "m-bio-08" }
+    ]
+  },
+  {
+    "id": "n-003",
+    "name": "Aether-Vernant",
+    "types": ["Bio", "Etereo"],
+    "baseStats": { "hp": 95, "stamina": 100, "potenza": 75, "resistenza": 85, "sintonia": 115, "spirito": 105, "flusso": 85 },
+    "evolutionLevel": null,
+    "evolvesTo": null,
+    "moves_learned": [
+      { "level": 1, "moveId": "m-bio-04" },
+      { "level": 10, "moveId": "m-ete-01" },
+      { "level": 20, "moveId": "m-bio-07" },
+      { "level": 30, "moveId": "m-ete-07" },
+      { "level": 40, "moveId": "m-ete-10" }
+    ]
+  },
+  {
+    "id": "n-004",
+    "name": "Ignis",
+    "types": ["Incandescente"],
+    "baseStats": { "hp": 50, "stamina": 100, "potenza": 65, "resistenza": 45, "sintonia": 55, "spirito": 45, "flusso": 50 },
+    "evolutionLevel": 20,
+    "evolvesTo": "n-005",
+    "moves_learned": [
+      { "level": 1, "moveId": "m-inc-01" },
+      { "level": 10, "moveId": "m-inc-03" },
+      { "level": 20, "moveId": "m-inc-09" },
+      { "level": 30, "moveId": "m-inc-04" },
+      { "level": 40, "moveId": "m-inc-07" }
+    ]
+  },
+  {
+    "id": "n-005",
+    "name": "Pyrosauro",
+    "types": ["Incandescente"],
+    "baseStats": { "hp": 70, "stamina": 100, "potenza": 85, "resistenza": 60, "sintonia": 75, "spirito": 65, "flusso": 75 },
+    "evolutionLevel": 40,
+    "evolvesTo": "n-006",
+    "moves_learned": [
+      { "level": 1, "moveId": "m-inc-01" },
+      { "level": 10, "moveId": "m-inc-03" },
+      { "level": 20, "moveId": "m-inc-02" },
+      { "level": 30, "moveId": "m-inc-05" },
+      { "level": 40, "moveId": "m-inc-08" }
+    ]
+  },
+  {
+    "id": "n-006",
+    "name": "Magma-Core",
+    "types": ["Incandescente", "Meccanico"],
+    "baseStats": { "hp": 90, "stamina": 100, "potenza": 110, "resistenza": 100, "sintonia": 90, "spirito": 80, "flusso": 90 },
+    "evolutionLevel": null,
+    "evolvesTo": null,
+    "moves_learned": [
+      { "level": 1, "moveId": "m-inc-08" },
+      { "level": 10, "moveId": "m-mec-01" },
+      { "level": 20, "moveId": "m-inc-07" },
+      { "level": 30, "moveId": "m-mec-08" },
+      { "level": 40, "moveId": "m-mec-10" }
+    ]
+  },
+  {
+    "id": "n-007",
+    "name": "Hydros",
+    "types": ["Idrico"],
+    "baseStats": { "hp": 65, "stamina": 100, "potenza": 45, "resistenza": 55, "sintonia": 50, "spirito": 55, "flusso": 40 },
+    "evolutionLevel": 20,
+    "evolvesTo": "n-008",
+    "moves_learned": [
+      { "level": 1, "moveId": "m-idr-01" },
+      { "level": 10, "moveId": "m-idr-02" },
+      { "level": 20, "moveId": "m-idr-09" },
+      { "level": 30, "moveId": "m-idr-04" },
+      { "level": 40, "moveId": "m-idr-07" }
+    ]
+  },
+  {
+    "id": "n-008",
+    "name": "Aquastream",
+    "types": ["Idrico"],
+    "baseStats": { "hp": 85, "stamina": 100, "potenza": 60, "resistenza": 75, "sintonia": 70, "spirito": 80, "flusso": 60 },
+    "evolutionLevel": 40,
+    "evolvesTo": "n-009",
+    "moves_learned": [
+      { "level": 1, "moveId": "m-idr-01" },
+      { "level": 10, "moveId": "m-idr-03" },
+      { "level": 20, "moveId": "m-idr-06" },
+      { "level": 30, "moveId": "m-idr-05" },
+      { "level": 40, "moveId": "m-idr-10" }
+    ]
+  },
+  {
+    "id": "n-009",
+    "name": "Tsunami-Titan",
+    "types": ["Idrico", "Geologico"],
+    "baseStats": { "hp": 110, "stamina": 100, "potenza": 85, "resistenza": 110, "sintonia": 95, "spirito": 100, "flusso": 60 },
+    "evolutionLevel": null,
+    "evolvesTo": null,
+    "moves_learned": [
+      { "level": 1, "moveId": "m-idr-07" },
+      { "level": 10, "moveId": "m-geo-02" },
+      { "level": 20, "moveId": "m-idr-08" },
+      { "level": 30, "moveId": "m-geo-07" },
+      { "level": 40, "moveId": "m-geo-09" }
+    ]
+  },
+  {
+    "id": "n-010",
+    "name": "Larva-Neon",
+    "types": ["Bio"],
+    "baseStats": { "hp": 45, "stamina": 100, "potenza": 40, "resistenza": 55, "sintonia": 45, "spirito": 50, "flusso": 75 },
+    "evolutionLevel": 15,
+    "evolvesTo": "n-011",
+    "moves_learned": [
+      { "level": 1, "moveId": "m-bio-01" },
+      { "level": 10, "moveId": "m-bio-10" },
+      { "level": 20, "moveId": "m-bio-03" },
+      { "level": 30, "moveId": "m-bio-06" },
+      { "level": 40, "moveId": "m-bio-05" }
+    ]
+  },
+  {
+    "id": "n-011",
+    "name": "Crisalide-Glow",
+    "types": ["Bio", "Meccanico"],
+    "baseStats": { "hp": 65, "stamina": 100, "potenza": 50, "resistenza": 100, "sintonia": 60, "spirito": 80, "flusso": 75 },
+    "evolutionLevel": 30,
+    "evolvesTo": "n-012",
+    "moves_learned": [
+      { "level": 1, "moveId": "m-mec-10" },
+      { "level": 10, "moveId": "m-mec-01" },
+      { "level": 20, "moveId": "m-mec-03" },
+      { "level": 30, "moveId": "m-bio-09" },
+      { "level": 40, "moveId": "m-mec-06" }
+    ]
+  },
+  {
+    "id": "n-012",
+    "name": "Farfalla-Prismatica",
+    "types": ["Bio", "Prismatico"],
+    "baseStats": { "hp": 80, "stamina": 100, "potenza": 70, "resistenza": 85, "sintonia": 110, "spirito": 100, "flusso": 115 },
+    "evolutionLevel": null,
+    "evolvesTo": null,
+    "moves_learned": [
+      { "level": 1, "moveId": "m-pri-01" },
+      { "level": 10, "moveId": "m-bio-05" },
+      { "level": 20, "moveId": "m-pri-04" },
+      { "level": 30, "moveId": "m-pri-09" },
+      { "level": 40, "moveId": "m-pri-07" }
+    ]
+  },
+  {
+    "id": "n-013",
+    "name": "Eco-Bit",
+    "types": ["Tetro"],
+    "baseStats": { "hp": 50, "stamina": 100, "potenza": 40, "resistenza": 45, "sintonia": 65, "spirito": 50, "flusso": 60 },
+    "evolutionLevel": 22,
+    "evolvesTo": "n-014",
+    "moves_learned": [
+      { "level": 1, "moveId": "m-tet-02" },
+      { "level": 10, "moveId": "m-tet-01" },
+      { "level": 20, "moveId": "m-tet-10" },
+      { "level": 30, "moveId": "m-tet-04" },
+      { "level": 40, "moveId": "m-tet-07" }
+    ]
+  },
+  {
+    "id": "n-014",
+    "name": "Radar-Wing",
+    "types": ["Tetro", "Aereo"],
+    "baseStats": { "hp": 75, "stamina": 100, "potenza": 65, "resistenza": 60, "sintonia": 85, "spirito": 70, "flusso": 105 },
+    "evolutionLevel": null,
+    "evolvesTo": null,
+    "moves_learned": [
+      { "level": 1, "moveId": "m-aer-01" },
+      { "level": 10, "moveId": "m-tet-05" },
+      { "level": 20, "moveId": "m-aer-04" },
+      { "level": 30, "moveId": "m-aer-09" },
+      { "level": 40, "moveId": "m-tet-07" }
+    ]
+  },
+  {
+    "id": "n-015",
+    "name": "Geo-Shell",
+    "types": ["Geologico"],
+    "baseStats": { "hp": 85, "stamina": 100, "potenza": 70, "resistenza": 120, "sintonia": 50, "spirito": 90, "flusso": 45 },
+    "evolutionLevel": null,
+    "evolvesTo": null,
+    "moves_learned": [
+      { "level": 1, "moveId": "m-geo-02" },
+      { "level": 10, "moveId": "m-geo-01" },
+      { "level": 20, "moveId": "m-geo-09" },
+      { "level": 30, "moveId": "m-geo-05" },
+      { "level": 40, "moveId": "m-geo-08" }
+    ]
+  },
+  {
+    "id": "n-016",
+    "name": "Cyber-Cane",
+    "types": ["Cinetico"],
+    "baseStats": { "hp": 55, "stamina": 100, "potenza": 60, "resistenza": 50, "sintonia": 45, "spirito": 45, "flusso": 55 },
+    "evolutionLevel": 25,
+    "evolvesTo": "n-017",
+    "moves_learned": [
+      { "level": 1, "moveId": "m-cin-01" },
+      { "level": 10, "moveId": "m-cin-03" },
+      { "level": 20, "moveId": "m-cin-09" },
+      { "level": 30, "moveId": "m-cin-05" },
+      { "level": 40, "moveId": "m-cin-07" }
+    ]
+  },
+  {
+    "id": "n-017",
+    "name": "Bolt-Hound",
+    "types": ["Cinetico", "Fulgido"],
+    "baseStats": { "hp": 80, "stamina": 100, "potenza": 90, "resistenza": 70, "sintonia": 75, "spirito": 65, "flusso": 110 },
+    "evolutionLevel": null,
+    "evolvesTo": null,
+    "moves_learned": [
+      { "level": 1, "moveId": "m-ful-02" },
+      { "level": 10, "moveId": "m-cin-04" },
+      { "level": 20, "moveId": "m-ful-08" },
+      { "level": 30, "moveId": "m-ful-09" },
+      { "level": 40, "moveId": "m-cin-07" }
+    ]
+  },
+  {
+    "id": "n-018",
+    "name": "Mecha-Micio",
+    "types": ["Meccanico"],
+    "baseStats": { "hp": 65, "stamina": 100, "potenza": 75, "resistenza": 65, "sintonia": 80, "spirito": 60, "flusso": 90 },
+    "evolutionLevel": null,
+    "evolvesTo": null,
+    "moves_learned": [
+      { "level": 1, "moveId": "m-mec-01" },
+      { "level": 10, "moveId": "m-mec-02" },
+      { "level": 20, "moveId": "m-mec-05" },
+      { "level": 30, "moveId": "m-mec-04" },
+      { "level": 45, "moveId": "m-mec-08" }
+    ]
+  },
+  {
+    "id": "n-019",
+    "name": "Crio-Lince",
+    "types": ["Criogenico"],
+    "baseStats": { "hp": 85, "stamina": 100, "potenza": 105, "resistenza": 75, "sintonia": 80, "spirito": 75, "flusso": 110 },
+    "evolutionLevel": null,
+    "evolvesTo": null,
+    "moves_learned": [
+      { "level": 1, "moveId": "m-cri-01" },
+      { "level": 10, "moveId": "m-cri-02" },
+      { "level": 20, "moveId": "m-cri-05" },
+      { "level": 30, "moveId": "m-cri-08" },
+      { "level": 40, "moveId": "m-cri-09" }
+    ]
+  },
+  {
+    "id": "n-020",
+    "name": "Aura-Nebula",
+    "types": ["Etereo"],
+    "baseStats": { "hp": 100, "stamina": 100, "potenza": 60, "resistenza": 85, "sintonia": 115, "spirito": 110, "flusso": 70 },
+    "evolutionLevel": null,
+    "evolvesTo": null,
+    "moves_learned": [
+      { "level": 1, "moveId": "m-ete-01" },
+      { "level": 10, "moveId": "m-ete-03" },
+      { "level": 20, "moveId": "m-ete-05" },
+      { "level": 30, "moveId": "m-ete-07" },
+      { "level": 40, "moveId": "m-ete-10" }
+    ]
+  }
+]

@@ -1,0 +1,1204 @@
+[
+    [
+        {
+            "id": "m-bio-01",
+            "name": "Seme Luminescente",
+            "type": "Bio",
+            "power": 45,
+            "staminaCost": 12,
+            "accuracy": 100,
+            "category": "Physical",
+            "effect": null
+        },
+        {
+            "id": "m-bio-02",
+            "name": "Frusta Fluorescente",
+            "type": "Bio",
+            "power": 50,
+            "staminaCost": 15,
+            "accuracy": 100,
+            "category": "Sintonia",
+            "effect": null
+        },
+        {
+            "id": "m-bio-03",
+            "name": "Spira di Radici-Laser",
+            "type": "Bio",
+            "power": 35,
+            "staminaCost": 8,
+            "accuracy": 100,
+            "category": "Sintonia",
+            "effect": null
+        },
+        {
+            "id": "m-bio-04",
+            "name": "Liana al Plasma",
+            "type": "Bio",
+            "power": 75,
+            "staminaCost": 30,
+            "accuracy": 95,
+            "category": "Physical",
+            "effect": null
+        },
+        {
+            "id": "m-bio-05",
+            "name": "Polline Elettrolitico",
+            "type": "Bio",
+            "power": 80,
+            "staminaCost": 35,
+            "accuracy": 90,
+            "category": "Sintonia",
+            "effect": "10% prob. Paralisi"
+        },
+        {
+            "id": "m-bio-06",
+            "name": "Spora Cibernetica",
+            "type": "Bio",
+            "power": 65,
+            "staminaCost": 25,
+            "accuracy": 95,
+            "category": "Sintonia",
+            "effect": null
+        },
+        {
+            "id": "m-bio-07",
+            "name": "Eruzione Clorofilliana",
+            "type": "Bio",
+            "power": 120,
+            "staminaCost": 75,
+            "accuracy": 80,
+            "category": "Sintonia",
+            "effect": "Danno massiccio"
+        },
+        {
+            "id": "m-bio-08",
+            "name": "Artiglio di Smeraldo",
+            "type": "Bio",
+            "power": 110,
+            "staminaCost": 65,
+            "accuracy": 85,
+            "category": "Physical",
+            "effect": null
+        },
+        {
+            "id": "m-bio-09",
+            "name": "Sintesi di Neon",
+            "type": "Bio",
+            "power": 0,
+            "staminaCost": 20,
+            "accuracy": 100,
+            "category": "Status",
+            "effect": "Aumenta Sintonia"
+        },
+        {
+            "id": "m-bio-10",
+            "name": "Veleno Neon",
+            "type": "Bio",
+            "power": 0,
+            "staminaCost": 25,
+            "accuracy": 100,
+            "category": "Status",
+            "effect": "Danno nel tempo"
+        },
+        {
+            "id": "m-inc-01",
+            "name": "Scintilla Digitale",
+            "type": "Incandescente",
+            "power": 40,
+            "staminaCost": 10,
+            "accuracy": 100,
+            "category": "Sintonia",
+            "effect": null
+        },
+        {
+            "id": "m-inc-02",
+            "name": "Colpo di Calore",
+            "type": "Incandescente",
+            "power": 45,
+            "staminaCost": 12,
+            "accuracy": 100,
+            "category": "Physical",
+            "effect": null
+        },
+        {
+            "id": "m-inc-03",
+            "name": "Fiamma Neon",
+            "type": "Incandescente",
+            "power": 50,
+            "staminaCost": 15,
+            "accuracy": 100,
+            "category": "Sintonia",
+            "effect": null
+        },
+        {
+            "id": "m-inc-04",
+            "name": "Pugno Magmatico",
+            "type": "Incandescente",
+            "power": 80,
+            "staminaCost": 35,
+            "accuracy": 95,
+            "category": "Physical",
+            "effect": "30% prob. Scottatura"
+        },
+        {
+            "id": "m-inc-05",
+            "name": "Flare Infrarosso",
+            "type": "Incandescente",
+            "power": 70,
+            "staminaCost": 30,
+            "accuracy": 95,
+            "category": "Sintonia",
+            "effect": null
+        },
+        {
+            "id": "m-inc-06",
+            "name": "Nebbia Incandescente",
+            "type": "Incandescente",
+            "power": 65,
+            "staminaCost": 25,
+            "accuracy": 95,
+            "category": "Sintonia",
+            "effect": null
+        },
+        {
+            "id": "m-inc-07",
+            "name": "Supernova di Quarzo",
+            "type": "Incandescente",
+            "power": 130,
+            "staminaCost": 85,
+            "accuracy": 70,
+            "category": "Sintonia",
+            "effect": null
+        },
+        {
+            "id": "m-inc-08",
+            "name": "Impatto Vulcanico",
+            "type": "Incandescente",
+            "power": 115,
+            "staminaCost": 75,
+            "accuracy": 80,
+            "category": "Physical",
+            "effect": null
+        },
+        {
+            "id": "m-inc-09",
+            "name": "Surriscaldamento",
+            "type": "Incandescente",
+            "power": 0,
+            "staminaCost": 20,
+            "accuracy": 100,
+            "category": "Status",
+            "effect": "Aumenta Potenza"
+        },
+        {
+            "id": "m-inc-10",
+            "name": "Barriera Termica",
+            "type": "Incandescente",
+            "power": 0,
+            "staminaCost": 15,
+            "accuracy": 100,
+            "category": "Status",
+            "effect": "Aumenta Resistenza"
+        },
+        {
+            "id": "m-idr-01",
+            "name": "Goccia Sonica",
+            "type": "Idrico",
+            "power": 35,
+            "staminaCost": 8,
+            "accuracy": 100,
+            "category": "Sintonia",
+            "effect": null
+        },
+        {
+            "id": "m-idr-02",
+            "name": "Taglio d'Acqua",
+            "type": "Idrico",
+            "power": 45,
+            "staminaCost": 12,
+            "accuracy": 100,
+            "category": "Physical",
+            "effect": null
+        },
+        {
+            "id": "m-idr-03",
+            "name": "Flusso di Fosforo",
+            "type": "Idrico",
+            "power": 50,
+            "staminaCost": 15,
+            "accuracy": 100,
+            "category": "Sintonia",
+            "effect": null
+        },
+        {
+            "id": "m-idr-04",
+            "name": "Idropulsore Beta",
+            "type": "Idrico",
+            "power": 75,
+            "staminaCost": 30,
+            "accuracy": 95,
+            "category": "Sintonia",
+            "effect": "Può confondere"
+        },
+        {
+            "id": "m-idr-05",
+            "name": "Colpo di Marea",
+            "type": "Idrico",
+            "power": 80,
+            "staminaCost": 35,
+            "accuracy": 95,
+            "category": "Physical",
+            "effect": null
+        },
+        {
+            "id": "m-idr-06",
+            "name": "Nebulosa Marina",
+            "type": "Idrico",
+            "power": 65,
+            "staminaCost": 25,
+            "accuracy": 95,
+            "category": "Sintonia",
+            "effect": null
+        },
+        {
+            "id": "m-idr-07",
+            "name": "Maremoto Digitale",
+            "type": "Idrico",
+            "power": 120,
+            "staminaCost": 80,
+            "accuracy": 75,
+            "category": "Sintonia",
+            "effect": null
+        },
+        {
+            "id": "m-idr-08",
+            "name": "Diluvio di Smeraldo",
+            "type": "Idrico",
+            "power": 110,
+            "staminaCost": 65,
+            "accuracy": 85,
+            "category": "Sintonia",
+            "effect": null
+        },
+        {
+            "id": "m-idr-09",
+            "name": "Nebbia Umida",
+            "type": "Idrico",
+            "power": 0,
+            "staminaCost": 18,
+            "accuracy": 100,
+            "category": "Status",
+            "effect": "Riduce Velocità"
+        },
+        {
+            "id": "m-idr-10",
+            "name": "Sorgente Purificatrice",
+            "type": "Idrico",
+            "power": 0,
+            "staminaCost": 22,
+            "accuracy": 100,
+            "category": "Status",
+            "effect": "Rimuove Debuff"
+        },
+        {
+            "id": "m-ful-01",
+            "name": "Scossa di Cobalto",
+            "type": "Fulgido",
+            "power": 40,
+            "staminaCost": 10,
+            "accuracy": 100,
+            "category": "Sintonia",
+            "effect": null
+        },
+        {
+            "id": "m-ful-02",
+            "name": "Lampo Istantaneo",
+            "type": "Fulgido",
+            "power": 45,
+            "staminaCost": 12,
+            "accuracy": 100,
+            "category": "Sintonia",
+            "effect": "Priorità alta"
+        },
+        {
+            "id": "m-ful-03",
+            "name": "Artiglio Fulmineo",
+            "type": "Fulgido",
+            "power": 50,
+            "staminaCost": 15,
+            "accuracy": 100,
+            "category": "Physical",
+            "effect": null
+        },
+        {
+            "id": "m-ful-04",
+            "name": "Arco Voltaico",
+            "type": "Fulgido",
+            "power": 80,
+            "staminaCost": 38,
+            "accuracy": 90,
+            "category": "Sintonia",
+            "effect": "Catena fulmini"
+        },
+        {
+            "id": "m-ful-05",
+            "name": "Scarica di Neon",
+            "type": "Fulgido",
+            "power": 75,
+            "staminaCost": 30,
+            "accuracy": 95,
+            "category": "Sintonia",
+            "effect": "10% prob. Paralisi"
+        },
+        {
+            "id": "m-ful-06",
+            "name": "Tuono Modulato",
+            "type": "Fulgido",
+            "power": 65,
+            "staminaCost": 25,
+            "accuracy": 95,
+            "category": "Sintonia",
+            "effect": null
+        },
+        {
+            "id": "m-ful-07",
+            "name": "Tempesta Elettromagnetica",
+            "type": "Fulgido",
+            "power": 125,
+            "staminaCost": 80,
+            "accuracy": 70,
+            "category": "Sintonia",
+            "effect": null
+        },
+        {
+            "id": "m-ful-08",
+            "name": "Fulmine di Zaffiro",
+            "type": "Fulgido",
+            "power": 110,
+            "staminaCost": 60,
+            "accuracy": 85,
+            "category": "Sintonia",
+            "effect": null
+        },
+        {
+            "id": "m-ful-09",
+            "name": "Sovraccarico",
+            "type": "Fulgido",
+            "power": 0,
+            "staminaCost": 30,
+            "accuracy": 100,
+            "category": "Status",
+            "effect": "Aumenta Sintonia"
+        },
+        {
+            "id": "m-ful-10",
+            "name": "Paralisi Statica",
+            "type": "Fulgido",
+            "power": 0,
+            "staminaCost": 15,
+            "accuracy": 100,
+            "category": "Status",
+            "effect": "Applica Paralisi"
+        },
+        {
+            "id": "m-tet-01",
+            "name": "Ombra di Vetro",
+            "type": "Tetro",
+            "power": 40,
+            "staminaCost": 10,
+            "accuracy": 100,
+            "category": "Physical",
+            "effect": null
+        },
+        {
+            "id": "m-tet-02",
+            "name": "Sussurro Oscuro",
+            "type": "Tetro",
+            "power": 45,
+            "staminaCost": 12,
+            "accuracy": 100,
+            "category": "Sintonia",
+            "effect": null
+        },
+        {
+            "id": "m-tet-03",
+            "name": "Graffio Tetro",
+            "type": "Tetro",
+            "power": 35,
+            "staminaCost": 8,
+            "accuracy": 100,
+            "category": "Physical",
+            "effect": null
+        },
+        {
+            "id": "m-tet-04",
+            "name": "Vuoto di Silenzio",
+            "type": "Tetro",
+            "power": 80,
+            "staminaCost": 35,
+            "accuracy": 90,
+            "category": "Sintonia",
+            "effect": null
+        },
+        {
+            "id": "m-tet-05",
+            "name": "Abisso di Codice",
+            "type": "Tetro",
+            "power": 75,
+            "staminaCost": 30,
+            "accuracy": 95,
+            "category": "Sintonia",
+            "effect": null
+        },
+        {
+            "id": "m-tet-06",
+            "name": "Morso dell'Oblio",
+            "type": "Tetro",
+            "power": 70,
+            "staminaCost": 28,
+            "accuracy": 95,
+            "category": "Physical",
+            "effect": null
+        },
+        {
+            "id": "m-tet-07",
+            "name": "Eclissi di Ossidiana",
+            "type": "Tetro",
+            "power": 120,
+            "staminaCost": 75,
+            "accuracy": 80,
+            "category": "Sintonia",
+            "effect": null
+        },
+        {
+            "id": "m-tet-08",
+            "name": "Lama delle Tenebre",
+            "type": "Tetro",
+            "power": 110,
+            "staminaCost": 60,
+            "accuracy": 85,
+            "category": "Physical",
+            "effect": null
+        },
+        {
+            "id": "m-tet-09",
+            "name": "Maledizione Digitale",
+            "type": "Tetro",
+            "power": 0,
+            "staminaCost": 25,
+            "accuracy": 100,
+            "category": "Status",
+            "effect": "Danno timer"
+        },
+        {
+            "id": "m-tet-10",
+            "name": "Terrore Assoluto",
+            "type": "Tetro",
+            "power": 0,
+            "staminaCost": 20,
+            "accuracy": 100,
+            "category": "Status",
+            "effect": "Riduce Attacco"
+        },
+        {
+            "id": "m-mec-01",
+            "name": "Ingranaggio Veloce",
+            "type": "Meccanico",
+            "power": 45,
+            "staminaCost": 12,
+            "accuracy": 100,
+            "category": "Physical",
+            "effect": null
+        },
+        {
+            "id": "m-mec-02",
+            "name": "Bullone Espulsore",
+            "type": "Meccanico",
+            "power": 40,
+            "staminaCost": 10,
+            "accuracy": 100,
+            "category": "Sintonia",
+            "effect": null
+        },
+        {
+            "id": "m-mec-03",
+            "name": "Pinza Idraulica",
+            "type": "Meccanico",
+            "power": 50,
+            "staminaCost": 15,
+            "accuracy": 100,
+            "category": "Physical",
+            "effect": null
+        },
+        {
+            "id": "m-mec-04",
+            "name": "Motore a Ioni",
+            "type": "Meccanico",
+            "power": 85,
+            "staminaCost": 40,
+            "accuracy": 90,
+            "category": "Physical",
+            "effect": "+Velocità"
+        },
+        {
+            "id": "m-mec-05",
+            "name": "Raggio Laser",
+            "type": "Meccanico",
+            "power": 75,
+            "staminaCost": 30,
+            "accuracy": 95,
+            "category": "Sintonia",
+            "effect": null
+        },
+        {
+            "id": "m-mec-06",
+            "name": "Impatto al Tungsteno",
+            "type": "Meccanico",
+            "power": 80,
+            "staminaCost": 35,
+            "accuracy": 95,
+            "category": "Physical",
+            "effect": null
+        },
+        {
+            "id": "m-mec-07",
+            "name": "Cacciabombardiere",
+            "type": "Meccanico",
+            "power": 130,
+            "staminaCost": 85,
+            "accuracy": 70,
+            "category": "Sintonia",
+            "effect": "Carica turno 1"
+        },
+        {
+            "id": "m-mec-08",
+            "name": "Pistone Colossale",
+            "type": "Meccanico",
+            "power": 115,
+            "staminaCost": 75,
+            "accuracy": 80,
+            "category": "Physical",
+            "effect": null
+        },
+        {
+            "id": "m-mec-09",
+            "name": "Calibrazione",
+            "type": "Meccanico",
+            "power": 0,
+            "staminaCost": 15,
+            "accuracy": 100,
+            "category": "Status",
+            "effect": "+Prec/Pot"
+        },
+        {
+            "id": "m-mec-10",
+            "name": "Scudo di Ferro",
+            "type": "Meccanico",
+            "power": 0,
+            "staminaCost": 20,
+            "accuracy": 100,
+            "category": "Status",
+            "effect": "+Resistenza"
+        },
+        {
+            "id": "m-ete-01",
+            "name": "Vuoto Etereo",
+            "type": "Etereo",
+            "power": 40,
+            "staminaCost": 10,
+            "accuracy": 100,
+            "category": "Sintonia",
+            "effect": null
+        },
+        {
+            "id": "m-ete-02",
+            "name": "Tocco Fantasma",
+            "type": "Etereo",
+            "power": 45,
+            "staminaCost": 12,
+            "accuracy": 100,
+            "category": "Physical",
+            "effect": null
+        },
+        {
+            "id": "m-ete-03",
+            "name": "Raggio Astrale",
+            "type": "Etereo",
+            "power": 50,
+            "staminaCost": 15,
+            "accuracy": 100,
+            "category": "Sintonia",
+            "effect": null
+        },
+        {
+            "id": "m-ete-04",
+            "name": "Dimensionamento",
+            "type": "Etereo",
+            "power": 80,
+            "staminaCost": 38,
+            "accuracy": 90,
+            "category": "Sintonia",
+            "effect": "Ignora scudi"
+        },
+        {
+            "id": "m-ete-05",
+            "name": "Nebulosa Spettrale",
+            "type": "Etereo",
+            "power": 70,
+            "staminaCost": 28,
+            "accuracy": 95,
+            "category": "Sintonia",
+            "effect": null
+        },
+        {
+            "id": "m-ete-06",
+            "name": "Artiglio dell'Anima",
+            "type": "Etereo",
+            "power": 75,
+            "staminaCost": 30,
+            "accuracy": 95,
+            "category": "Physical",
+            "effect": null
+        },
+        {
+            "id": "m-ete-07",
+            "name": "Cataclisma Astrale",
+            "type": "Etereo",
+            "power": 125,
+            "staminaCost": 80,
+            "accuracy": 75,
+            "category": "Sintonia",
+            "effect": null
+        },
+        {
+            "id": "m-ete-08",
+            "name": "Lama dello Spirito",
+            "type": "Etereo",
+            "power": 110,
+            "staminaCost": 60,
+            "accuracy": 85,
+            "category": "Physical",
+            "effect": null
+        },
+        {
+            "id": "m-ete-09",
+            "name": "Fasatura",
+            "type": "Etereo",
+            "power": 0,
+            "staminaCost": 25,
+            "accuracy": 100,
+            "category": "Status",
+            "effect": "Evasione +2"
+        },
+        {
+            "id": "m-ete-10",
+            "name": "Trascendenza",
+            "type": "Etereo",
+            "power": 0,
+            "staminaCost": 30,
+            "accuracy": 100,
+            "category": "Status",
+            "effect": "+Spirito"
+        },
+        {
+            "id": "m-cin-01",
+            "name": "Impatto Cinetico",
+            "type": "Cinetico",
+            "power": 45,
+            "staminaCost": 12,
+            "accuracy": 100,
+            "category": "Physical",
+            "effect": null
+        },
+        {
+            "id": "m-cin-02",
+            "name": "Onda d'Urto",
+            "type": "Cinetico",
+            "power": 40,
+            "staminaCost": 10,
+            "accuracy": 100,
+            "category": "Sintonia",
+            "effect": null
+        },
+        {
+            "id": "m-cin-03",
+            "name": "Frizione Rapida",
+            "type": "Cinetico",
+            "power": 50,
+            "staminaCost": 15,
+            "accuracy": 100,
+            "category": "Physical",
+            "effect": null
+        },
+        {
+            "id": "m-cin-04",
+            "name": "Vettore di Forza",
+            "type": "Cinetico",
+            "power": 85,
+            "staminaCost": 40,
+            "accuracy": 90,
+            "category": "Physical",
+            "effect": null
+        },
+        {
+            "id": "m-cin-05",
+            "name": "Spinta Gravitazionale",
+            "type": "Cinetico",
+            "power": 75,
+            "staminaCost": 30,
+            "accuracy": 95,
+            "category": "Sintonia",
+            "effect": "-Velocità avv."
+        },
+        {
+            "id": "m-cin-06",
+            "name": "Collisione Elastica",
+            "type": "Cinetico",
+            "power": 65,
+            "staminaCost": 25,
+            "accuracy": 95,
+            "category": "Physical",
+            "effect": null
+        },
+        {
+            "id": "m-cin-07",
+            "name": "Impatto Metropolitano",
+            "type": "Cinetico",
+            "power": 130,
+            "staminaCost": 85,
+            "accuracy": 70,
+            "category": "Physical",
+            "effect": null
+        },
+        {
+            "id": "m-cin-08",
+            "name": "Fulcro di Energia",
+            "type": "Cinetico",
+            "power": 110,
+            "staminaCost": 60,
+            "accuracy": 85,
+            "category": "Sintonia",
+            "effect": null
+        },
+        {
+            "id": "m-cin-09",
+            "name": "Accelerazione",
+            "type": "Cinetico",
+            "power": 0,
+            "staminaCost": 20,
+            "accuracy": 100,
+            "category": "Status",
+            "effect": "+Flusso"
+        },
+        {
+            "id": "m-cin-10",
+            "name": "Inerzia",
+            "type": "Cinetico",
+            "power": 0,
+            "staminaCost": 15,
+            "accuracy": 100,
+            "category": "Status",
+            "effect": "-Difesa avv."
+        },
+        {
+            "id": "m-geo-01",
+            "name": "Pietrisco Laser",
+            "type": "Geologico",
+            "power": 40,
+            "staminaCost": 10,
+            "accuracy": 100,
+            "category": "Sintonia",
+            "effect": null
+        },
+        {
+            "id": "m-geo-02",
+            "name": "Pugno Roccioso",
+            "type": "Geologico",
+            "power": 45,
+            "staminaCost": 12,
+            "accuracy": 100,
+            "category": "Physical",
+            "effect": null
+        },
+        {
+            "id": "m-geo-03",
+            "name": "Scheggia di Rubino",
+            "type": "Geologico",
+            "power": 50,
+            "staminaCost": 15,
+            "accuracy": 100,
+            "category": "Sintonia",
+            "effect": null
+        },
+        {
+            "id": "m-geo-04",
+            "name": "Terremoto Modulato",
+            "type": "Geologico",
+            "power": 85,
+            "staminaCost": 40,
+            "accuracy": 90,
+            "category": "Physical",
+            "effect": "Area"
+        },
+        {
+            "id": "m-geo-05",
+            "name": "Pilastro di Titanio",
+            "type": "Geologico",
+            "power": 75,
+            "staminaCost": 30,
+            "accuracy": 95,
+            "category": "Physical",
+            "effect": null
+        },
+        {
+            "id": "m-geo-06",
+            "name": "Frana di Neon",
+            "type": "Geologico",
+            "power": 70,
+            "staminaCost": 28,
+            "accuracy": 95,
+            "category": "Sintonia",
+            "effect": null
+        },
+        {
+            "id": "m-geo-07",
+            "name": "Meteore di Cristallo",
+            "type": "Geologico",
+            "power": 130,
+            "staminaCost": 85,
+            "accuracy": 70,
+            "category": "Sintonia",
+            "effect": null
+        },
+        {
+            "id": "m-geo-08",
+            "name": "Crollo Strutturale",
+            "type": "Geologico",
+            "power": 110,
+            "staminaCost": 60,
+            "accuracy": 85,
+            "category": "Physical",
+            "effect": null
+        },
+        {
+            "id": "m-geo-09",
+            "name": "Fortificazione",
+            "type": "Geologico",
+            "power": 0,
+            "staminaCost": 20,
+            "accuracy": 100,
+            "category": "Status",
+            "effect": "++Resistenza"
+        },
+        {
+            "id": "m-geo-10",
+            "name": "Sabbia Neon",
+            "type": "Geologico",
+            "power": 0,
+            "staminaCost": 15,
+            "accuracy": 100,
+            "category": "Status",
+            "effect": "-Precisione avv."
+        },
+        {
+            "id": "m-aer-01",
+            "name": "Refolo di Luce",
+            "type": "Aereo",
+            "power": 40,
+            "staminaCost": 8,
+            "accuracy": 100,
+            "category": "Sintonia",
+            "effect": null
+        },
+        {
+            "id": "m-aer-02",
+            "name": "Colpo di Vento",
+            "type": "Aereo",
+            "power": 45,
+            "staminaCost": 12,
+            "accuracy": 100,
+            "category": "Physical",
+            "effect": null
+        },
+        {
+            "id": "m-aer-03",
+            "name": "Lama di Pressione",
+            "type": "Aereo",
+            "power": 50,
+            "staminaCost": 15,
+            "accuracy": 100,
+            "category": "Sintonia",
+            "effect": null
+        },
+        {
+            "id": "m-aer-04",
+            "name": "Tornado di Neon",
+            "type": "Aereo",
+            "power": 80,
+            "staminaCost": 35,
+            "accuracy": 90,
+            "category": "Sintonia",
+            "effect": null
+        },
+        {
+            "id": "m-aer-05",
+            "name": "Picchiata Sonica",
+            "type": "Aereo",
+            "power": 85,
+            "staminaCost": 40,
+            "accuracy": 90,
+            "category": "Physical",
+            "effect": null
+        },
+        {
+            "id": "m-aer-06",
+            "name": "Raffica Tracciante",
+            "type": "Aereo",
+            "power": 70,
+            "staminaCost": 25,
+            "accuracy": 95,
+            "category": "Sintonia",
+            "effect": null
+        },
+        {
+            "id": "m-aer-07",
+            "name": "Ciclone Cinetico",
+            "type": "Aereo",
+            "power": 120,
+            "staminaCost": 75,
+            "accuracy": 80,
+            "category": "Sintonia",
+            "effect": null
+        },
+        {
+            "id": "m-aer-08",
+            "name": "Uragano di Plasma",
+            "type": "Aereo",
+            "power": 115,
+            "staminaCost": 70,
+            "accuracy": 85,
+            "category": "Sintonia",
+            "effect": null
+        },
+        {
+            "id": "m-aer-09",
+            "name": "Corrente Ascensionale",
+            "type": "Aereo",
+            "power": 0,
+            "staminaCost": 20,
+            "accuracy": 100,
+            "category": "Status",
+            "effect": "+Flusso/+Evasione"
+        },
+        {
+            "id": "m-aer-10",
+            "name": "Turbolenza",
+            "type": "Aereo",
+            "power": 0,
+            "staminaCost": 15,
+            "accuracy": 100,
+            "category": "Status",
+            "effect": "Applica Confusione"
+        },
+        {
+            "id": "m-cri-01",
+            "name": "Scheggia di Ghiaccio",
+            "type": "Criogenico",
+            "power": 40,
+            "staminaCost": 10,
+            "accuracy": 100,
+            "category": "Physical",
+            "effect": "Sempre primo"
+        },
+        {
+            "id": "m-cri-02",
+            "name": "Soffio Gelo",
+            "type": "Criogenico",
+            "power": 45,
+            "staminaCost": 12,
+            "accuracy": 100,
+            "category": "Sintonia",
+            "effect": null
+        },
+        {
+            "id": "m-cri-03",
+            "name": "Cristallo Affilato",
+            "type": "Criogenico",
+            "power": 50,
+            "staminaCost": 15,
+            "accuracy": 100,
+            "category": "Physical",
+            "effect": null
+        },
+        {
+            "id": "m-cri-04",
+            "name": "Bufera di Neon",
+            "type": "Criogenico",
+            "power": 85,
+            "staminaCost": 40,
+            "accuracy": 90,
+            "category": "Sintonia",
+            "effect": "10% prob. Congelam."
+        },
+        {
+            "id": "m-cri-05",
+            "name": "Pugno Polare",
+            "type": "Criogenico",
+            "power": 80,
+            "staminaCost": 35,
+            "accuracy": 95,
+            "category": "Physical",
+            "effect": null
+        },
+        {
+            "id": "m-cri-06",
+            "name": "Marea Ghiacciata",
+            "type": "Criogenico",
+            "power": 70,
+            "staminaCost": 30,
+            "accuracy": 95,
+            "category": "Sintonia",
+            "effect": null
+        },
+        {
+            "id": "m-cri-07",
+            "name": "Era Glaciale",
+            "type": "Criogenico",
+            "power": 130,
+            "staminaCost": 85,
+            "accuracy": 70,
+            "category": "Sintonia",
+            "effect": null
+        },
+        {
+            "id": "m-cri-08",
+            "name": "Schiacciamento Artico",
+            "type": "Criogenico",
+            "power": 115,
+            "staminaCost": 75,
+            "accuracy": 80,
+            "category": "Physical",
+            "effect": null
+        },
+        {
+            "id": "m-cri-09",
+            "name": "Congelamento Rapido",
+            "type": "Criogenico",
+            "power": 0,
+            "staminaCost": 25,
+            "accuracy": 100,
+            "category": "Status",
+            "effect": "Applica Congelam."
+        },
+        {
+            "id": "m-cri-10",
+            "name": "Velo di Brina",
+            "type": "Criogenico",
+            "power": 0,
+            "staminaCost": 20,
+            "accuracy": 100,
+            "category": "Status",
+            "effect": "+Difesa/+Spirito"
+        },
+        {
+            "id": "m-pri-01",
+            "name": "Impulso Prisma",
+            "type": "Prismatico",
+            "power": 45,
+            "staminaCost": 10,
+            "accuracy": 100,
+            "category": "Sintonia",
+            "effect": null
+        },
+        {
+            "id": "m-pri-02",
+            "name": "Colpo Bilanciato",
+            "type": "Prismatico",
+            "power": 50,
+            "staminaCost": 12,
+            "accuracy": 100,
+            "category": "Physical",
+            "effect": null
+        },
+        {
+            "id": "m-pri-03",
+            "name": "Raggio Neutro",
+            "type": "Prismatico",
+            "power": 40,
+            "staminaCost": 8,
+            "accuracy": 100,
+            "category": "Sintonia",
+            "effect": null
+        },
+        {
+            "id": "m-pri-04",
+            "name": "Armonia Cromatica",
+            "type": "Prismatico",
+            "power": 80,
+            "staminaCost": 35,
+            "accuracy": 95,
+            "category": "Sintonia",
+            "effect": null
+        },
+        {
+            "id": "m-pri-05",
+            "name": "Pressione Neutrale",
+            "type": "Prismatico",
+            "power": 75,
+            "staminaCost": 30,
+            "accuracy": 95,
+            "category": "Physical",
+            "effect": null
+        },
+        {
+            "id": "m-pri-06",
+            "name": "Rifrazione Ottica",
+            "type": "Prismatico",
+            "power": 70,
+            "staminaCost": 25,
+            "accuracy": 95,
+            "category": "Sintonia",
+            "effect": null
+        },
+        {
+            "id": "m-pri-07",
+            "name": "Esplosione Spettrale",
+            "type": "Prismatico",
+            "power": 120,
+            "staminaCost": 80,
+            "accuracy": 80,
+            "category": "Sintonia",
+            "effect": null
+        },
+        {
+            "id": "m-pri-08",
+            "name": "Urti Equilibranti",
+            "type": "Prismatico",
+            "power": 110,
+            "staminaCost": 60,
+            "accuracy": 85,
+            "category": "Physical",
+            "effect": null
+        },
+        {
+            "id": "m-pri-09",
+            "name": "Rifrazione Equilibrante",
+            "type": "Prismatico",
+            "power": 0,
+            "staminaCost": 20,
+            "accuracy": 100,
+            "category": "Status",
+            "effect": "+Sintonia/+Spirito"
+        },
+        {
+            "id": "m-pri-10",
+            "name": "Neutralizzazione",
+            "type": "Prismatico",
+            "power": 0,
+            "staminaCost": 15,
+            "accuracy": 100,
+            "category": "Status",
+            "effect": "Rimuove Buff/Debuff"
+        }
+    ]
+]

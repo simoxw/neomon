@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="it">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+    <title>Neo-Mon Link 🦾</title>
+    <link rel="icon" type="image/png" href="./favicon.png" />
+    <link rel="apple-touch-icon" href="./apple-touch-icon.png">
+    <meta name="theme-color" content="#000000" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-title" content="Neo-Mon Link" />
+
+    <style>
+      /* Prevent scrolling on desktop/mobile for true app feel */
+      html, body, #root {
+        height: 100%;
+        overflow: hidden;
+        margin: 0;
+        padding: 0;
+        background-color: #05070a;
+      }
+    </style>
+    <script type="module" crossorigin src="./assets/js/index-CYlZV_qb.js"></script>
+    <link rel="stylesheet" crossorigin href="./assets/css/index-C-m3_5L9.css">
+  <link rel="manifest" href="./manifest.webmanifest"><script id="vite-plugin-pwa:register-sw" src="./registerSW.js"></script></head>
+  <body>
+    <div id="root"></div>
+
+    <!-- Service Worker Registration Offline Support -->
+    <script>
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+          navigator.serviceWorker.register('/sw.js').catch(() => {
+            // Silenzioso in caso di fallimento locale
+          });
+        });
+      }
+    </script>
+  </body>
+</html>

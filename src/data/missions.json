@@ -1,0 +1,82 @@
+[
+  {
+    "id": "m-01",
+    "title": "Primo Sync",
+    "description": "Sconfiggi il tuo primo Neo-Mon selvatico.",
+    "requirement": "battles_won >= 1",
+    "rewardCoins": 100,
+    "completed": false
+  },
+  {
+    "id": "m-02",
+    "title": "Collezionista Bio",
+    "description": "Cattura 3 Neo-Mon di tipo Bio.",
+    "requirement": "captured_bio >= 3",
+    "rewardCoins": 250,
+    "completed": false
+  },
+  {
+    "id": "m-03",
+    "title": "Risparmio Energetico",
+    "description": "Vinci una lotta usando l'azione 'Riposo' almeno 2 volte.",
+    "requirement": "rest_actions_battle >= 2",
+    "rewardCoins": 150,
+    "completed": false
+  },
+  {
+    "id": "m-04",
+    "title": "Veterano del Nexus",
+    "description": "Raggiungi il livello 10 con un Neo-Mon.",
+    "requirement": "max_level >= 10",
+    "rewardCoins": 500,
+    "completed": false
+  },
+  {
+    "id": "m-05",
+    "title": "Sintonia Pura",
+    "description": "Vinci una lotta senza subire danni critici.",
+    "requirement": "no_crit_win >= 1",
+    "rewardCoins": 300,
+    "completed": false
+  },
+  {
+    "id": "m-06",
+    "title": "Mercante Stellare",
+    "description": "Spendi 1000 monete nello Shop.",
+    "requirement": "spent_coins >= 1000",
+    "rewardCoins": 200,
+    "completed": false
+  },
+  {
+    "id": "m-07",
+    "title": "Evoluzione Digitale",
+    "description": "Fai evolvere il tuo primo Neo-Mon.",
+    "requirement": "evolutions >= 1",
+    "rewardCoins": 1000,
+    "completed": false
+  },
+  {
+    "id": "m-08",
+    "title": "Dominio Idrico",
+    "description": "Sconfiggi 5 Neo-Mon di tipo Idrico.",
+    "requirement": "defeated_water >= 5",
+    "rewardCoins": 400,
+    "completed": false
+  },
+  {
+    "id": "m-09",
+    "title": "Linker Esperto",
+    "description": "Cattura 10 Neo-Mon diversi.",
+    "requirement": "unique_captured >= 10",
+    "rewardCoins": 800,
+    "completed": false
+  },
+  {
+    "id": "m-10",
+    "title": "Sincronia Massima",
+    "description": "Vinci 10 lotte consecutive.",
+    "requirement": "win_streak >= 10",
+    "rewardCoins": 1500,
+    "completed": false
+  }
+]

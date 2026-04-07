@@ -1,0 +1,67 @@
+[
+  {
+    "id": "i-prism-01",
+    "name": "Prisma Base",
+    "type": "Catch",
+    "multiplier": 1,
+    "price": 200,
+    "description": "Un prisma standard per la sincronizzazione di base."
+  },
+  {
+    "id": "i-prism-02",
+    "name": "Prisma Neon",
+    "type": "Catch",
+    "multiplier": 1.5,
+    "price": 600,
+    "description": "Frequenza ottimizzata. Aumenta notevolmente le chance di cattura."
+  },
+  {
+    "id": "i-prism-03",
+    "name": "Prisma Master",
+    "type": "Catch",
+    "multiplier": 255,
+    "price": 5000,
+    "description": "Sincronizzazione perfetta garantita al 100%."
+  },
+  {
+    "id": "i-cure-01",
+    "name": "Cellula Energetica",
+    "type": "curative",
+    "description": "Ripristina 50 HP di un Neo-Mon.",
+    "price": 30,
+    "value": 50,
+    "target": "hp"
+  },
+  {
+    "id": "i-cure-02",
+    "name": "Batteria Nexus",
+    "type": "curative",
+    "description": "Ripristina 30 Stamina istantaneamente.",
+    "price": 40,
+    "value": 30,
+    "target": "stamina"
+  },
+  {
+    "id": "i-cure-03",
+    "name": "Kit Ripristino",
+    "type": "curative",
+    "description": "Recupero completo di HP e Stamina.",
+    "price": 200,
+    "value": 999,
+    "target": "both"
+  },
+  {
+    "id": "i-evo-01",
+    "name": "Nucleo Bio",
+    "type": "evolutive",
+    "description": "Frammento di DNA compresso per evoluzioni Bio.",
+    "price": 500
+  },
+  {
+    "id": "i-evo-02",
+    "name": "Nucleo Incandescente",
+    "type": "evolutive",
+    "description": "Essenza termica pura per evoluzioni di tipo Fuoco.",
+    "price": 500
+  }
+]
