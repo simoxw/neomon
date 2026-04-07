@@ -28,17 +28,35 @@ export const useBattle = (playerId: string, opponentId: string) => {
 
   // Caricamento Iniziale
   useEffect(() => {
+    let isCancelled = false;
+
     const initBattle = async () => {
-      // Carica mosse
-      const flattenedMoves: Move[] = (movesData as any).flat();
-      setAllMoves(flattenedMoves);
+      try {
+        // Carica mosse
+        const flattenedMoves: Move[] = (movesData as any).flat();
+        if (isCancelled) return;
+        setAllMoves(flattenedMoves);
 
-      // Carica Player dalla squadra
-      const team = await db.team.toArray();
-      const pMon = team[0]; 
+        // Carica Player dalla squadra
+        const team = await db.team.toArray();
+        if (isCancelled) return;
 
-      if (pMon) {
+        // Se la squadra è vuota, torna all'hub
+        if (team.length === 0) {
+          setBattleLog(['⚠ Nessun Neo-Mon in squadra!']);
+          setStatus('lost');
+          return;
+        }
+
+        const pMon = team[0];
+        if (!pMon) {
+          setBattleLog(['⚠ Errore: impossibile caricare il Neo-Mon.']);
+          setStatus('lost');
+          return;
+        }
+
         const stats = pMon.currentStats || pMon.baseStats;
+        if (isCancelled) return;
         setPlayerMon({
           ...pMon,
           currentHp: stats.hp,
@@ -46,9 +64,10 @@ export const useBattle = (playerId: string, opponentId: string) => {
         });
 
         // Genera avversario casuale dinamico
-        const randomId = `n-00${Math.floor(Math.random() * 9) + 1}`; // Esempio n-001 a n-009
+        const randomId = `n-00${Math.floor(Math.random() * 9) + 1}`;
         const generatedOpponent = generateWildMon(randomId, pMon.level);
-        
+        if (isCancelled) return;
+
         setOpponentMon({
           ...generatedOpponent,
           currentHp: generatedOpponent.currentStats!.hp,
@@ -57,10 +76,20 @@ export const useBattle = (playerId: string, opponentId: string) => {
 
         setStatus('fighting');
         setBattleLog([`Inizia la battaglia contro ${generatedOpponent.name} selvatico!`]);
+      } catch (err) {
+        console.error('Errore inizializzazione battaglia:', err);
+        if (!isCancelled) {
+          setBattleLog(['⚠ Errore durante il caricamento della battaglia.']);
+          setStatus('lost');
+        }
       }
     };
 
     initBattle();
+
+    return () => {
+      isCancelled = true;
+    };
   }, []);
 
   const addLog = (msg: string) => {
@@ -116,7 +145,7 @@ export const useBattle = (playerId: string, opponentId: string) => {
     // 3. Esegui Turno (Clone per evitare mutazioni dirette prima di set state)
     const pClone = JSON.parse(JSON.stringify(playerMon));
     const oClone = JSON.parse(JSON.stringify(opponentMon));
-    
+
     // Inseriamo stamina/hp dinamici nell'oggetto per l'engine (che usa (mon as any).currentStamina)
     pClone.currentStamina = playerMon.currentStamina;
     pClone.currentHp = playerMon.currentHp;
@@ -136,28 +165,28 @@ export const useBattle = (playerId: string, opponentId: string) => {
 
     const executeAndLog = async (res: TurnExecutionResult) => {
       addLog(res.message);
-      
+
       // Aggiorna stati visibili gradualmente
       if (res.playerId === 'player') {
-        setPlayerMon(prev => prev ? { 
-            ...prev, 
-            currentStamina: Math.max(0, prev.currentStamina - res.consumedStamina + res.recoveredStamina) 
-          } : null);
-        setOpponentMon(prev => prev ? { 
-            ...prev, 
-            currentHp: Math.max(0, prev.currentHp - res.damage) 
-          } : null);
+        setPlayerMon(prev => prev ? {
+          ...prev,
+          currentStamina: Math.max(0, prev.currentStamina - res.consumedStamina + res.recoveredStamina)
+        } : null);
+        setOpponentMon(prev => prev ? {
+          ...prev,
+          currentHp: Math.max(0, prev.currentHp - res.damage)
+        } : null);
       } else {
-        setOpponentMon(prev => prev ? { 
-            ...prev, 
-            currentStamina: Math.max(0, prev.currentStamina - res.consumedStamina + res.recoveredStamina) 
-          } : null);
-        setPlayerMon(prev => prev ? { 
-            ...prev, 
-            currentHp: Math.max(0, prev.currentHp - res.damage) 
-          } : null);
+        setOpponentMon(prev => prev ? {
+          ...prev,
+          currentStamina: Math.max(0, prev.currentStamina - res.consumedStamina + res.recoveredStamina)
+        } : null);
+        setPlayerMon(prev => prev ? {
+          ...prev,
+          currentHp: Math.max(0, prev.currentHp - res.damage)
+        } : null);
       }
-      
+
       await sleep(1000); // Pausa tra azioni
     };
 
@@ -166,10 +195,10 @@ export const useBattle = (playerId: string, opponentId: string) => {
 
     // Se la battaglia non è finita dopo la prima azione, esegui la seconda
     if (!result.isBattleOver || (result.winner === 'player' && result.first.playerId === 'ai') || (result.winner === 'ai' && result.first.playerId === 'player')) {
-       // Se il secondo attore non è quello che è andato KO nel primo step (già gestito dall'engine)
-       if (!result.second.isKO) {
-          await executeAndLog(result.second);
-       }
+      // Se il secondo attore non è quello che è andato KO nel primo step (già gestito dall'engine)
+      if (!result.second.isKO) {
+        await executeAndLog(result.second);
+      }
     }
 
     // 5. Controllo Fine Battaglia
@@ -187,7 +216,7 @@ export const useBattle = (playerId: string, opponentId: string) => {
 
   const handleVittoria = async () => {
     if (!playerMon) return;
-    
+
     // Aggiorna monete tramite store (si riflette immediatamente nell'UI)
     updateCoins(50);
 
