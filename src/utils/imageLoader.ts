@@ -5,10 +5,10 @@
 
 export const getCreatureSprite = (id: string): string => {
   try {
-    // Usiamo il percorso relativo per garantire la compatibilità con GitHub Pages.
-    // In produzione (GitHub Pages) l'URL è https://simoxw.github.io/neomon/
-    // Con base: './' in vite.config, 'assets/sprites/' punta correttamente alla cartella nel root della repo.
-    return `assets/sprites/${id}.webp`;
+    // Usiamo import.meta.env.BASE_URL che viene popolato da Vite in base al config.
+    // In locale sarà '/' e in produzione '/neomon/'.
+    const baseUrl = import.meta.env.BASE_URL;
+    return `${baseUrl}assets/sprites/${id}.webp`;
   } catch (err) {
     return 'https://placehold.co/400x400/0f172a/22d3ee?text=NEOMON';
   }
