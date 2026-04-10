@@ -1,8 +1,8 @@
 export const getCreatureSprite = (id: string): string => {
   try {
-    // Percorso relativo semplice che punta a public/assets/sprites/ durante lo sviluppo
-    // e alla root della dist/ dopo la build.
-    return `assets/sprites/${id}.webp`;
+    // import.meta.env.BASE_URL è '/' in dev e '/neomon/' in produzione.
+    // Questo è il modo più affidabile per puntare alla cartella public/assets/sprites/
+    return `${import.meta.env.BASE_URL}assets/sprites/${id}.webp`;
   } catch (err) {
     return 'https://placehold.co/400x400/0f172a/22d3ee?text=NEOMON';
   }

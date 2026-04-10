@@ -63,21 +63,62 @@ export const useStore = create<NeoState>()(
       volume: 0.5,
 
       loadData: async () => {
-        const team = await db.team.toArray();
-        const box = await db.box.toArray();
-        const inventory = await db.inventory.toArray();
-        const player = (await db.player.toArray())[0];
+        let team = await db.team.toArray();
+        let box = await db.box.toArray();
+        let inventory = await db.inventory.toArray();
+        let player = (await db.player.toArray())[0];
         
-        if (team.length > 0 || box.length > 0 || player || inventory.length > 0) {
-          set({ 
-            team, 
-            box, 
-            inventory,
-            player, 
-            coins: player?.coins || 500,
-            seenIds: Array.from(new Set([...team.map(m => m.id), ...box.map(m => m.id)])) 
-          });
+        // Se il database è vuoto, inizializziamo con dati starter
+        if (team.length === 0 && box.length === 0 && !player) {
+          console.log("Inizializzazione primo salvataggio...");
+          
+          // Crea Player
+          player = { 
+            id: 1, 
+            name: 'NEO-LINKER', 
+            coins: 500,
+            badges: [],
+            unlockedNodes: [],
+            lastSave: Date.now()
+          };
+          await db.player.add(player);
+          
+          // Crea Starter Neo-Mon (Floris n-001)
+          const starterData = creaturesData[0]; // Floris
+          const starter: NeoMon = {
+            ...starterData,
+            uniqueId: `starter-${Date.now()}`,
+            level: 5,
+            exp: 0,
+            potential: 25,
+            currentHp: starterData.baseStats.hp,
+            currentStamina: starterData.baseStats.stamina,
+            currentStats: starterData.baseStats,
+            moves: [starterData.moves_learned[0].moveId],
+            development: { hp: 0, potenza: 0, resistenza: 0, sintonia: 0, spirito: 0, flusso: 0 },
+            friendship: 50,
+            caughtAt: Date.now()
+          } as any;
+          
+          await db.team.add(starter);
+          team = [starter];
+          
+          // Crea item iniziali (3 Prismi Base)
+          const initialItems = [
+            { itemId: 'i-prism-01', quantity: 3 }
+          ];
+          await db.inventory.bulkAdd(initialItems);
+          inventory = initialItems;
         }
+
+        set({ 
+          team, 
+          box, 
+          inventory,
+          player, 
+          coins: player?.coins || 500,
+          seenIds: Array.from(new Set([...team.map(m => m.id), ...box.map(m => m.id)])) 
+        });
       },
 
       toggleMute: () => set((state) => ({ volMuted: !state.volMuted })),
