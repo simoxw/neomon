@@ -4,6 +4,7 @@ import { BattleEngine, BattleAction, FullTurnResult, TurnExecutionResult } from 
 import movesData from '../data/moves.json';
 import { db } from '../db';
 import { useStore } from '../context/useStore';
+import creaturesData from '../data/creatures.json';
 
 /**
  * Neo-Mon Hook: Battle Logic Orchestrator
@@ -63,8 +64,15 @@ export const useBattle = (playerId: string, opponentId: string) => {
           currentStamina: stats.stamina
         });
 
-        // Genera avversario casuale dinamico
-        const randomId = `n-00${Math.floor(Math.random() * 9) + 1}`;
+        // Genera avversario casuale pescando solo dalle creature con immagine disponibile (fino a n-026)
+        const availableCreatureIds = (creaturesData as any[])
+          .map((c: any) => c.id as string)
+          .filter((id: string) => {
+            const num = parseInt(id.split('-')[1]);
+            return num <= 26;
+          });
+        
+        const randomId = availableCreatureIds[Math.floor(Math.random() * availableCreatureIds.length)];
         const generatedOpponent = generateWildMon(randomId, pMon.level);
         if (isCancelled) return;
 
