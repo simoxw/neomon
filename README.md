@@ -18,6 +18,12 @@ Benvenuti nell'universo di **Neo-Mon Link**, un gioco di addestramento creature 
 - **Coins Sincronizzati**: Le monete guadagnate in battaglia vengono aggiornate istantaneamente nell'Hub senza richiedere reload.
 - **PWA Offline Completa**: Tramite `vite-plugin-pwa` con strategia `generateSW`, tutti gli asset (JS, CSS, WebP, JSON) vengono pre-cachati nel Service Worker. Il gioco è giocabile offline dopo il primo caricamento.
 
+### Aggiornamenti recenti (documentazione)
+- **Battaglia a squadra (multi-slot)**: In lotta l’ordine della squadra coincide con quello impostato nell’Hub/Box. Ogni slot tiene traccia di **HP e Stamina** in battaglia; se il Neo-Mon attivo va K.O., entra il **successivo ancora valido** senza fine partita immediata: la sconfitta arriva solo se **tutti** i membri sono esausti. Lo **switch** consuma il turno, salva chi esce nello slot e applica danni/costi coerenti al motore (`BattleEngine` + `DamageCalc`).
+- **Zaino da battaglia**: Aprendo l’inventario durante uno scontro è disponibile il ritorno esplicito all’Arena (**Indietro alla lotta**, inclusa area fissa in basso), così non resti «bloccato» senza usare oggetti.
+- **Test automatici (Vitest)**: Oltre a EXP/cattura, il progetto include test su **party di battaglia** (`battleParty.ts`), **turni e danni** (`battle.turn.test.ts` + `BattleEngine`). Comando: `npm test`.
+- **Script di contenuti**: In `scripts/` (es. `expand-moves-and-creatures.mjs`) utility per generare o espandere dati in `creatures.json` / mosse — utile agli sviluppatori che aggiornano il Neo-Dex.
+
 ## 🎮 Meccaniche di Gioco
 ### Combattimento
 - **HP**: Punti Vita. Se scendono a zero, il Neo-Mon va K.O.
@@ -28,6 +34,7 @@ Benvenuti nell'universo di **Neo-Mon Link**, un gioco di addestramento creature 
 ### Gestione Squadra
 - **Team Manager**: Sposta i tuoi 4 Neo-Mon attivi, gestisci l'ordine e visualizza le statistiche vitali.
 - **Team Swap**: Sostituisci qualsiasi membro della squadra con uno del Box direttamente dall'interfaccia, senza passare da schermate intermedie.
+- **Ordine e lotta**: L’ordine salvato con **swapPositions** / Team Manager è quello usato anche in **Arena** per la panchina e il cambio Neo-Mon.
 - **Linker Box**: Archivio digitale con ricerca e filtri avanzati per catalogare le tue creature.
 - **Link-Dex**: Consulta l'enciclopedia tattica per studiare debolezze e tipi una volta catturati i Neo-Mon.
 
@@ -38,6 +45,7 @@ Benvenuti nell'universo di **Neo-Mon Link**, un gioco di addestramento creature 
 - **Styling**: Tailwind CSS + Custom Neon Layers
 - **PWA**: vite-plugin-pwa + Workbox (generateSW, offline-first)
 - **Animazioni**: Framer Motion
+- **Test**: Vitest (`vitest.config.ts`, `npm test` / `npm run test:watch`)
 - **Deployment**: GitHub Pages (con `404.html` per SPA routing e `.nojekyll` per asset Vite)
 
 ## 🚀 Deployment su GitHub Pages

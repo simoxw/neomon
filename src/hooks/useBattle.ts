@@ -8,7 +8,6 @@ import {
   FloatEvent,
 } from '../logic/BattleEngine';
 import movesData from '../data/moves.json';
-import { db } from '../db';
 import { useStore } from '../context/useStore';
 import { expGainFromBattle } from '../logic/expFormula';
 import { calculateRewards, rollMaterialDropFromTypes } from '../logic/battleRewards';
@@ -19,11 +18,20 @@ import { calculateDamage } from '../logic/DamageCalc';
 import type { BattleLogEntry, BattleLogKind } from '../types/battleLog';
 import { ensureBattleFields } from '../logic/normalizeCreature';
 import { createDefaultStatStages } from '../logic/statStages';
+import {
+  type PartySlot,
+  initPartySlotsFromTeam,
+  findFirstAliveSlotIndex,
+  writeSlotFromBattle,
+  getMaxHp,
+  getMaxStamina,
+} from '../logic/battleParty';
 import { pickCreatureIdFromPool, randomLevelInZone } from '../logic/worldEncounters';
 import trainersData from '../data/trainers.json';
 import itemsCatalog from '../data/items.json';
 import type { TrainerData } from '../types/world';
 import type { BattleSummaryPayload } from '../types/battleSummary';
+import { computeCurativeHeal, type CurativeTarget } from '../logic/battleItems';
 
 const DEFAULT_MOVE_IDS = ['m-pri-01'] as const;
 
@@ -51,6 +59,38 @@ function mergeBattleFromClone<T extends BattleEntity | null>(prev: T, clone: Bat
   } as T;
 }
 
+function buildPlayerEntity(raw: NeoMon, slot: PartySlot): BattleEntity {
+  const mon = ensureBattleFields(withMoves(raw) as NeoMon & Record<string, unknown>) as NeoMon;
+  const maxHp = getMaxHp(mon);
+  const maxSt = getMaxStamina(mon);
+  
+  // Inizializza movePPs se non presenti (default 15 PP per mossa)
+  const movePPs = raw.movePPs?.length === mon.moves.length
+    ? [...(raw.movePPs ?? [])]
+    : (mon.moves ?? [...DEFAULT_MOVE_IDS]).map(() => 15);
+  
+  return {
+    ...(mon as BattleEntity),
+    currentStats: mon.currentStats ?? mon.baseStats,
+    moves: mon.moves ?? [...DEFAULT_MOVE_IDS],
+    movePPs,
+    currentHp: Math.min(Math.max(0, slot.currentHp), maxHp),
+    currentStamina: Math.min(Math.max(0, slot.currentStamina), maxSt),
+  };
+}
+
+function mergeBattleIntoNeoMon(raw: NeoMon, ent: BattleEntity): NeoMon {
+  return {
+    ...raw,
+    currentHp: ent.currentHp,
+    currentStamina: ent.currentStamina,
+    status: ent.status ?? null,
+    statStages: ent.statStages ?? createDefaultStatStages(),
+    sleepTurnsRemaining: ent.sleepTurnsRemaining ?? 0,
+    statBoostHistory: ((ent as BattleEntity & { statBoostHistory?: string[] }).statBoostHistory ?? []) as string[],
+  } as NeoMon;
+}
+
 export type DamageFloat = FloatEvent & { id: string };
 
 function buildTrainerOpponent(trainer: TrainerData, monIndex: number, allMoves: Move[]): BattleEntity {
@@ -58,9 +98,14 @@ function buildTrainerOpponent(trainer: TrainerData, monIndex: number, allMoves: 
   if (!slot) throw new Error('Trainer team slot missing');
   const gen = generateWildMonWithMoves(slot.creatureId, slot.level, slot.moves);
   const opp = ensureBattleFields(gen as any) as NeoMon;
+  
+  // Inizializza movePPs (default 15 PP per mossa)
+  const movePPs = (opp.moves ?? [...DEFAULT_MOVE_IDS]).map(() => 15);
+  
   return {
     ...(opp as BattleEntity),
     moves: opp.moves ?? [...DEFAULT_MOVE_IDS],
+    movePPs,
     currentHp: opp.currentStats!.hp,
     currentStamina: opp.currentStats!.stamina,
   };
@@ -78,6 +123,7 @@ export const useBattle = (_playerId: string, _opponentId: string) => {
     addBadge,
     grantInventoryItem,
   } = useStore();
+  const battleConsumableRequest = useStore((s) => s.battleConsumableRequest);
 
   const [playerMon, setPlayerMon] = useState<BattleEntity | null>(null);
   const [opponentMon, setOpponentMon] = useState<BattleEntity | null>(null);
@@ -86,10 +132,24 @@ export const useBattle = (_playerId: string, _opponentId: string) => {
   const [status, setStatus] = useState<'idle' | 'fighting' | 'won' | 'lost' | 'escaped'>('idle');
   const [allMoves, setAllMoves] = useState<Move[]>([]);
   const [damageFloats, setDamageFloats] = useState<DamageFloat[]>([]);
+  const [partySlots, setPartySlots] = useState<PartySlot[]>([]);
+  const [activeSlotIndex, setActiveSlotIndex] = useState(0);
+  const partySlotsRef = useRef<PartySlot[]>([]);
+  const activeSlotRef = useRef(0);
   const playerMonRef = useRef<BattleEntity | null>(null);
   const opponentMonRef = useRef<BattleEntity | null>(null);
   playerMonRef.current = playerMon;
   opponentMonRef.current = opponentMon;
+
+  const syncPartySlotsRef = useCallback((next: PartySlot[]) => {
+    partySlotsRef.current = next;
+    setPartySlots(next);
+  }, []);
+
+  const setActiveSlot = useCallback((i: number) => {
+    activeSlotRef.current = i;
+    setActiveSlotIndex(i);
+  }, []);
 
   const pushFloats = useCallback((events: FloatEvent[] | undefined) => {
     if (!events?.length) return;
@@ -111,13 +171,15 @@ export const useBattle = (_playerId: string, _opponentId: string) => {
       setDamageFloats([]);
       setPlayerMon(null);
       setOpponentMon(null);
+      syncPartySlotsRef([]);
+      setActiveSlot(0);
 
       try {
         const flattenedMoves: Move[] = (movesData as unknown as Move[][]).flat();
         if (isCancelled) return;
         setAllMoves(flattenedMoves);
 
-        const team = await db.team.toArray();
+        const team = useStore.getState().team;
         if (isCancelled) return;
 
         if (team.length === 0) {
@@ -126,23 +188,27 @@ export const useBattle = (_playerId: string, _opponentId: string) => {
           return;
         }
 
-        const raw = team[0];
+        const slots = initPartySlotsFromTeam(team);
+        const firstIdx = findFirstAliveSlotIndex(slots);
+        if (firstIdx === null) {
+          setBattleLog([{ text: '⚠ Tutta la squadra è esausta!', kind: 'system' }]);
+          setStatus('lost');
+          return;
+        }
+
+        const raw = team[firstIdx];
         if (!raw) {
           setBattleLog([{ text: '⚠ Errore: impossibile caricare il Neo-Mon.', kind: 'system' }]);
           setStatus('lost');
           return;
         }
 
-        const pMon = ensureBattleFields(withMoves(raw) as any) as NeoMon;
-        const stats = pMon.currentStats || pMon.baseStats;
         if (isCancelled) return;
 
-        setPlayerMon({
-          ...(pMon as BattleEntity),
-          moves: pMon.moves ?? [...DEFAULT_MOVE_IDS],
-          currentHp: stats.hp,
-          currentStamina: stats.stamina,
-        });
+        syncPartySlotsRef(slots.map((s) => ({ ...s })));
+        setActiveSlot(firstIdx);
+
+        setPlayerMon(buildPlayerEntity(raw, slots[firstIdx]));
 
         const ctx = useStore.getState().battleContext;
         let generatedOpponent: NeoMon;
@@ -168,7 +234,7 @@ export const useBattle = (_playerId: string, _opponentId: string) => {
               return num <= 26;
             });
           const randomId = availableCreatureIds[Math.floor(Math.random() * availableCreatureIds.length)];
-          generatedOpponent = generateWildMon(randomId, pMon.level);
+          generatedOpponent = generateWildMon(randomId, raw.level);
         }
 
         if (isCancelled) return;
@@ -209,7 +275,7 @@ export const useBattle = (_playerId: string, _opponentId: string) => {
     return () => {
       isCancelled = true;
     };
-  }, [battleSessionKey]);
+  }, [battleSessionKey, syncPartySlotsRef, setActiveSlot]);
 
   const addLog = useCallback((msg: string, kind: BattleLogKind = 'neutral') => {
     setBattleLog((prev) => [...prev.slice(-4), { text: msg, kind }]);
@@ -339,8 +405,53 @@ export const useBattle = (_playerId: string, _opponentId: string) => {
     ]
   );
 
+  /** Persiste il KO nello slot, manda il prossimo vivo se c'è; ritorna false se la lotta è persa. */
+  const sendNextMonIfAnyAfterFaint = useCallback(
+    async (faintedSlotIndex: number, faintedClone: BattleEntity): Promise<boolean> => {
+      const team = useStore.getState().team;
+      const rawFainted = team[faintedSlotIndex];
+      if (rawFainted) {
+        await persistNeoMon(
+          mergeBattleIntoNeoMon(rawFainted, { ...faintedClone, currentHp: 0, currentStamina: faintedClone.currentStamina })
+        );
+      }
+
+      const afterFaint = partySlotsRef.current.map((s) => ({ ...s }));
+      writeSlotFromBattle(afterFaint, faintedSlotIndex, 0, faintedClone.currentStamina);
+      syncPartySlotsRef(afterFaint);
+
+      const nextIdx = findFirstAliveSlotIndex(partySlotsRef.current);
+      if (nextIdx === null) {
+        setStatus('lost');
+        addLog('Tutta la squadra è stata sconfitta!', 'damageIn');
+        const ctx = useStore.getState().battleContext;
+        if (ctx?.kind === 'trainer') {
+          const tr = (trainersData as TrainerData[]).find((t) => t.id === ctx.trainerId);
+          if (tr) addLog(tr.dialogue.lose, 'neutral');
+        }
+        return false;
+      }
+
+      const rawNext = team[nextIdx];
+      if (!rawNext) {
+        setStatus('lost');
+        return false;
+      }
+
+      setActiveSlot(nextIdx);
+      const slotNext = partySlotsRef.current[nextIdx];
+      const ent = buildPlayerEntity(rawNext, slotNext);
+      setPlayerMon(ent);
+      setStatus('fighting');
+      addLog(`Vai! ${ent.name}!`, 'system');
+      await persistNeoMon(mergeBattleIntoNeoMon(rawNext, ent));
+      return true;
+    },
+    [addLog, persistNeoMon, syncPartySlotsRef, setActiveSlot]
+  );
+
   const processTurnResults = useCallback(
-    async (result: FullTurnResult, pClone: BattleEntity, oClone: BattleEntity) => {
+    async (result: FullTurnResult, pClone: BattleEntity, oClone: BattleEntity): Promise<boolean> => {
       const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
       const executeAndLog = async (res: TurnExecutionResult) => {
@@ -404,6 +515,11 @@ export const useBattle = (_playerId: string, _opponentId: string) => {
       setPlayerMon((prev) => mergeBattleFromClone(prev, pClone));
       setOpponentMon((prev) => mergeBattleFromClone(prev, oClone));
 
+      const act = activeSlotRef.current;
+      const synced = partySlotsRef.current.map((s) => ({ ...s }));
+      writeSlotFromBattle(synced, act, pClone.currentHp, pClone.currentStamina);
+      syncPartySlotsRef(synced);
+
       if (result.isBattleOver) {
         if (result.winner === 'player') {
           const ctx = useStore.getState().battleContext;
@@ -421,18 +537,27 @@ export const useBattle = (_playerId: string, _opponentId: string) => {
           } else {
             await handleWildOrZoneVictory(oClone, expGained);
           }
-        } else {
-          setStatus('lost');
-          addLog('Sei stato sconfitto... I tuoi Neo-Mon hanno bisogno di riposo.', 'damageIn');
-          const ctx = useStore.getState().battleContext;
-          if (ctx?.kind === 'trainer') {
-            const tr = (trainersData as TrainerData[]).find((t) => t.id === ctx.trainerId);
-            if (tr) addLog(tr.dialogue.lose, 'neutral');
-          }
+          return true;
         }
+
+        if (pClone.currentHp <= 0) {
+          await sendNextMonIfAnyAfterFaint(act, pClone);
+          return false;
+        }
+
+        setStatus('lost');
+        addLog('Sei stato sconfitto... I tuoi Neo-Mon hanno bisogno di riposo.', 'damageIn');
+        const ctx = useStore.getState().battleContext;
+        if (ctx?.kind === 'trainer') {
+          const tr = (trainersData as TrainerData[]).find((t) => t.id === ctx.trainerId);
+          if (tr) addLog(tr.dialogue.lose, 'neutral');
+        }
+        return false;
       }
+
+      return true;
     },
-    [addLog, handleTrainerMultiWin, handleWildOrZoneVictory, pushFloats]
+    [addLog, handleTrainerMultiWin, handleWildOrZoneVictory, pushFloats, syncPartySlotsRef, sendNextMonIfAnyAfterFaint]
   );
 
   const handleAction = useCallback(
@@ -441,36 +566,79 @@ export const useBattle = (_playerId: string, _opponentId: string) => {
 
       if (actionType === 'switch' && moveId) {
         setIsTurnInProgress(true);
-        const team = await db.team.toArray();
-        const newMonRaw = team.find((m) => m.id === moveId);
-        if (newMonRaw) {
-          const newMon = ensureBattleFields(withMoves(newMonRaw) as any) as NeoMon;
-          const st = newMon.currentStats || newMon.baseStats;
-          let currentHp = st.hp;
-          const currentStamina = st.stamina;
-          addLog(`Vai ${newMon.name}! Cambiato in campo!`, 'system');
-          const aiAction = BattleEngine.getBestMoveAI(
-            opponentMon,
-            { ...newMon, currentHp, currentStamina } as BattleEntity,
-            allMoves
-          );
-          const oClone = JSON.parse(JSON.stringify(opponentMon));
-          oClone.currentHp = opponentMon.currentHp;
-          oClone.currentStamina = opponentMon.currentStamina;
-          await new Promise((resolve) => setTimeout(resolve, 800));
-          if (aiAction.move) {
-            addLog(`${opponentMon.name} usa ${aiAction.move.name}!`, 'damageIn');
-            const dmg = Math.max(1, Math.floor((oClone.currentStats?.potenza || oClone.baseStats.potenza) * 0.5));
-            currentHp = Math.max(0, currentHp - dmg);
+        const team = useStore.getState().team;
+        const newIdx = team.findIndex((m) => m.id === moveId);
+        const oldIdx = activeSlotRef.current;
+        if (newIdx === -1 || newIdx === oldIdx) {
+          setIsTurnInProgress(false);
+          return;
+        }
+        // Ensure partySlots is in sync before reading incoming slot
+        const currentSlots = partySlotsRef.current.length === team.length 
+          ? partySlotsRef.current 
+          : initPartySlotsFromTeam(team);
+        const slotIncoming = currentSlots[newIdx];
+        if (!slotIncoming || slotIncoming.currentHp <= 0) {
+          addLog('Questo Neo-Mon non può entrare in campo!', 'system');
+          setIsTurnInProgress(false);
+          return;
+        }
+
+        const newMonRaw = team[newIdx];
+        const outgoing = playerMon;
+        const outgoingRaw = team[oldIdx];
+
+        if (newMonRaw && outgoing) {
+          const synced = partySlotsRef.current.map((s) => ({ ...s }));
+          writeSlotFromBattle(synced, oldIdx, outgoing.currentHp, outgoing.currentStamina);
+          syncPartySlotsRef(synced);
+          if (outgoingRaw) {
+            await persistNeoMon(mergeBattleIntoNeoMon(outgoingRaw, outgoing));
           }
-          const switched: BattleEntity = {
-            ...(newMon as BattleEntity),
-            moves: newMon.moves ?? [...DEFAULT_MOVE_IDS],
+
+          const newMon = ensureBattleFields(withMoves(newMonRaw) as NeoMon & Record<string, unknown>) as NeoMon;
+          let currentHp = slotIncoming.currentHp;
+          let currentStamina = slotIncoming.currentStamina;
+          addLog(`Vai ${newMon.name}! Cambiato in campo!`, 'system');
+          const slotSlice: PartySlot = {
+            speciesId: newMonRaw.id,
             currentHp,
             currentStamina,
           };
-          setPlayerMon(switched);
-          await persistNeoMon({ ...switched, currentStats: switched.currentStats || switched.baseStats });
+          const entPreview = buildPlayerEntity(newMonRaw, slotSlice);
+          const aiAction = BattleEngine.getBestMoveAI(opponentMon, entPreview, allMoves);
+          const oClone = JSON.parse(JSON.stringify(opponentMon)) as BattleEntity;
+          oClone.currentHp = opponentMon.currentHp;
+          oClone.currentStamina = opponentMon.currentStamina;
+          await new Promise((resolve) => setTimeout(resolve, 800));
+          if (aiAction.type !== 'rest' && aiAction.move) {
+            addLog(`${opponentMon.name} usa ${aiAction.move.name}!`, 'damageIn');
+            const move = resolveMoveById(aiAction.moveId!, allMoves);
+            const pIncoming = buildPlayerEntity(newMonRaw, { ...slotSlice, currentHp, currentStamina });
+            const dmg = Math.max(1, Math.floor(calculateDamage(oClone, pIncoming, move)));
+            pushFloats([{ side: 'player', amount: dmg, variant: 'damage' }]);
+            currentHp = Math.max(0, currentHp - dmg);
+            const nextOppStam = Math.max(0, opponentMon.currentStamina - move.staminaCost);
+            setOpponentMon((prev) => (prev ? { ...prev, currentStamina: nextOppStam } : null));
+          }
+
+          const afterSwitch = partySlotsRef.current.map((s) => ({ ...s }));
+          writeSlotFromBattle(afterSwitch, newIdx, currentHp, currentStamina);
+          syncPartySlotsRef(afterSwitch);
+
+          const switched = buildPlayerEntity(newMonRaw, {
+            speciesId: newMonRaw.id,
+            currentHp,
+            currentStamina,
+          });
+
+          if (currentHp <= 0) {
+            await sendNextMonIfAnyAfterFaint(newIdx, switched);
+          } else {
+            setActiveSlot(newIdx);
+            setPlayerMon(switched);
+            await persistNeoMon(mergeBattleIntoNeoMon(newMonRaw, switched));
+          }
         }
         setIsTurnInProgress(false);
         return;
@@ -496,12 +664,23 @@ export const useBattle = (_playerId: string, _opponentId: string) => {
 
       const turnResult = BattleEngine.executeTurn(pClone, oClone, playerAction, aiAction, allMoves);
 
-      await processTurnResults(turnResult, pClone, oClone);
+      const shouldPersistEnd = await processTurnResults(turnResult, pClone, oClone);
 
       const won = turnResult.isBattleOver && turnResult.winner === 'player';
       const trainerCtx = useStore.getState().battleContext?.kind === 'trainer';
+      if (!shouldPersistEnd) {
+        setIsTurnInProgress(false);
+        return;
+      }
+
+      const refMon = playerMonRef.current;
+      if (!refMon) {
+        setIsTurnInProgress(false);
+        return;
+      }
+
       if (won && trainerCtx) {
-        const liveFromStore = useStore.getState().team.find((m) => m.id === playerMon.id) ?? playerMon;
+        const liveFromStore = useStore.getState().team.find((m) => m.id === refMon.id) ?? refMon;
         const pFinal = {
           ...liveFromStore,
           currentHp: pClone.currentHp,
@@ -516,8 +695,8 @@ export const useBattle = (_playerId: string, _opponentId: string) => {
         return;
       }
 
-      const liveFromStore = won ? useStore.getState().team.find((m) => m.id === playerMon.id) : undefined;
-      const baseMon = liveFromStore ?? playerMon;
+      const liveFromStore = won ? useStore.getState().team.find((m) => m.id === refMon.id) : undefined;
+      const baseMon = liveFromStore ?? refMon;
 
       const pFinal = {
         ...baseMon,
@@ -527,6 +706,8 @@ export const useBattle = (_playerId: string, _opponentId: string) => {
         status: pClone.status ?? null,
         statStages: pClone.statStages ?? createDefaultStatStages(),
         sleepTurnsRemaining: pClone.sleepTurnsRemaining ?? 0,
+        // Ripristina PP a 15 dopo la battaglia vinta
+        movePPs: (baseMon.moves ?? []).map(() => 15),
       } as NeoMon;
 
       if (import.meta.env.DEV) {
@@ -542,7 +723,20 @@ export const useBattle = (_playerId: string, _opponentId: string) => {
 
       setIsTurnInProgress(false);
     },
-    [playerMon, opponentMon, isTurnInProgress, status, allMoves, persistNeoMon, processTurnResults, addLog]
+    [
+      playerMon,
+      opponentMon,
+      isTurnInProgress,
+      status,
+      allMoves,
+      persistNeoMon,
+      processTurnResults,
+      addLog,
+      pushFloats,
+      syncPartySlotsRef,
+      setActiveSlot,
+      sendNextMonIfAnyAfterFaint,
+    ]
   );
 
   const handleSelectMove = useCallback(
@@ -570,6 +764,91 @@ export const useBattle = (_playerId: string, _opponentId: string) => {
     }
   }, [playerMon, opponentMon, isTurnInProgress, status, addLog]);
 
+  const processBattleItem = useCallback(
+    async (itemId: string) => {
+      const item = (itemsCatalog as { id: string; type: string; name: string; target?: string; value?: number }[]).find(
+        (i) => i.id === itemId
+      );
+      if (!item || item.type !== 'curative') {
+        addLog('Oggetto non utilizzabile in lotta.', 'system');
+        return;
+      }
+      const ok = await useStore.getState().consumeInventoryItem(itemId, 1);
+      if (!ok) {
+        addLog('Quantità insufficiente!', 'system');
+        return;
+      }
+      const p = playerMonRef.current;
+      const o = opponentMonRef.current;
+      if (!p || !o) return;
+
+      const target = (item.target as CurativeTarget) || 'hp';
+      const value = item.value ?? 0;
+      const maxHp = getMaxHp(p);
+      const maxSt = getMaxStamina(p);
+      const { nextHp, nextSt } = computeCurativeHeal(target, value, p.currentHp, maxHp, p.currentStamina, maxSt);
+
+      const healed: BattleEntity = { ...p, currentHp: nextHp, currentStamina: nextSt };
+      setPlayerMon(healed);
+      playerMonRef.current = healed;
+
+      const act = activeSlotRef.current;
+      const synced = partySlotsRef.current.map((s) => ({ ...s }));
+      writeSlotFromBattle(synced, act, nextHp, nextSt);
+      syncPartySlotsRef(synced);
+
+      const raw = useStore.getState().team[act];
+      if (raw) await persistNeoMon(mergeBattleIntoNeoMon(raw, healed));
+
+      addLog(`Hai usato ${item.name}!`, 'system');
+
+      const aiAction = BattleEngine.getBestMoveAI(o, healed, allMoves);
+      if (aiAction.type === 'rest' || !aiAction.moveId) {
+        addLog(`${o.name} attende...`, 'neutral');
+        return;
+      }
+      const move = resolveMoveById(aiAction.moveId, allMoves);
+      const oClone = JSON.parse(JSON.stringify(o)) as BattleEntity;
+      const pClone = JSON.parse(JSON.stringify(healed)) as BattleEntity;
+      oClone.currentHp = o.currentHp;
+      oClone.currentStamina = o.currentStamina;
+      pClone.currentHp = healed.currentHp;
+      pClone.currentStamina = healed.currentStamina;
+
+      const dmg = Math.max(1, Math.floor(calculateDamage(oClone, pClone, move)));
+      addLog(`${o.name} reagisce con ${move.name}!`, 'damageIn');
+      pushFloats([{ side: 'player', amount: dmg, variant: 'damage' }]);
+      const hpAfter = Math.max(0, healed.currentHp - dmg);
+      const nextOppStam = Math.max(0, o.currentStamina - move.staminaCost);
+      setPlayerMon((prev) => (prev ? { ...prev, currentHp: hpAfter } : null));
+      playerMonRef.current = playerMonRef.current ? { ...playerMonRef.current, currentHp: hpAfter } : null;
+      setOpponentMon((prev) => (prev ? { ...prev, currentStamina: nextOppStam } : null));
+
+      const synced2 = partySlotsRef.current.map((s) => ({ ...s }));
+      writeSlotFromBattle(synced2, act, hpAfter, healed.currentStamina);
+      syncPartySlotsRef(synced2);
+
+      const afterHit: BattleEntity = { ...healed, currentHp: hpAfter };
+      const rawPersist = useStore.getState().team[act];
+      if (hpAfter <= 0) {
+        addLog('Il tuo Neo-Mon non regge più...', 'damageIn');
+        await sendNextMonIfAnyAfterFaint(act, afterHit);
+      } else if (rawPersist) {
+        await persistNeoMon(mergeBattleIntoNeoMon(rawPersist, afterHit));
+      }
+    },
+    [addLog, allMoves, persistNeoMon, pushFloats, sendNextMonIfAnyAfterFaint, syncPartySlotsRef]
+  );
+
+  useEffect(() => {
+    if (!battleConsumableRequest) return;
+    const { itemId } = battleConsumableRequest;
+    useStore.getState().clearBattleConsumableRequest();
+    if (!playerMonRef.current || !opponentMonRef.current) return;
+    setIsTurnInProgress(true);
+    void processBattleItem(itemId).finally(() => setIsTurnInProgress(false));
+  }, [battleConsumableRequest, processBattleItem]);
+
   const afterCatchFailure = useCallback(async () => {
     const p = playerMonRef.current;
     const o = opponentMonRef.current;
@@ -596,13 +875,21 @@ export const useBattle = (_playerId: string, _opponentId: string) => {
     setPlayerMon((prev) => (prev ? { ...prev, currentHp: nextHp } : null));
     setOpponentMon((prev) => (prev ? { ...prev, currentStamina: nextEnemyStam } : null));
 
+    const act = activeSlotRef.current;
+    const synced = partySlotsRef.current.map((s) => ({ ...s }));
+    writeSlotFromBattle(synced, act, nextHp, p.currentStamina);
+    syncPartySlotsRef(synced);
+
+    const faintedShape: BattleEntity = { ...p, currentHp: nextHp, currentStamina: p.currentStamina };
+
     if (nextHp <= 0) {
-      setStatus('lost');
       addLog('Il tuo Neo-Mon non regge più...', 'damageIn');
+      await sendNextMonIfAnyAfterFaint(act, faintedShape);
+    } else {
+      const raw = useStore.getState().team.find((m) => m.id === p.id);
+      if (raw) await persistNeoMon(mergeBattleIntoNeoMon(raw, faintedShape));
     }
-    const merged = { ...p, currentHp: nextHp, currentStats: p.currentStats || p.baseStats };
-    await persistNeoMon(merged);
-  }, [allMoves, status, addLog, persistNeoMon, pushFloats]);
+  }, [allMoves, status, addLog, pushFloats, sendNextMonIfAnyAfterFaint, syncPartySlotsRef]);
 
   const activeMoves = (playerMon?.moves ?? [])
     .slice(0, 4)
@@ -622,5 +909,7 @@ export const useBattle = (_playerId: string, _opponentId: string) => {
     afterCatchFailure,
     damageFloats,
     activeMoves,
+    partySlots,
+    activeSlotIndex,
   };
 };

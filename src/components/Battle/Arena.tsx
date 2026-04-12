@@ -9,7 +9,9 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { getCreatureSprite } from '../../utils/imageLoader';
 import CatchAnimation from './CatchAnimation';
 import BattleLog from './BattleLog';
+import DamageNumber from './DamageNumber';
 import { performCatchAttempt } from '../../logic/CatchSystem';
+import { getMaxHp, getMaxStamina } from '../../logic/battleParty';
 import itemsData from '../../data/items.json';
 import creaturesData from '../../data/creatures.json';
 import { db } from '../../db';
@@ -168,14 +170,20 @@ const Arena: React.FC = () => {
     afterCatchFailure,
     damageFloats,
     activeMoves,
+    partySlots,
+    activeSlotIndex,
   } = useBattle('p-01', 'o-01');
   const [showPrisms, setShowPrisms] = useState(false);
   const [showSwitch, setShowSwitch] = useState(false);
   const [inventoryPrisms, setInventoryPrisms] = useState<any[]>([]);
   const [catchAttempt, setCatchAttempt] = useState<{ success: boolean; shakes: number } | null>(null);
+  const [screenShake, setScreenShake] = useState<'light' | 'heavy' | null>(null);
+  const [floatingDamage, setFloatingDamage] = useState<Array<{ id: string; value: number; type: 'damage' | 'heal' | 'status'; position: { x: number; y: number } }>>([]);
   const { team } = useStore();
   const catchMetaRef = useRef<{ result: { success: boolean; shakes: number }; prismId: string } | null>(null);
   const wildMonRef = useRef(opponentMon);
+  const playerSpriteRef = useRef<HTMLDivElement | null>(null);
+  const enemySpriteRef = useRef<HTMLDivElement | null>(null);
   wildMonRef.current = opponentMon;
 
   const speciesCatchRate = useMemo(() => {
@@ -185,6 +193,73 @@ const Arena: React.FC = () => {
   }, [opponentMon]);
 
   const enemyGlow = opponentMon?.types?.[0] ? TYPE_GLOW[opponentMon.types[0]] || 'rgba(34,211,238,0.7)' : 'rgba(34,211,238,0.7)';
+
+  // Game Feel Helpers - Screen Shake, Floating Damage, Sprite Hit
+  const triggerScreenShake = (intensity: 'light' | 'heavy') => {
+    setScreenShake(intensity);
+    setTimeout(() => setScreenShake(null), 250);
+  };
+
+  const getHPColor = (current: number, max: number): string => {
+    const pct = current / max;
+    if (pct > 0.5) return '#22d3ee';   // cyan-400
+    if (pct > 0.25) return '#facc15';  // yellow-400
+    return '#f43f5e';                  // rose-500
+  };
+
+  const addFloatingDamage = (value: number, type: 'damage' | 'heal' | 'status', side: 'player' | 'enemy') => {
+    const sprite = side === 'player' ? playerSpriteRef.current : enemySpriteRef.current;
+    if (!sprite) return;
+    const rect = sprite.getBoundingClientRect();
+    const id = `${Date.now()}_${Math.random()}`;
+    const newDamage = {
+      id,
+      value,
+      type,
+      position: { x: rect.left + rect.width / 2, y: rect.top + rect.height / 2 }
+    };
+    setFloatingDamage(prev => [...prev, newDamage]);
+    setTimeout(() => {
+      setFloatingDamage(prev => prev.filter(d => d.id !== id));
+    }, 900);
+  };
+
+  const triggerSpriteHit = (side: 'player' | 'enemy') => {
+    const sprite = side === 'player' ? playerSpriteRef.current : enemySpriteRef.current;
+    if (!sprite) return;
+    sprite.style.animation = 'sprite-hit 0.2s ease-in-out';
+    setTimeout(() => {
+      sprite.style.animation = '';
+    }, 200);
+  };
+
+
+  useEffect(() => {
+    // Trigger screen shake and sprite hit when damage is taken
+    if (damageFloats.length > 0) {
+      damageFloats.forEach(f => {
+        if (f.side === 'enemy') {
+          const dmg = f.amount;
+          const oppMaxHp = opponentMon?.currentStats?.hp || opponentMon?.baseStats?.hp || 100;
+          if (dmg > oppMaxHp * 0.3) {
+            triggerScreenShake('heavy');
+          } else if (dmg > 0) {
+            triggerScreenShake('light');
+          }
+          triggerSpriteHit('enemy');
+        } else if (f.side === 'player') {
+          const dmg = f.amount;
+          const playerMaxHp = playerMon?.currentStats?.hp || playerMon?.baseStats?.hp || 100;
+          if (dmg > playerMaxHp * 0.3) {
+            triggerScreenShake('heavy');
+          } else if (dmg > 0) {
+            triggerScreenShake('light');
+          }
+          triggerSpriteHit('player');
+        }
+      });
+    }
+  }, [damageFloats, opponentMon, playerMon]);
 
   useEffect(() => {
     const loadInventory = async () => {
@@ -227,7 +302,12 @@ const Arena: React.FC = () => {
   }
 
   return (
-    <div className="relative h-full w-full bg-gradient-to-b from-emerald-800 via-emerald-950 to-slate-950 flex flex-col overflow-hidden select-none animate-in fade-in duration-700">
+    <motion.div 
+      className={cn("relative h-full w-full bg-gradient-to-b from-emerald-800 via-emerald-950 to-slate-950 flex flex-col overflow-hidden select-none animate-in fade-in duration-700",
+        screenShake === 'light' && 'shake-light',
+        screenShake === 'heavy' && 'shake-heavy'
+      )}
+    >
 
       {/* Background Accent */}
       <div className="absolute inset-0 flex items-center justify-center opacity-[0.12] pointer-events-none">
@@ -268,12 +348,17 @@ const Arena: React.FC = () => {
             <div className="space-y-1">
               <StatBar
                 value={opponentMon.currentHp}
-                max={opponentMon.currentStats?.hp || opponentMon.baseStats.hp}
+                max={getMaxHp(opponentMon)}
                 label="HP"
                 variant="hp"
               />
               <div className="h-0.5 w-full bg-black/40 rounded-full overflow-hidden">
-                <div className="h-full bg-cyan-400 shadow-[0_0_8px_rgba(34,211,238,0.5)]" style={{ width: `${(opponentMon.currentStamina / (opponentMon.currentStats?.stamina || opponentMon.baseStats.stamina)) * 100}%` }} />
+                <div
+                  className="h-full bg-cyan-400 shadow-[0_0_8px_rgba(34,211,238,0.5)]"
+                  style={{
+                    width: `${Math.min(100, (opponentMon.currentStamina / Math.max(1, getMaxStamina(opponentMon))) * 100)}%`,
+                  }}
+                />
               </div>
             </div>
           </motion.div>
@@ -301,14 +386,16 @@ const Arena: React.FC = () => {
               ))}
           </AnimatePresence>
           <motion.div className="absolute inset-0 rounded-full blur-3xl opacity-20 bg-emerald-400" animate={{ scale: [1, 1.2, 1] }} transition={{ duration: 3, repeat: Infinity }} />
-          <motion.img
-            src={getCreatureSprite(opponentMon.id)}
-            alt=""
-            className="w-full h-full object-contain relative z-10"
-            style={{ filter: `drop-shadow(0 0 20px ${enemyGlow})` }}
-            animate={{ scale: [1, 1.02, 1], y: [0, -4, 0] }}
-            transition={{ duration: 4, repeat: Infinity }}
-          />
+          <div ref={enemySpriteRef} className="w-full h-full">
+            <motion.img
+              src={getCreatureSprite(opponentMon.id)}
+              alt=""
+              className="w-full h-full object-contain relative z-10"
+              style={{ filter: `drop-shadow(0 0 20px ${enemyGlow})` }}
+              animate={{ scale: [1, 1.02, 1], y: [0, -4, 0] }}
+              transition={{ duration: 4, repeat: Infinity }}
+            />
+          </div>
         </div>
       </div>
 
@@ -348,11 +435,13 @@ const Arena: React.FC = () => {
                   </motion.span>
                 ))}
             </AnimatePresence>
-            <motion.img
-              src={getCreatureSprite(playerMon.id)}
-              alt=""
-              className="w-full h-full object-contain relative z-10 drop-shadow-[0_20px_20px_rgba(0,0,0,0.5)] buddy-bounce"
-            />
+            <div ref={playerSpriteRef} className="w-full h-full">
+              <motion.img
+                src={getCreatureSprite(playerMon.id)}
+                alt=""
+                className="w-full h-full object-contain relative z-10 drop-shadow-[0_20px_20px_rgba(0,0,0,0.5)] buddy-bounce"
+              />
+            </div>
           </div>
 
           {/* Biometry Player (In basso a destra) */}
@@ -367,13 +456,13 @@ const Arena: React.FC = () => {
             <StageStrip stages={playerMon.statStages} />
             <StatBar
               value={playerMon.currentHp}
-              max={playerMon.currentStats?.hp || playerMon.baseStats.hp}
+              max={getMaxHp(playerMon)}
               label="HP"
               variant="hp"
             />
             <StatBar
               value={playerMon.currentStamina}
-              max={playerMon.currentStats?.stamina || playerMon.baseStats.stamina}
+              max={getMaxStamina(playerMon)}
               label="SP"
               variant="sp"
             />
@@ -384,7 +473,7 @@ const Arena: React.FC = () => {
           <MoveSelector
             moves={activeMoves}
             currentSP={playerMon.currentStamina}
-            maxSP={playerMon.currentStats?.stamina || playerMon.baseStats.stamina}
+            maxSP={getMaxStamina(playerMon)}
             onSelectMove={handleSelectMove}
             disabled={isTurnInProgress || status !== 'fighting'}
           />
@@ -400,7 +489,11 @@ const Arena: React.FC = () => {
             <button
               type="button"
               onClick={() => setShowSwitch(true)}
-              disabled={isTurnInProgress || status !== 'fighting' || team.filter((m) => m.id !== playerMon?.id).length === 0}
+              disabled={
+                isTurnInProgress ||
+                status !== 'fighting' ||
+                !team.some((_, i) => i !== activeSlotIndex && (partySlots[i]?.currentHp ?? 0) > 0)
+              }
               className="flex-1 bg-purple-900/40 border border-purple-500/30 text-purple-400 text-[11px] font-black uppercase rounded-xl hover:bg-purple-500 hover:text-white transition-all flex items-center justify-center gap-1.5 active:scale-95 shadow-md disabled:opacity-30"
             >
               <Users className="w-3.5 h-3.5" /> Switch
@@ -458,18 +551,26 @@ const Arena: React.FC = () => {
                 <div>
                   <h3 className="text-3xl font-black italic uppercase text-white">Cambio</h3>
                   <p className="text-[9px] text-white/30 uppercase font-mono tracking-widest mt-0.5">Seleziona il sostituto — costerà il turno</p>
+                  {import.meta.env.DEV && (
+                    <p className="text-[7px] text-cyan-400 mt-2">
+                      Team order: {team.map((m, i) => `${i}:${m.name}`).join(' | ')} | Current: {activeSlotIndex}
+                    </p>
+                  )}
                 </div>
                 <button onClick={() => setShowSwitch(false)} className="text-xs font-black text-white/40 uppercase hover:text-white transition-colors">Annulla</button>
               </div>
               <div className="flex flex-col gap-3">
                 {team
-                  .filter(m => m.id !== playerMon?.id)
-                  .map(m => {
-                    const hp = m.currentStats?.hp || m.baseStats.hp;
-                    const hpPercent = 100; // al massimo fuori campo
+                  .map((m, idx) => ({ m, idx }))
+                  .filter(({ m, idx }) => m.id !== playerMon?.id && idx !== activeSlotIndex && (partySlots[idx]?.currentHp ?? 0) > 0)
+                  .map(({ m, idx }) => {
+                    const hpMax = m.currentStats?.hp || m.baseStats.hp;
+                    const hpCur = partySlots[idx]?.currentHp ?? hpMax;
+                    const hpPercent = Math.min(100, Math.max(0, (hpCur / Math.max(1, hpMax)) * 100));
                     return (
                       <button
                         key={m.id}
+                        type="button"
                         onClick={() => { handleAction('switch', m.id); setShowSwitch(false); }}
                         className="w-full flex items-center gap-4 p-4 bg-white/5 border border-white/10 rounded-2xl hover:border-purple-400 hover:bg-purple-900/20 transition-all active:scale-95 group"
                       >
@@ -480,7 +581,7 @@ const Arena: React.FC = () => {
                           <div className="text-sm font-black uppercase text-white tracking-tight">{m.name}</div>
                           <div className="text-[8px] font-mono text-white/30 uppercase">LV.{m.level} • {m.types.join('/')}</div>
                           <div className="mt-1.5 h-1 w-full bg-black/40 rounded-full overflow-hidden">
-                            <div className="h-full bg-rose-500 rounded-full" style={{ width: `${hpPercent}%` }} />
+                            <div className="h-full bg-emerald-500 rounded-full" style={{ width: `${hpPercent}%` }} />
                           </div>
                         </div>
                         <Users className="w-4 h-4 text-purple-400/40 group-hover:text-purple-400 transition-colors shrink-0" />
@@ -557,7 +658,14 @@ const Arena: React.FC = () => {
           }
         />
       )}
-    </div>
+
+      {/* Floating Damage Numbers */}
+      <AnimatePresence>
+        {floatingDamage.map(dmg => (
+          <DamageNumber key={dmg.id} {...dmg} />
+        ))}
+      </AnimatePresence>
+    </motion.div>
   );
 };
 

@@ -69,4 +69,29 @@ describe('Statistiche dopo level-up (IV + livello)', () => {
     expect(high).toBeGreaterThanOrEqual(low);
     expect(calculateHP(55, 5, 25)).toBeGreaterThan(0);
   });
+
+  it('recalculateAllStats: stamina massima del pool energia è sempre 100', () => {
+    const base: NeoMon = {
+      id: 'n-001',
+      name: 'Test',
+      types: [ElementType.Bio],
+      baseStats: {
+        hp: 55,
+        stamina: 30,
+        potenza: 45,
+        resistenza: 50,
+        sintonia: 60,
+        spirito: 55,
+        flusso: 45,
+      },
+      potential: 25,
+      development: { hp: 0, potenza: 0, resistenza: 0, sintonia: 0, spirito: 0, flusso: 0 },
+      level: 5,
+      exp: 0,
+      moves: ['m-bio-01'],
+      friendship: 50,
+    };
+    const r = recalculateAllStats(base);
+    expect(r.currentStats?.stamina).toBe(100);
+  });
 });

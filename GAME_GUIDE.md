@@ -3,6 +3,8 @@
 
 Questa guida contiene l'elenco completo delle efficacie, dei Neo-Mon registrati e dell'intera libreria mosse (120 tecniche totali).
 
+**Aggiornamento (Neo-Dex):** il registro tattico qui sotto copre **40 specie** (ID **n-001** … **n-040**) allineate a `src/data/creatures.json`. In battaglia la squadra segue l’**ordine definito nell’Hub**; se il Neo-Mon attivo va K.O., entra automaticamente il **primo della panchina ancora in piedi** (stessa logica del cambio manuale: HP/Stamina e mosse sincronizzati allo slot). Dallo **Zaino** aperto in lotta puoi tornare all’Arena con **Indietro alla lotta** (anche barra fissa in basso), senza dover usare un oggetto.
+
 ## 🕹️ Guida Rapida ai Sistemi Nexus
 
 ### 🧬 Catch System (Sincronizzazione)
@@ -44,7 +46,7 @@ Ogni vittoria nel Nexus conferisce **100 XP** al Neo-Mon attivo.
 
 ---
 
-## 🐈 Registro Creature Nazionale (Neo-Dex 001-020)
+## 🐈 Registro Creature Nazionale (Neo-Dex 001-040)
 | ID | Nome | Tipo 1 | Tipo 2 | Evoluzione |
 | :--- | :--- | :--- | :--- | :--- |
 | **n-001** | **Floris** | Bio | - | Floragile (LV 20) |
@@ -67,6 +69,28 @@ Ogni vittoria nel Nexus conferisce **100 XP** al Neo-Mon attivo.
 | **n-018** | **Mecha-Micio** | Meccanico | - | - (Stadio Unico) |
 | **n-019** | **Crio-Lince** | Criogenico | - | - (Stadio Unico) |
 | **n-020** | **Aura-Nebula** | Etereo | - | - (Stadio Unico) |
+| **n-021** | **Volt-Achel** | Fulgido | - | Tesla-Don (LV 24) |
+| **n-022** | **Tesla-Don** | Fulgido | - | - (Stadio Finale) |
+| **n-023** | **Bit-Moth** | Bio | Meccanico | Cyber-Os (LV 18) |
+| **n-024** | **Cyber-Os** | Bio | Meccanico | - (Stadio Finale) |
+| **n-025** | **Magma-Core** | Incandescente | - | Reactor-Gron (LV 30) |
+| **n-026** | **Reactor-Gron** | Incandescente | Meccanico | - (Stadio Finale) |
+| **n-027** | **Neon-Puff** | Prismatico | - | Aura-Spectra (LV 25) |
+| **n-028** | **Aura-Spectra** | Prismatico | Etereo | - (Stadio Finale) |
+| **n-029** | **Rusty** | Meccanico | - | Scrap-Titan (LV 20) |
+| **n-030** | **Scrap-Titan** | Meccanico | - | - (Stadio Finale) |
+| **n-031** | **Hydro-Chip** | Idrico | - | Tsunami-Node (LV 22) |
+| **n-032** | **Tsunami-Node** | Idrico | Fulgido | - (Stadio Finale) |
+| **n-033** | **Gravel-Bot** | Geologico | - | Terra-Drill (LV 28) |
+| **n-034** | **Terra-Drill** | Geologico | Meccanico | - (Stadio Finale) |
+| **n-035** | **Shadow-Byte** | Tetro | - | Void-Zero (LV 32) |
+| **n-036** | **Void-Zero** | Tetro | Meccanico | - (Stadio Finale) |
+| **n-037** | **Aero-Bit** | Aereo | - | Sky-Server (LV 20) |
+| **n-038** | **Sky-Server** | Aereo | Prismatico | - (Stadio Finale) |
+| **n-039** | **Crio-Mite** | Criogenico | - | Frost-Frame (LV 25) |
+| **n-040** | **Frost-Frame** | Criogenico | Idrico | - (Stadio Finale) |
+
+*Nota dati:* **n-025** e **n-006** condividono il nome «Magma-Core» nel database specie, ma sono ID diversi e linee evolutive distinte (vedi colonne ID e catena).
 
 ---
 
@@ -218,3 +242,5 @@ Ogni vittoria nel Nexus conferisce **100 XP** al Neo-Mon attivo.
 
 ---
 *Neo-Mon Link - Digital Database Complete Update - 07/04/2026*
+
+*Appendice documentazione — 12/04/2026: Neo-Dex esteso a 40 voci, note su battaglia a squadra e Zaino in lotta.*

@@ -24,7 +24,8 @@ export const recalculateAllStats = (mon: NeoMon): NeoMon => {
   
   const newStats: Stats = {
     hp: calculateHP(baseStats.hp, level, potential),
-    stamina: calculateStat(baseStats.stamina, level, potential),
+    /** Pool energia in battaglia: massimo fisso 100 (come richiesto dal design di gioco). */
+    stamina: 100,
     potenza: calculateStat(baseStats.potenza, level, potential),
     resistenza: calculateStat(baseStats.resistenza, level, potential),
     sintonia: calculateStat(baseStats.sintonia, level, potential),

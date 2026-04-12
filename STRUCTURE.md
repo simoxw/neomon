@@ -77,6 +77,114 @@ NEO-MON LINK
 └── GAME_GUIDE.md               # Manuale di gioco e database tattico per l'utente
 ```
 
+### Appendice — Albero progetto (stato attuale, 04/2026)
+
+Struttura integrativa: non sostituisce il blocco precedente; riflette cartelle e file aggiunti o non elencati sopra.
+
+```text
+NEO-MON LINK (root)
+├── dev-dist/                   # Output sviluppo PWA / cache locale (generato)
+├── dist/                       # Build produzione (`npm run build`)
+├── scripts/                    # Script Node per manutenzione dati (es. espansione mosse/creature)
+│   └── expand-moves-and-creatures.mjs
+├── public/                     # (invariato: asset statici, PWA, 404 SPA)
+├── src/
+│   ├── components/
+│   │   ├── Battle/
+│   │   │   ├── Arena.tsx
+│   │   │   ├── BattleLog.tsx
+│   │   │   ├── BattleScreen.tsx
+│   │   │   ├── BattleSummary.tsx
+│   │   │   ├── CatchAnimation.tsx
+│   │   │   ├── EvolutionScene.tsx
+│   │   │   ├── MoveButtons.tsx
+│   │   │   ├── MoveSelector.tsx
+│   │   │   └── MoveTooltip.tsx
+│   │   ├── Box/
+│   │   │   ├── CreatureGrid.tsx
+│   │   │   ├── Filters.tsx
+│   │   │   ├── StatDetail.tsx
+│   │   │   └── TeamManager.tsx
+│   │   ├── Common/
+│   │   │   ├── Button.tsx
+│   │   │   ├── EvolutionModal.tsx
+│   │   │   ├── Modal.tsx
+│   │   │   ├── NeoMonDetailModal.tsx
+│   │   │   └── ProgressBar.tsx
+│   │   ├── Hub/
+│   │   │   ├── Crafting.tsx
+│   │   │   ├── Inventory.tsx      # Zaino; da battaglia: “Indietro alla lotta” (anche sticky in basso)
+│   │   │   ├── LinkDex.tsx
+│   │   │   ├── MainHub.tsx
+│   │   │   ├── MissionTerminal.tsx
+│   │   │   ├── Settings.tsx
+│   │   │   ├── SettingsMenu.tsx
+│   │   │   └── Shop.tsx
+│   │   ├── Navigation/
+│   │   │   └── NeoNavBar.tsx
+│   │   └── World/
+│   │       ├── TrainerBattle.tsx
+│   │       └── WorldMap.tsx
+│   ├── context/
+│   │   └── useStore.ts
+│   ├── data/
+│   │   ├── creatures.json        # Specie Neo-Mon (40 ID n-001 … n-040 nel dataset attuale)
+│   │   ├── items.json
+│   │   ├── missions.json
+│   │   ├── moves.json            # Libreria mosse (120 tecniche in tabella GAME_GUIDE)
+│   │   ├── recipes.json
+│   │   ├── trainers.json
+│   │   └── zones.json
+│   ├── db/
+│   │   └── index.ts
+│   ├── hooks/
+│   │   ├── useBattle.ts          # Battaglia: party slot, ordine Hub, KO bench, switch, persistenza
+│   │   └── useInventory.ts
+│   ├── logic/
+│   │   ├── battleParty.ts        # Slot squadra (HP/SP), primo vivo, sync da battaglia
+│   │   ├── battleParty.test.ts
+│   │   ├── battle.turn.test.ts   # Test turni / danni su BattleEngine
+│   │   ├── battle.exp.test.ts
+│   │   ├── catch.battle.test.ts
+│   │   ├── BattleEngine.ts
+│   │   ├── battleRewards.ts
+│   │   ├── CatchSystem.ts
+│   │   ├── DamageCalc.ts
+│   │   ├── EvolutionSystem.ts
+│   │   ├── expFormula.ts
+│   │   ├── generateWildMon.ts
+│   │   ├── moveEffectHelpers.ts
+│   │   ├── moveLookup.ts
+│   │   ├── normalizeCreature.ts
+│   │   ├── StaminaManager.ts
+│   │   ├── statStages.ts
+│   │   ├── StatsCalculator.ts
+│   │   └── worldEncounters.ts
+│   ├── services/
+│   │   └── AudioService.ts
+│   ├── store/
+│   │   └── useStore.ts           # Stub deprecato (re-export vuoto; usare context/useStore.ts)
+│   ├── styles/
+│   │   └── index.css
+│   ├── types/
+│   │   ├── battleLog.ts
+│   │   ├── battleSummary.ts
+│   │   └── world.ts
+│   ├── utils/
+│   │   └── imageLoader.ts
+│   ├── App.tsx
+│   ├── main.tsx
+│   ├── types.ts
+│   └── vite-env.d.ts
+├── vitest.config.ts              # Config suite test Vitest
+├── tsconfig.node.json
+├── vite.config.ts
+├── package.json
+├── README.md
+├── STRUCTURE.md
+└── GAME_GUIDE.md
+```
+
 ---
 
 ## 📜 Analisi Dettagliata per File
@@ -117,6 +225,19 @@ NEO-MON LINK
 - **`imageLoader.ts`**: Utility fondamentale che mappa gli ID delle creature sui file .webp nella cartella assets.
 - **`manifest.json`**: Fornisce al browser le istruzioni per trattare il sito come un'app mobile (Splash screen, icone, colori).
 
+### Appendice — File e moduli aggiuntivi (cosa fanno)
+
+- **`src/logic/battleParty.ts`**: Modello leggero della **squadra in battaglia**: per ogni slot memorizza `speciesId` (ID istanza Neo-Mon), `currentHp` e `currentStamina`. Espone `initPartySlotsFromTeam`, `findFirstAliveSlotIndex` (primo slot con HP > 0), `writeSlotFromBattle` per allineare slot e stato a fine turno o dopo switch. Usato da `useBattle.ts` per non perdere l’ordine Hub e per mandare in campo il prossimo Neo-Mon dopo un K.O.
+- **`src/hooks/useBattle.ts`**: Orchestratore aggiornato: carica il team dallo **store Zustand** (stesso ordine dell’Hub), mantiene **party slot** e **indice attivo**, gestisce **vittoria/sconfitta** solo a squadra intera K.O., **switch** con persistenza e contrattacco AI tramite `calculateDamage`, **afterCatchFailure** coerente con la panchina, esporta `partySlots` / `activeSlotIndex` per l’UI (es. barre HP in lista cambio).
+- **`src/logic/battleParty.test.ts`**: Test Vitest su inizializzazione slot, primo vivente e scrittura HP/SP.
+- **`src/logic/battle.turn.test.ts`**: Test su `calculateDamage` e `BattleEngine.executeTurn` (flusso turni e riduzione HP).
+- **`src/components/Hub/Inventory.tsx`**: Schermata Zaino; se aperta dalla battaglia (`inventoryReturnTarget === 'battle'`), mostra **Indietro alla lotta** in header e **barra fissa in basso** per tornare all’Arena senza usare oggetti.
+- **`src/components/World/WorldMap.tsx`**, **`TrainerBattle.tsx`**: Flusso esplorazione mappa e sfide allenatori (contesto battaglia `battleContext`).
+- **`src/data/zones.json`**, **`trainers.json`**, **`recipes.json`**: Zone di incontro, definizioni allenatori e ricette crafting collegate al mondo di gioco.
+- **`src/services/AudioService.ts`**: Servizio audio centralizzato per effetti/musica (se abilitati in UI).
+- **`scripts/expand-moves-and-creatures.mjs`**: Script di supporto per generare o ampliare voci in `creatures.json` / mosse (workflow sviluppatore).
+- **`vitest.config.ts`**: Configurazione Vitest per `npm test` / `npm run test:watch`.
+
 ### 🚀 Deployment (`public/`, `vite.config.ts`)
 - **`vite.config.ts`**: Configura `vite-plugin-pwa` con `generateSW` per pre-caching offline di tutti gli asset. Minificazione Terser attiva. Output strutturato in `assets/js`, `assets/css`, `assets/img`.
 - **`404.html`**: Intercetta i refresh su rotte deep (es. `/arena`) su GitHub Pages e reindirizza a `index.html` tramite script JS, mantenendo l'URL originale per React Router.
@@ -125,3 +246,5 @@ NEO-MON LINK
 
 ---
 *Documentazione Architetturale Definitiva Neo-Mon Link - Aggiornata il 08/04/2026*
+
+*Appendice 12/04/2026: albero esteso, descrizione `battleParty`, test battaglia, World/Inventory, nota Neo-Dex 40 specie in `creatures.json`.*

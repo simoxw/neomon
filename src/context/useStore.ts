@@ -9,6 +9,7 @@ import { EvolutionSystem } from '../logic/EvolutionSystem';
 import type { BattleContext } from '../types/world';
 import type { BattleSummaryPayload } from '../types/battleSummary';
 import missionsData from '../data/missions.json';
+import { getMaxHp, getMaxStamina } from '../logic/battleParty';
 
 /**
  * Neo-Mon Link Central Store
@@ -37,6 +38,8 @@ interface NeoState {
     | 'crafting';
   /** Se l'inventario è stato aperto dall'Arena, il pulsante Indietro torna alla lotta */
   inventoryReturnTarget: 'battle' | null;
+  /** Inventario come overlay: non cambia `currentScreen`, così la battaglia non si smonta */
+  inventoryOverlayOpen: boolean;
   boxTab: 'box' | 'team';
   evolvingMonId: string | null;
   volMuted: boolean;
@@ -55,11 +58,18 @@ interface NeoState {
   totalCaptures: number;
   playtimeMs: number;
   toastMessage: string | null;
+  /** Richiesta uso oggetto da Zaino in lotta (processata da useBattle) */
+  battleConsumableRequest: { itemId: string } | null;
+  isLoading: boolean;
 
   // Actions
   loadData: () => Promise<void>;
   enterInventory: (opts?: { fromBattle?: boolean }) => void;
   returnToBattleFromInventory: () => void;
+  requestBattleConsumable: (itemId: string) => void;
+  clearBattleConsumableRequest: () => void;
+  /** Consuma una quantità dall’inventario IndexedDB e aggiorna lo store */
+  consumeInventoryItem: (itemId: string, qty?: number) => Promise<boolean>;
   toggleMute: () => void;
   setVolume: (val: number) => void;
   setScreen: (screen: NeoState['currentScreen']) => void;
@@ -112,6 +122,7 @@ export const useStore = create<NeoState>()(
       selectedBoxIndex: 0,
       currentScreen: 'hub',
       inventoryReturnTarget: null,
+      inventoryOverlayOpen: false,
       boxTab: 'box',
       evolvingMonId: null,
       volMuted: false,
@@ -130,6 +141,8 @@ export const useStore = create<NeoState>()(
       totalCaptures: 0,
       playtimeMs: 0,
       toastMessage: null,
+      battleConsumableRequest: null,
+      isLoading: true,
 
       setBattleContext: (ctx) => set({ battleContext: ctx }),
       bumpBattleSession: () => set((s) => ({ battleSessionKey: s.battleSessionKey + 1 })),
@@ -249,25 +262,47 @@ export const useStore = create<NeoState>()(
       },
 
       enterInventory: (opts) => {
-        set({
-          inventoryReturnTarget: opts?.fromBattle ? 'battle' : null,
-          currentScreen: 'inventory',
-        });
+        if (opts?.fromBattle) {
+          set({ inventoryReturnTarget: 'battle', inventoryOverlayOpen: true });
+        } else {
+          set({ inventoryReturnTarget: null, inventoryOverlayOpen: false, currentScreen: 'inventory' });
+        }
       },
 
       returnToBattleFromInventory: () => {
-        set({ inventoryReturnTarget: null, currentScreen: 'battle' });
+        set({ inventoryReturnTarget: null, inventoryOverlayOpen: false });
+      },
+
+      requestBattleConsumable: (itemId) => set({ battleConsumableRequest: { itemId } }),
+      clearBattleConsumableRequest: () => set({ battleConsumableRequest: null }),
+
+      consumeInventoryItem: async (itemId, qty = 1) => {
+        const row = await db.inventory.get(itemId);
+        if (!row || row.quantity < qty) return false;
+        await db.transaction('rw', db.inventory, async () => {
+          const r = await db.inventory.get(itemId);
+          if (!r || r.quantity < qty) return;
+          if (r.quantity <= qty) await db.inventory.delete(itemId);
+          else await db.inventory.update(itemId, { quantity: r.quantity - qty });
+        });
+        await get().updateInventory();
+        return true;
       },
 
       loadData: async () => {
-        let team = (await db.team.toArray()).map((m) => normalizeNeoMon(m as NeoMon));
-        let box = (await db.box.toArray()).map((m) => normalizeNeoMon(m as NeoMon));
-        let inventory = await db.inventory.toArray();
-        let player = (await db.player.toArray())[0];
+        console.log('[Store] loadData starting...');
         
-        // Se il database è vuoto, inizializziamo con dati starter
-        if (team.length === 0 && box.length === 0 && !player) {
-          console.log("Inizializzazione primo salvataggio...");
+        try {
+          let team = (await db.team.toArray()).map((m: any) => recalculateAllStats(normalizeNeoMon(m as NeoMon)));
+          let box = (await db.box.toArray()).map((m: any) => recalculateAllStats(normalizeNeoMon(m as NeoMon)));
+          let inventory = await db.inventory.toArray();
+          let player = (await db.player.toArray())[0];
+          
+          console.log('[Store] loadData completed. team:', team.length, 'box:', box.length, 'player:', !!player);
+          
+          // Se il database è vuoto, inizializziamo con dati starter
+          if (team.length === 0 && box.length === 0 && !player) {
+            console.log("[Store] Inizializzazione primo salvataggio...");
           
           // Crea Player
           player = { 
@@ -293,22 +328,25 @@ export const useStore = create<NeoState>()(
               : [starterData.moves_learned?.[0]?.moveId || 'm-pri-01'];
           const learnPool = starterData.learnPool;
           const starterPool = learnPool && learnPool.length > 0 ? [...learnPool] : [...starterMoves];
-          const starter: NeoMon = normalizeNeoMon({
+          let starter: NeoMon = normalizeNeoMon({
             ...starterData,
             uniqueId: `starter-${Date.now()}`,
             level: 5,
             exp: 0,
             potential: 25,
-            currentHp: starterData.baseStats.hp,
-            currentStamina: starterData.baseStats.stamina,
-            currentStats: starterData.baseStats,
             moves: starterMoves,
             learnPool: starterPool,
             development: { hp: 0, potenza: 0, resistenza: 0, sintonia: 0, spirito: 0, flusso: 0 },
             friendship: 50,
             caughtAt: Date.now(),
           } as NeoMon & { uniqueId?: string });
-          
+          starter = recalculateAllStats(starter);
+          starter = {
+            ...starter,
+            currentHp: getMaxHp(starter),
+            currentStamina: getMaxStamina(starter),
+          } as NeoMon;
+
           await db.team.add(starter as unknown as NeoMon);
           team = [starter];
           
@@ -326,13 +364,43 @@ export const useStore = create<NeoState>()(
           inventory,
           player,
           coins: player?.coins || 500,
-          seenIds: Array.from(new Set([...team.map((m) => m.id), ...box.map((m) => m.id)])),
+          seenIds: Array.from(new Set([...team.map((m: NeoMon) => m.id), ...box.map((m: NeoMon) => m.id)])),
           defeatedTrainerIds: player?.defeatedTrainerIds ?? [],
           totalBattles: player?.totalBattles ?? 0,
           totalBattlesWon: player?.totalBattlesWon ?? 0,
           totalCaptures: player?.totalCaptures ?? 0,
           playtimeMs: player?.playtimeMs ?? 0,
+          isLoading: false,
         });
+        } catch (error) {
+          console.error('[Store] loadData error:', error);
+          // Fallback: imposta stato minimalista per permettere al gioco di continuare
+          set({
+            team: [],
+            box: [],
+            inventory: [],
+            player: { 
+              id: 1, 
+              name: 'NEO-LINKER', 
+              coins: 500,
+              badges: [],
+              unlockedNodes: [],
+              lastSave: Date.now(),
+              defeatedTrainerIds: [],
+              totalBattles: 0,
+              totalBattlesWon: 0,
+              totalCaptures: 0,
+              playtimeMs: 0,
+            },
+            seenIds: [],
+            defeatedTrainerIds: [],
+            totalBattles: 0,
+            totalBattlesWon: 0,
+            totalCaptures: 0,
+            playtimeMs: 0,
+            isLoading: false,
+          });
+        }
       },
 
       persistNeoMon: async (mon) => {
@@ -455,7 +523,13 @@ export const useStore = create<NeoState>()(
 
       captureNeoMon: async (wildMon, prismId) => {
         const { box, seenIds } = get();
-        const capturedMon = normalizeNeoMon({ ...wildMon, caughtAt: Date.now() } as NeoMon);
+        let capturedMon = normalizeNeoMon({ ...wildMon, caughtAt: Date.now() } as NeoMon);
+        capturedMon = recalculateAllStats(capturedMon);
+        capturedMon = {
+          ...capturedMon,
+          currentHp: getMaxHp(capturedMon),
+          currentStamina: getMaxStamina(capturedMon),
+        } as NeoMon;
         const nextSeen = seenIds.includes(wildMon.id) ? seenIds : [...seenIds, wildMon.id];
 
         await db.transaction('rw', db.box, db.inventory, async () => {

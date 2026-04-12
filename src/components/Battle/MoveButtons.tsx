@@ -1,19 +1,15 @@
+/**
+ * @deprecated Questo componente è un placeholder obsoleto.
+ * Il vero componente di selezione mosse è <MoveSelector /> usato in Arena.tsx
+ * Manteniamo questo file solo per compatibilità backwards - NON USARE
+ */
+
 import React from 'react'
 import { Button } from '../Common/Button'
 
 export const MoveButtons: React.FC = () => {
-  const moves = ['Attacco Base', 'Sfuriata', 'Rigenera', 'Difesa']
+  console.warn('[MoveButtons] DEPRECATED: This is an obsolete placeholder. Use <MoveSelector /> instead.')
   
-  return (
-    <div className="grid grid-cols-2 gap-3 p-4 bg-slate-900 border-t border-slate-700">
-      {moves.map((move) => (
-        <Button 
-          key={move} 
-          className="h-16 text-lg font-bold bg-slate-800 border-2 border-slate-700 hover:border-slate-500 active:scale-95 transition-transform"
-        >
-          {move}
-        </Button>
-      ))}
-    </div>
-  )
+  return null
 }
+

@@ -1,5 +1,6 @@
 import { NeoMon, Move, MoveEffect, StatusCondition } from '../types';
-import { calculateDamage, getEffectiveness, calculateFlatNeutralDamage } from './DamageCalc.ts';
+import { calculateDamage, getEffectiveness, calculateFlatNeutralDamage, checkCriticalHit } from './DamageCalc.ts';
+import { getMaxStamina } from './battleParty';
 import { restAction, passiveRecovery, canUseMove, BASE_RECOVERY } from './StaminaManager.ts';
 import { resolveMoveById } from './moveLookup';
 import { getStructuredMoveEffect, getMoveAccuracy } from './moveEffectHelpers';
@@ -45,6 +46,10 @@ function resetStatStages(mon: any) {
 
 function maxHp(mon: any): number {
   return mon.currentStats?.hp ?? mon.baseStats.hp;
+}
+
+function maxStamina(mon: any): number {
+  return getMaxStamina(mon as NeoMon);
 }
 
 function rollAccuracy(move: Move, eff?: MoveEffect): boolean {
@@ -161,8 +166,8 @@ export class BattleEngine {
     const availableMoves = allMoves.filter((m) => attackerMoves.includes(m.id) && (m.staminaCost ?? 0) <= (attacker.currentStamina ?? 0));
     if (availableMoves.length === 0) return { type: 'rest' };
 
-    const currentStam = attacker.currentStamina ?? attacker.baseStats.stamina;
-    const maxStam = attacker.baseStats.stamina;
+    const currentStam = attacker.currentStamina ?? maxStamina(attacker);
+    const maxStam = maxStamina(attacker);
     const staminaRatio = maxStam > 0 ? currentStam / maxStam : 1;
     const hpRatio = maxHp(attacker) > 0 ? attacker.currentHp / maxHp(attacker) : 1;
     const defStatus = defender.status as StatusCondition;
@@ -237,10 +242,10 @@ export class BattleEngine {
     playerMon.__side = 'player';
     aiMon.__side = 'enemy';
 
-    if (playerMon.currentHp === undefined) playerMon.currentHp = playerMon.baseStats.hp;
-    if (playerMon.currentStamina === undefined) playerMon.currentStamina = playerMon.baseStats.stamina;
-    if (aiMon.currentHp === undefined) aiMon.currentHp = aiMon.baseStats.hp;
-    if (aiMon.currentStamina === undefined) aiMon.currentStamina = aiMon.baseStats.stamina;
+    if (playerMon.currentHp === undefined) playerMon.currentHp = maxHp(playerMon);
+    if (playerMon.currentStamina === undefined) playerMon.currentStamina = maxStamina(playerMon);
+    if (aiMon.currentHp === undefined) aiMon.currentHp = maxHp(aiMon);
+    if (aiMon.currentStamina === undefined) aiMon.currentStamina = maxStamina(aiMon);
 
     let firstActor: 'player' | 'ai';
     let secondActor: 'player' | 'ai';
@@ -281,7 +286,7 @@ export class BattleEngine {
     const firstResult = this.resolveAction(actors[firstActor].mon, targetOfFirst, actors[firstActor].action, firstActor);
     targetOfFirst.currentHp -= firstResult.damage;
     actors[firstActor].mon.currentStamina = Math.min(
-      actors[firstActor].mon.baseStats.stamina,
+      maxStamina(actors[firstActor].mon),
       actors[firstActor].mon.currentStamina - firstResult.consumedStamina + firstResult.recoveredStamina
     );
     if (firstResult.damage > 0 && targetOfFirst.currentHp <= 0) resetStatStages(targetOfFirst);
@@ -305,7 +310,7 @@ export class BattleEngine {
       secondResult = this.resolveAction(actors[secondActor].mon, targetOfSecond, actors[secondActor].action, secondActor);
       targetOfSecond.currentHp -= secondResult.damage;
       actors[secondActor].mon.currentStamina = Math.min(
-        actors[secondActor].mon.baseStats.stamina,
+        maxStamina(actors[secondActor].mon),
         actors[secondActor].mon.currentStamina - secondResult.consumedStamina + secondResult.recoveredStamina
       );
       if (secondResult.damage > 0 && targetOfSecond.currentHp <= 0) resetStatStages(targetOfSecond);
@@ -350,8 +355,8 @@ export class BattleEngine {
 
     if (action.type === 'rest') {
       const currentStamina = attacker.currentStamina;
-      const maxStamina = attacker.baseStats.stamina;
-      const newStamina = restAction(currentStamina, maxStamina);
+      const maxSt = maxStamina(attacker);
+      const newStamina = restAction(currentStamina, maxSt);
       recovered = newStamina - currentStamina;
       message = `${attacker.name} si riposa e recupera energia!`;
       return {
@@ -411,8 +416,8 @@ export class BattleEngine {
 
       if (!staminaCheck.ok) {
         isStaminaFailure = true;
-        const maxStamina = attacker.baseStats.stamina;
-        const newStamina = passiveRecovery(currentStamina, maxStamina);
+        const maxSt = maxStamina(attacker);
+        const newStamina = passiveRecovery(currentStamina, maxSt);
         recovered = newStamina - currentStamina;
         message = `${attacker.name} non può agire: ${staminaCheck.message}`;
         return {
@@ -472,12 +477,17 @@ export class BattleEngine {
 
       if ((move.power ?? 0) > 0) {
         damage = calculateDamage(attacker, defender, move);
+        const isCritical = checkCriticalHit(attacker, move);
+        if (isCritical) {
+          damage = Math.floor(damage * 1.5);
+        }
         effectiveness = getEffectiveness(move.type, defender.types);
         let effMsg = '';
         if (effectiveness > 1) effMsg = ' È superefficace!';
         if (effectiveness < 1 && effectiveness > 0) effMsg = ' Non è molto efficace...';
         if (effectiveness === 0) effMsg = ' Non ha effetto...';
-        message = `${attacker.name} usa ${move.name}!${effMsg}`;
+        const critMsg = isCritical ? ' 💥 Colpo Critico!' : '';
+        message = `${attacker.name} usa ${move.name}!${effMsg}${critMsg}`;
         floatEvents.push({ side, amount: damage, variant: 'damage' });
 
         if (eff?.drainPercent && damage > 0) {
@@ -523,6 +533,16 @@ export class BattleEngine {
         if (stMsg) {
           message += ' ' + stMsg;
           floatEvents.push({ side, amount: 0, variant: 'status' });
+        }
+      }
+
+      // Sottrai 1 PP dalla mossa usata
+      if (!attacker.movePPs) attacker.movePPs = (attacker.moves || []).map(() => 15);
+      const moveIdx = attacker.moves?.indexOf(move.id) ?? -1;
+      if (moveIdx >= 0 && attacker.movePPs[moveIdx] !== undefined) {
+        attacker.movePPs[moveIdx] = Math.max(0, attacker.movePPs[moveIdx] - 1);
+        if (attacker.movePPs[moveIdx] === 0) {
+          message += ` [PP esausti per ${move.name}]`;
         }
       }
     }

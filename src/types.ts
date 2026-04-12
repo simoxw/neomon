@@ -74,6 +74,8 @@ export interface Move {
   description?: string;
   /** Livello minimo per apprendere / installare via Neural Uplink */
   learnLevel?: number;
+  /** Massimo Power Points (PP) per la mossa - default 15 */
+  maxPP?: number;
 }
 
 /**
@@ -140,6 +142,9 @@ export interface NeoMon {
   
   /** ID mosse equipaggiate (max 4 in battaglia) */
   moves: string[];
+
+  /** Power Points attuali per ogni mossa equipaggiata (parallelo a moves) */
+  movePPs?: number[];
 
   /** Pool mosse apprendibili (specie + istanza) */
   learnPool?: string[];

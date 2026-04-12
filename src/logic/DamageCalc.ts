@@ -38,11 +38,18 @@ export const calculateDamage = (attacker: NeoMon, defender: NeoMon, move: Move):
     ? defender.baseStats.resistenza * getStageMultiplier(defender.statStages?.defense ?? 0)
     : defender.baseStats.spirito * getStageMultiplier(defender.statStages?.specialDef ?? 0);
 
-  const stab = attacker.types.includes(move.type) ? 1.25 : 1;
+  const stab = attacker.types.includes(move.type) ? 1.5 : 1;
   const effectiveness = getEffectiveness(move.type, defender.types);
   const randomFactor = Math.random() * (1 - 0.85) + 0.85;
   const baseDamage = (((2 * attacker.level) / 5 + 2) * move.power * (atk / Math.max(1, def)) / 50) + 2;
   return Math.floor(baseDamage * stab * effectiveness * randomFactor);
+};
+
+/** Calcola se c'è un colpo critico (1/16 base chance) */
+export const checkCriticalHit = (attacker: NeoMon, move: Move): boolean => {
+  const BASE_CRIT_CHANCE = 1 / 16;
+  // Possibile futura estensione: considerare move.critRatio o item effects
+  return Math.random() < BASE_CRIT_CHANCE;
 };
 
 export const calculateFlatNeutralDamage = (attacker: NeoMon, defender: NeoMon, power: number): number => {

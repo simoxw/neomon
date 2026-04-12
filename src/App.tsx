@@ -16,10 +16,20 @@ import { Crafting } from './components/Hub/Crafting';
 import EvolutionModal from './components/Common/EvolutionModal';
 
 const App: React.FC = () => {
-  const { currentScreen, loadData, evolutionQueue, lastBattleSummary, toastMessage, addPlaytime } = useStore();
+  const { currentScreen, loadData, evolutionQueue, lastBattleSummary, toastMessage, addPlaytime, inventoryOverlayOpen, isLoading } =
+    useStore();
 
   useEffect(() => {
-    loadData();
+    const load = async () => {
+      try {
+        console.log('[App] Starting loadData...');
+        await loadData();
+        console.log('[App] loadData completed!');
+      } catch (error) {
+        console.error('[App] loadData error:', error);
+      }
+    };
+    load();
   }, [loadData]);
 
   useEffect(() => {
@@ -56,6 +66,12 @@ const App: React.FC = () => {
       {toastMessage && (
         <div className="fixed top-4 left-1/2 -translate-x-1/2 z-[2500] px-4 py-2 rounded-xl bg-cyan-600 text-black text-xs font-black uppercase shadow-lg">
           {toastMessage}
+        </div>
+      )}
+
+      {inventoryOverlayOpen && (
+        <div className="fixed inset-0 z-[2000] h-[100dvh] w-screen overflow-hidden bg-slate-950">
+          <Inventory />
         </div>
       )}
 

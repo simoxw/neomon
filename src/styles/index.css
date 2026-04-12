@@ -114,3 +114,95 @@
 .animate-fade-in {
   animation: fadeIn 0.4s ease-out forwards;
 }
+
+/* GAME FEEL ANIMATIONS - PROMPT 19 */
+
+@keyframes screen-shake-light {
+  0%, 100% { transform: translateX(0px); }
+  20% { transform: translateX(-2px); }
+  40% { transform: translateX(2px); }
+  60% { transform: translateX(-2px); }
+  80% { transform: translateX(2px); }
+}
+
+@keyframes screen-shake-heavy {
+  0%, 100% { transform: translate(0px, 0px); }
+  20% { transform: translate(-4px, -4px); }
+  40% { transform: translate(4px, 4px); }
+  60% { transform: translate(-4px, 4px); }
+  80% { transform: translate(4px, -4px); }
+}
+
+.shake-light {
+  animation: screen-shake-light 0.25s ease-in-out;
+}
+
+.shake-heavy {
+  animation: screen-shake-heavy 0.25s ease-in-out;
+}
+
+@keyframes sprite-hit {
+  0%, 100% { transform: translateX(0px); }
+  20% { transform: translateX(-6px); }
+  40% { transform: translateX(6px); }
+  60% { transform: translateX(-6px); }
+  80% { transform: translateX(6px); }
+}
+
+.sprite-hit {
+  animation: sprite-hit 0.2s ease-in-out;
+}
+
+@keyframes damage-float {
+  0% {
+    transform: translateY(0px) scale(0.8);
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(-50px) scale(1.2);
+    opacity: 0;
+  }
+}
+
+.damage-number {
+  font-family: Orbitron, monospace;
+  font-weight: bold;
+  pointer-events: none;
+  animation: damage-float 0.9s ease-out forwards;
+}
+
+.damage-number.type-damage {
+  color: #f43f5e; /* rose-500 */
+  text-shadow: 0 0 8px rgba(244, 63, 94, 0.8);
+}
+
+.damage-number.type-heal {
+  color: #10b981; /* emerald-500 */
+  text-shadow: 0 0 8px rgba(16, 185, 129, 0.8);
+}
+
+.damage-number.type-status {
+  color: #facc15; /* yellow-400 */
+  text-shadow: 0 0 8px rgba(250, 204, 21, 0.8);
+}
+
+/* HP Bar color transitions smooth */
+@keyframes hp-color-transition {
+  0% { background-color: #22d3ee; }
+  50% { background-color: #facc15; }
+  100% { background-color: #f43f5e; }
+}
+
+.hp-bar-critical {
+  animation: hp-low-pulse 0.8s infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
