@@ -47,5 +47,231 @@
     "reward": { "coins": 500, "badge": "badge-01" },
     "badge": "badge-01",
     "defeated": false
+  },
+  {
+    "id": "trainer-02",
+    "name": "Link-Surfer Nami",
+    "zone": "zone-02",
+    "sprite": "trainer_nami",
+    "dialogue": {
+      "intro": "Il flusso dei dati qui è profondo. Riesci a stare a galla?",
+      "win": "Mi hai sommerso con la tua strategia...",
+      "lose": "Torna quando avrai imparato a nuotare nel codice."
+    },
+    "team": [
+      {
+        "creatureId": "n-007",
+        "level": 10,
+        "moves": ["m-idr-01", "m-idr-02", "m-idr-03", "m-idr-09"]
+      },
+      {
+        "creatureId": "n-023",
+        "level": 11,
+        "moves": ["m-bio-01", "m-mec-01", "m-bio-03", "m-mec-02"]
+      }
+    ],
+    "reward": { "coins": 250, "items": [{ "id": "i-prism-02", "qty": 1 }] },
+    "badge": null,
+    "defeated": false,
+    "isBoss": false
+  },
+  {
+    "id": "trainer-boss-02",
+    "name": "Captain Ray — Guardiano dei Fondali",
+    "zone": "zone-02",
+    "sprite": "trainer_ray",
+    "isBoss": true,
+    "dialogue": {
+      "intro": "Nessuno attraversa questo settore senza il mio permesso.",
+      "win": "Notevole. Hai il permesso di procedere nella foresta.",
+      "lose": "Le correnti digitali sono troppo forti per te."
+    },
+    "team": [
+      {
+        "creatureId": "n-031",
+        "level": 18,
+        "moves": ["m-idr-04", "m-idr-05", "m-cri-01", "m-idr-10"]
+      },
+      {
+        "creatureId": "n-008",
+        "level": 19,
+        "moves": ["m-idr-05", "m-idr-06", "m-mec-04", "m-idr-07"]
+      }
+    ],
+    "reward": { "coins": 800, "badge": "badge-02" },
+    "badge": "badge-02",
+    "defeated": false
+  },
+  {
+    "id": "trainer-03",
+    "name": "Eco-Warrior Gaia",
+    "zone": "zone-03",
+    "sprite": "trainer_gaia",
+    "dialogue": {
+      "intro": "La natura sintetica protegge i suoi segreti.",
+      "win": "Il tuo Link è in armonia con l'ambiente.",
+      "lose": "La foresta ti ha respinto."
+    },
+    "team": [
+      {
+        "creatureId": "n-001",
+        "level": 22,
+        "moves": ["m-bio-04", "m-bio-05", "m-bio-09", "m-bio-10"]
+      },
+      {
+        "creatureId": "n-027",
+        "level": 23,
+        "moves": ["m-bio-04", "m-aer-01", "m-bio-06", "m-aer-02"]
+      }
+    ],
+    "reward": { "coins": 400, "items": [{ "id": "i-prism-02", "qty": 2 }] },
+    "badge": null,
+    "defeated": false,
+    "isBoss": false
+  },
+  {
+    "id": "trainer-boss-03",
+    "name": "Warden Sylvan — Spirito della Selva",
+    "zone": "zone-03",
+    "sprite": "trainer_sylvan",
+    "isBoss": true,
+    "dialogue": {
+      "intro": "Il battito del Nexus è forte qui. Riesci a sentirlo?",
+      "win": "Sei degno di vedere le fonderie del Nucleo.",
+      "lose": "Non sei ancora pronto per l'evoluzione finale."
+    },
+    "team": [
+      {
+        "creatureId": "n-034",
+        "level": 28,
+        "moves": ["m-bio-06", "m-aer-04", "m-aer-05", "m-bio-08"]
+      },
+      {
+        "creatureId": "n-002",
+        "level": 30,
+        "moves": ["m-bio-07", "m-bio-08", "m-bio-09", "m-bio-10"]
+      }
+    ],
+    "reward": { "coins": 1200, "badge": "badge-03" },
+    "badge": "badge-03",
+    "defeated": false
+  },
+  {
+    "id": "trainer-04",
+    "name": "Factory-Linker Jax",
+    "zone": "zone-04",
+    "sprite": "trainer_jax",
+    "dialogue": {
+      "intro": "Qui assembliamo il futuro del Nexus. Vuoi unirti?",
+      "win": "Produzione interrotta... Link superiore rilevato.",
+      "lose": "Sei solo un pezzo difettoso nel sistema."
+    },
+    "team": [
+      {
+        "creatureId": "n-004",
+        "level": 32,
+        "moves": ["m-mec-04", "m-mec-05", "m-mec-09", "m-mec-10"]
+      },
+      {
+        "creatureId": "n-025",
+        "level": 33,
+        "moves": ["m-inc-04", "m-inc-05", "m-inc-09", "m-inc-10"]
+      }
+    ],
+    "reward": { "coins": 600, "items": [{ "id": "i-prism-03", "qty": 1 }] },
+    "badge": null,
+    "defeated": false,
+    "isBoss": false
+  },
+  {
+    "id": "trainer-boss-04",
+    "name": "Overlord Iron — Comandante Industriale",
+    "zone": "zone-04",
+    "sprite": "trainer_iron",
+    "isBoss": true,
+    "dialogue": {
+      "intro": "Il ferro e il fuoco forgeranno la tua sconfitta.",
+      "win": "La tua volontà è più dura dell'acciaio. Procedi al Nexus.",
+      "lose": "Fuso e riciclato. Ecco il tuo destino."
+    },
+    "team": [
+      {
+        "creatureId": "n-029",
+        "level": 38,
+        "moves": ["m-mec-06", "m-geo-04", "m-geo-05", "m-mec-08"]
+      },
+      {
+        "creatureId": "n-006",
+        "level": 40,
+        "moves": ["m-inc-07", "m-inc-08", "m-inc-09", "m-inc-10"]
+      }
+    ],
+    "reward": { "coins": 2000, "badge": "badge-04" },
+    "badge": "badge-04",
+    "defeated": false
+  },
+  {
+    "id": "trainer-05",
+    "name": "Elite-Linker Zen",
+    "zone": "zone-05",
+    "sprite": "trainer_zen",
+    "dialogue": {
+      "intro": "Il silenzio del Nexus è la prova finale.",
+      "win": "La tua mente è limpida come il codice sorgente.",
+      "lose": "Troppo rumore nel tuo Link."
+    },
+    "team": [
+      {
+        "creatureId": "n-012",
+        "level": 45,
+        "moves": ["m-bio-07", "m-bio-08", "m-ete-04", "m-ete-05"]
+      },
+      {
+        "creatureId": "n-022",
+        "level": 46,
+        "moves": ["m-ful-07", "m-ful-08", "m-ful-09", "m-ful-10"]
+      },
+      {
+        "creatureId": "n-024",
+        "level": 47,
+        "moves": ["m-bio-07", "m-mec-07", "m-mec-08", "m-bio-08"]
+      }
+    ],
+    "reward": { "coins": 1000, "items": [{ "id": "i-prism-03", "qty": 2 }] },
+    "badge": null,
+    "defeated": false,
+    "isBoss": false
+  },
+  {
+    "id": "trainer-boss-05",
+    "name": "Grandmaster Alpha — Architetto del Nexus",
+    "zone": "zone-05",
+    "sprite": "trainer_alpha",
+    "isBoss": true,
+    "dialogue": {
+      "intro": "Io ho scritto le leggi di questo mondo. Tu sei solo un'eccezione.",
+      "win": "L'eccezione è diventata la nuova regola. Complimenti, Linker Supremo.",
+      "lose": "Ritorna all'inizio del ciclo. Il sistema ti ha cancellato."
+    },
+    "team": [
+      {
+        "creatureId": "n-035",
+        "level": 55,
+        "moves": ["m-pri-04", "m-pri-05", "m-pri-06", "m-pri-07"]
+      },
+      {
+        "creatureId": "n-036",
+        "level": 56,
+        "moves": ["m-inc-07", "m-mec-07", "m-mec-08", "m-inc-08"]
+      },
+      {
+        "creatureId": "n-033",
+        "level": 58,
+        "moves": ["m-pri-07", "m-ete-07", "m-ete-08", "m-pri-08"]
+      }
+    ],
+    "reward": { "coins": 5000 },
+    "badge": null,
+    "defeated": false
   }
 ]

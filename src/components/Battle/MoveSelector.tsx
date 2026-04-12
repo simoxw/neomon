@@ -134,7 +134,7 @@ const MoveSelector: React.FC<MoveSelectorProps> = ({
                   <span className="font-orbitron tabular-nums">
                     {(move.power ?? 0) === 0 ? 'STATUS' : `PWR ${move.power}`}
                   </span>
-                  <span className="text-emerald-300/90 font-orbitron tabular-nums">SP {move.staminaCost}</span>
+                  <span className="text-yellow-400 font-orbitron tabular-nums">SP {move.staminaCost}</span>
                 </div>
               </button>
             </div>

@@ -25,13 +25,13 @@ const TYPE_COLORS: Record<string, string> = {
 };
 
 const STAT_CONFIG = [
-  { key: 'hp', label: 'HP', color: 'from-rose-600 to-rose-400', max: 300 },
+  { key: 'hp', label: 'HP', color: 'from-emerald-600 to-emerald-400', max: 300 },
   { key: 'potenza', label: 'Potenza', color: 'from-orange-600 to-orange-400', max: 200 },
   { key: 'resistenza', label: 'Resistenza', color: 'from-blue-600 to-blue-400', max: 200 },
   { key: 'sintonia', label: 'Sintonia', color: 'from-emerald-600 to-emerald-400', max: 200 },
   { key: 'spirito', label: 'Spirito', color: 'from-purple-600 to-purple-400', max: 200 },
   { key: 'flusso', label: 'Flusso', color: 'from-yellow-600 to-yellow-400', max: 200 },
-  { key: 'stamina', label: 'Stamina', color: 'from-cyan-600 to-cyan-400', max: 200 },
+  { key: 'stamina', label: 'Stamina', color: 'from-yellow-600 to-yellow-400', max: 200 },
 ] as const;
 
 type TabId = 'stats' | 'moves' | 'uplink';

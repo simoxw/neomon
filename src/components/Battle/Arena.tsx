@@ -144,11 +144,11 @@ const StatBar = ({
   variant: 'hp' | 'sp';
 }) => {
   const percentage = Math.max(0, Math.min(100, (value / max) * 100));
-  let barClass = variant === 'sp' ? 'bg-emerald-400' : 'bg-cyan-400';
+  let barClass = variant === 'sp' ? 'bg-yellow-400' : 'bg-emerald-500';
   if (variant === 'hp') {
     if (percentage < 25) barClass = 'bg-rose-500 animate-hp-pulse';
     else if (percentage < 50) barClass = 'bg-yellow-400';
-    else barClass = 'bg-cyan-400';
+    else barClass = 'bg-emerald-500';
   }
 
   return (
@@ -181,6 +181,8 @@ const Arena: React.FC = () => {
     setBattleContext,
   } = useStore();
   const isTrainerBattle = battleContext?.kind === 'trainer';
+  const isCombatMode = battleContext?.mode === 'combat';
+  const canCatch = !isTrainerBattle && !isCombatMode;
   const {
     playerMon,
     opponentMon,
@@ -320,7 +322,7 @@ const Arena: React.FC = () => {
         {/* LEFT TOP: Flee + Backpack + Opponent Stats */}
         <div className="flex flex-col gap-4">
           <div className="flex gap-2">
-            {!isTrainerBattle && (
+            {canCatch && (
               <button
                 type="button"
                 onClick={() => handleFlee()}
@@ -535,7 +537,7 @@ const Arena: React.FC = () => {
             >
               <Users className="w-3.5 h-3.5" /> Switch
             </button>
-            {!isTrainerBattle && (
+            {canCatch && (
               <button
                 type="button"
                 onClick={() => setShowPrisms(true)}

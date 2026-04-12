@@ -50,4 +50,4 @@ export type BattleContext =
       minLevel: number;
       maxLevel: number;
     }
-  | { kind: 'trainer'; trainerId: string; monIndex: number };
+  | { kind: 'trainer'; mode?: 'combat' | 'capture'; trainerId: string; monIndex: number };

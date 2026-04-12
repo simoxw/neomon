@@ -35,6 +35,25 @@ Per i tester o per chi desidera una progressione rapida, è possibile inserire d
 - **5555**: Fornisce un **Pacchetto Risorse** (Prismi di vari tipi).
 - **9999**: Porta il primo Neo-Mon in squadra direttamente al **Livello 100**.
 
+### 👤 Profilo Giocatore
+Cliccando sul tuo nome o sull'icona dell'utente nell'Hub, accederai al tuo profilo:
+- **Personalizzazione**: Clicca sull'icona delle impostazioni affianco al nome per cambiarlo.
+- **Rank**: Il tuo livello di Linker aumenta in base alle vittorie e alle catture effettuate.
+- **Bacheca Badge**: Visualizza i badge ottenuti sconfiggendo i boss delle varie zone.
+- **Statistiche**: Tieni d'occhio la tua Win Rate e il numero totale di catture.
+
+### 🧪 Gestione Oggetti & Cure
+Puoi curare i tuoi Neo-Mon direttamente dallo **Zaino** fuori dalla lotta:
+1. Apri lo **Zaino** dall'Hub o dalla barra di navigazione.
+2. Seleziona un oggetto curativo (Cellule, Batterie, Kit).
+3. Verrai indirizzato alla squadra: clicca sul Neo-Mon che vuoi curare.
+4. L'oggetto verrà consumato solo se il Neo-Mon ne ha effettivamente bisogno.
+
+### ⚔️ Modalità di Battaglia nell'Hub
+Dall'Hub principale puoi accedere a due tipi di link neurali:
+- **Lotte (Combat Link)**: Simulazioni di combattimento puro. Non puoi catturare creature, ma ricevi **+50% EXP** e **x2 Crediti**. Ideale per livellare e guadagnare.
+- **Cattura (Freq. Scan)**: Scansione dell'area per trovare nuove creature. Il pulsante Prisma è attivo per permetterti di espandere la tua collezione.
+
 ---
 
 ## ⚡ Tabella delle Efficacie Elementali

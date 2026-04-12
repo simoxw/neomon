@@ -17,10 +17,13 @@ const WorldMap: React.FC = () => {
   const [detail, setDetail] = useState<ZoneData | null>(null);
 
   const zones = useMemo(() => {
-    return (zonesData as ZoneData[]).map((z) => ({
-      ...z,
-      unlocked: z.unlocked && (!z.requiredBadge || badges.includes(z.requiredBadge)),
-    }));
+    return (zonesData as ZoneData[]).map((z) => {
+      const isUnlocked = z.unlocked || (z.requiredBadge && badges.includes(z.requiredBadge));
+      return {
+        ...z,
+        unlocked: !!isUnlocked,
+      };
+    });
   }, [badges]);
 
   const startExplore = (z: ZoneData) => {

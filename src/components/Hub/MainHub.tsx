@@ -15,11 +15,17 @@ import {
   X,
   Map,
   Hammer,
+  User,
+  Settings,
+  Trophy,
+  Activity,
+  Award,
 } from 'lucide-react';
 import { clsx, type ClassValue } from 'clsx';
 import { twMerge } from 'tailwind-merge';
 import missionsData from '../../data/missions.json';
 import creaturesData from '../../data/creatures.json';
+import itemsCatalog from '../../data/items.json';
 import { getCreatureSprite } from '../../utils/imageLoader';
 import NeoMonDetailModal from '../Common/NeoMonDetailModal';
 import type { NeoMon } from '../../types';
@@ -27,6 +33,115 @@ import type { NeoMon } from '../../types';
 function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
+
+const ProfileModal = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) => {
+  const { player, coins, totalBattles, totalBattlesWon, totalCaptures, team, box } = useStore();
+  const [isEditingName, setIsEditingName] = React.useState(false);
+  const [newName, setNewName] = React.useState(player?.name || '');
+
+  if (!isOpen) return null;
+
+  const handleSaveName = async () => {
+    if (!newName.trim() || !player) return;
+    const { db } = await import('../../db');
+    await db.player.update(player.id, { name: newName });
+    useStore.setState({ player: { ...player, name: newName } });
+    setIsEditingName(false);
+  };
+
+  const winRate = totalBattles > 0 ? Math.round((totalBattlesWon / totalBattles) * 100) : 0;
+  const totalMons = team.length + box.length;
+  const playerLevel = Math.floor(Math.sqrt((totalBattlesWon * 10 + totalCaptures * 20) / 100)) + 1;
+
+  return (
+    <motion.div 
+      initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+      className="fixed inset-0 z-[1000] bg-black/95 backdrop-blur-3xl flex flex-col p-6 overflow-y-auto"
+    >
+      <div className="flex justify-between items-center mb-10 pt-6">
+        <div className="flex items-center gap-4">
+          <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-cyan-500 to-blue-600 flex items-center justify-center shadow-[0_0_20px_rgba(34,211,238,0.3)]">
+            <User className="w-8 h-8 text-white" />
+          </div>
+          <div>
+            <div className="flex items-center gap-2">
+              {isEditingName ? (
+                <div className="flex items-center gap-2">
+                  <input 
+                    type="text" value={newName} onChange={(e) => setNewName(e.target.value)}
+                    className="bg-white/5 border-b-2 border-cyan-400 text-xl font-black text-white focus:outline-none w-32 px-1"
+                  />
+                  <button onClick={handleSaveName} className="p-1 text-emerald-400 hover:scale-110 transition-transform">✓</button>
+                </div>
+              ) : (
+                <div className="flex items-center gap-2">
+                  <h2 className="text-2xl font-black italic uppercase text-white tracking-tighter">{player?.name || 'Linker'}</h2>
+                  <button onClick={() => setIsEditingName(true)} className="p-1 text-white/20 hover:text-white transition-colors">
+                    <Settings className="w-4 h-4" />
+                  </button>
+                </div>
+              )}
+            </div>
+            <div className="text-[10px] font-mono text-cyan-400/60 uppercase tracking-widest">Neural Link Rank: {playerLevel}</div>
+          </div>
+        </div>
+        <button onClick={onClose} className="p-3 bg-white/10 rounded-full text-white hover:bg-white/20 transition-all">
+          <X className="w-6 h-6" />
+        </button>
+      </div>
+
+      <div className="grid grid-cols-2 gap-4 mb-8">
+        <div className="p-4 rounded-3xl bg-white/5 border border-white/10">
+          <div className="flex items-center gap-2 mb-2 text-white/40">
+            <Trophy className="w-4 h-4" />
+            <span className="text-[10px] font-black uppercase tracking-widest">Battaglie</span>
+          </div>
+          <div className="text-2xl font-black text-white italic">{totalBattlesWon} <span className="text-xs text-white/20">Vinte</span></div>
+          <div className="text-[10px] font-mono text-cyan-400/60 mt-1">Win Rate: {winRate}%</div>
+        </div>
+        <div className="p-4 rounded-3xl bg-white/5 border border-white/10">
+          <div className="flex items-center gap-2 mb-2 text-white/40">
+            <Activity className="w-4 h-4" />
+            <span className="text-[10px] font-black uppercase tracking-widest">Catture</span>
+          </div>
+          <div className="text-2xl font-black text-white italic">{totalCaptures}</div>
+          <div className="text-[10px] font-mono text-cyan-400/60 mt-1">Totali: {totalMons}</div>
+        </div>
+      </div>
+
+      <div className="mb-8">
+        <h3 className="text-[10px] font-black uppercase tracking-[0.3em] text-white/20 mb-4 px-2">Badge Conseguiti</h3>
+        <div className="grid grid-cols-4 gap-4">
+          {['badge-01', 'badge-02', 'badge-03', 'badge-04'].map((bId) => {
+            const hasBadge = player?.badges?.includes(bId);
+            return (
+              <div key={bId} className={cn(
+                "aspect-square rounded-2xl border flex items-center justify-center transition-all duration-500",
+                hasBadge ? "bg-cyan-500/10 border-cyan-400/50 shadow-[0_0_15px_rgba(34,211,238,0.2)]" : "bg-black/40 border-white/5 grayscale opacity-20"
+              )}>
+                <Award className={cn("w-8 h-8", hasBadge ? "text-cyan-400" : "text-white/20")} />
+              </div>
+            );
+          })}
+        </div>
+      </div>
+
+      <div className="mt-auto p-6 rounded-[2.5rem] bg-gradient-to-br from-cyan-900/20 to-blue-900/20 border border-cyan-500/20">
+        <div className="flex justify-between items-center mb-4">
+          <div className="flex items-center gap-3">
+            <Wallet className="w-5 h-5 text-amber-400" />
+            <span className="text-xs font-black uppercase tracking-widest text-white">Crediti Totali</span>
+          </div>
+          <span className="text-2xl font-black text-amber-400 tabular-nums">{coins.toLocaleString()}</span>
+        </div>
+        <div className="h-2 w-full bg-black/40 rounded-full overflow-hidden">
+          <div className="h-full bg-cyan-400" style={{ width: `${(playerLevel % 1) * 100}%` }} />
+        </div>
+        <div className="mt-2 text-[8px] font-mono text-white/20 text-center uppercase tracking-widest">Next Rank Progress</div>
+      </div>
+    </motion.div>
+  );
+};
 
 const TerminalIcon = ({ icon: Icon, label, color, onClick, badge }: { icon: any, label: string, color: string, onClick?: () => void, badge?: number }) => (
   <button 
@@ -63,15 +178,27 @@ const MainHub: React.FC = () => {
   const healTeam = useStore(s => s.healTeam);
   const setBattleContext = useStore(s => s.setBattleContext);
   const bumpBattleSession = useStore(s => s.bumpBattleSession);
+  const missionProgress = useStore(s => s.missionProgress);
   const [showMissions, setShowMissions] = React.useState(false);
   const [showCodes, setShowCodes] = React.useState(false);
+  const [showProfile, setShowProfile] = React.useState(false);
   const [inputCode, setInputCode] = React.useState('');
-  const [missions, setMissions] = React.useState(missionsData);
   const [detailMon, setDetailMon] = React.useState<NeoMon | null>(null);
 
-  const redeemMission = (id: string, reward: number) => {
+  const redeemMission = async (id: string, reward: number) => {
+    const { updateCoins, missionProgress } = useStore.getState();
+    const mp = { ...missionProgress };
+    if (mp[id]?.completed) return;
+    
+    mp[id] = { ...mp[id], completed: true };
     updateCoins(reward);
-    setMissions(prev => prev.map(m => m.id === id ? { ...m, completed: true } : m));
+    useStore.setState({ missionProgress: mp });
+    
+    const p = useStore.getState().player;
+    if (p) {
+      const { db } = await import('../../db');
+      await db.player.update(p.id, { missionProgress: mp });
+    }
   };
 
   const handleCodeSubmit = async (e: React.FormEvent) => {
@@ -108,23 +235,31 @@ const MainHub: React.FC = () => {
     setShowCodes(false);
   };
 
-  const pendingMissions = missions.filter(m => !m.completed).length;
+  const pendingMissions = (missionsData as any[]).filter(m => !missionProgress[m.id]?.completed).length;
 
   return (
     <div className="flex flex-col h-full bg-slate-950 px-3 py-6 pb-24 overflow-y-auto scrollbar-hide select-none transition-all duration-700 animate-in fade-in relative">
       
-      {/* HUB HEADER: Solo visibile qui */}
+      {/* HUB HEADER */}
       <div className="flex items-center justify-between mb-8 pt-4 animate-in slide-in-from-top-4 duration-500">
-         <div className="flex flex-col gap-2">
-            <div className="flex items-center gap-2">
-               <span className="w-2 h-2 rounded-full bg-cyan-400 animate-pulse shadow-[0_0_10px_rgba(34,211,238,0.8)]" />
-               <span className="font-black italic uppercase tracking-[0.2em] text-[10px] text-white">{player?.name || "LINKER"}</span>
+         <button 
+           onClick={() => setShowProfile(true)}
+           className="flex items-center gap-3 bg-white/5 hover:bg-white/10 border border-white/10 px-4 py-2 rounded-2xl transition-all group active:scale-95"
+         >
+            <div className="w-8 h-8 rounded-full bg-cyan-500/20 flex items-center justify-center border border-cyan-400/30 group-hover:border-cyan-400">
+               <User className="w-4 h-4 text-cyan-400" />
             </div>
-            <div className="flex items-center gap-2 bg-black/40 px-3 py-1.5 rounded-full border border-white/5 self-start shadow-inner">
-               <span className="text-amber-400 font-black text-xs">{coins.toLocaleString()}</span>
-               <div className="w-3 h-3 rounded-full bg-amber-400 shadow-[0_0_10px_rgba(251,191,36,0.6)]" />
+            <div className="flex flex-col items-start">
+               <div className="flex items-center gap-2">
+                  <span className="font-black italic uppercase tracking-tighter text-xs text-white">{player?.name || "LINKER"}</span>
+                  <div className="flex items-center gap-1 bg-amber-400/10 px-1.5 py-0.5 rounded-full border border-amber-400/20">
+                     <span className="text-amber-400 font-black text-[9px]">{coins.toLocaleString()}</span>
+                     <div className="w-2 h-2 rounded-full bg-amber-400 shadow-[0_0_5px_rgba(251,191,36,0.6)]" />
+                  </div>
+               </div>
+               <span className="text-[7px] font-mono text-cyan-400/60 uppercase tracking-widest leading-none">Visualizza Profilo</span>
             </div>
-         </div>
+         </button>
 
          <button 
            onClick={() => setShowCodes(true)}
@@ -360,24 +495,31 @@ const MainHub: React.FC = () => {
                 <button onClick={() => setShowMissions(false)} className="p-3 bg-white/10 rounded-full text-white hover:bg-white/20 transition-all"><X className="w-6 h-6" /></button>
              </div>
              <div className="space-y-4 px-4 pb-20">
-                {missions.map((mission) => (
-                  <div key={mission.id} className={cn("p-6 rounded-[2rem] border transition-all duration-300", mission.completed ? "border-green-500/10 bg-green-500/1 opacity-30" : "border-white/10 bg-white/5 shadow-2xl")}>
-                     <div className="flex justify-between items-start mb-2">
-                        <h4 className="font-black uppercase tracking-widest text-white italic">{mission.title}</h4>
-                        <div className="flex items-center gap-1 text-amber-400 font-black text-xs">+{mission.rewardCoins} <Zap className="w-3 h-3 fill-amber-400" /></div>
-                     </div>
-                     <p className="text-[11px] text-white/40 mb-6 leading-relaxed uppercase tracking-tighter">{mission.description}</p>
-                     {!mission.completed && (
-                       <button onClick={() => redeemMission(mission.id, mission.rewardCoins)} className="w-full py-4 bg-cyan-400 text-black font-black uppercase text-[10px] tracking-widest rounded-xl hover:scale-105 active:scale-95 transition-all shadow-[0_0_20px_rgba(34,211,238,0.2)]">Claim Rewards</button>
-                     )}
-                  </div>
-                ))}
+                {(missionsData as any[]).map((mission) => {
+                  const isCompleted = missionProgress[mission.id]?.completed;
+                  return (
+                    <div key={mission.id} className={cn("p-6 rounded-[2rem] border transition-all duration-300", isCompleted ? "border-green-500/10 bg-green-500/1 opacity-30" : "border-white/10 bg-white/5 shadow-2xl")}>
+                       <div className="flex justify-between items-start mb-2">
+                          <h4 className="font-black uppercase tracking-widest text-white italic">{mission.title}</h4>
+                          <div className="flex items-center gap-1 text-amber-400 font-black text-xs">+{mission.rewardCoins} <Zap className="w-3 h-3 fill-amber-400" /></div>
+                       </div>
+                       <p className="text-[11px] text-white/40 mb-6 leading-relaxed uppercase tracking-tighter">{mission.description}</p>
+                       {!isCompleted && (
+                         <button onClick={() => redeemMission(mission.id, mission.rewardCoins)} className="w-full py-4 bg-cyan-400 text-black font-black uppercase text-[10px] tracking-widest rounded-xl hover:scale-105 active:scale-95 transition-all shadow-[0_0_20px_rgba(34,211,238,0.2)]">Claim Rewards</button>
+                       )}
+                    </div>
+                  );
+                })}
              </div>
           </motion.div>
         )}
       </AnimatePresence>
 
       {detailMon && <NeoMonDetailModal mon={detailMon} onClose={() => setDetailMon(null)} />}
+      
+      <AnimatePresence>
+        {showProfile && <ProfileModal isOpen={showProfile} onClose={() => setShowProfile(false)} />}
+      </AnimatePresence>
     </div>
   );
 };

@@ -17,6 +17,11 @@ Benvenuti nell'universo di **Neo-Mon Link**, un gioco di addestramento creature 
 - **Heal Team Reale**: Il riposo nell'Hub ora ripristina concretamente HP e Stamina al massimo per ogni membro del team, con aggiornamento immediato sia nello store Zustand che nel database Dexie.
 - **Coins Sincronizzati**: Le monete guadagnate in battaglia vengono aggiornate istantaneamente nell'Hub senza richiedere reload.
 - **PWA Offline Completa**: Tramite `vite-plugin-pwa` con strategia `generateSW`, tutti gli asset (JS, CSS, WebP, JSON) vengono pre-cachati nel Service Worker. Il gioco è giocabile offline dopo il primo caricamento.
+- **Sistema Profilo Linker**: Profilo giocatore personalizzabile con Rank (Livello Giocatore), statistiche di vittoria, numero di catture e bacheca dei Badge collezionati.
+- **Zaino & Cure Fuori Lotta**: Implementata la logica di utilizzo degli oggetti curativi (HP e Stamina) direttamente dallo zaino fuori battaglia, con selezione del bersaglio in squadra e salvataggio persistente dei dati.
+- **Dual Battle Modes**: Differenziazione tra modalità "Lotte" (Combat Link) per allenamento intensivo (+50% EXP, x2 Coins, cattura disabilitata) e modalità "Cattura" (Freq. Scan) per completare la collezione.
+- **Link-Dex Dinamico**: Enciclopedia automatizzata che supporta l'intera lista di Neo-Mon (36+ entries) con calcolo automatico delle debolezze (Neural Analysis) basato sulla tabella dei tipi.
+- **Ottimizzazione UI Terminale**: Nuova griglia compatta a 3 colonne per le funzioni dell'Hub e ottimizzazione degli spazi per la visualizzazione di nomi lunghi e statistiche vitali.
 
 ### Aggiornamenti recenti (documentazione)
 - **Battaglia a squadra (multi-slot)**: In lotta l’ordine della squadra coincide con quello impostato nell’Hub/Box. Ogni slot tiene traccia di **HP e Stamina** in battaglia; se il Neo-Mon attivo va K.O., entra il **successivo ancora valido** senza fine partita immediata: la sconfitta arriva solo se **tutti** i membri sono esausti. Lo **switch** consuma il turno, salva chi esce nello slot e applica danni/costi coerenti al motore (`BattleEngine` + `DamageCalc`).

@@ -236,7 +236,7 @@ export const useBattle = (_playerId: string, _opponentId: string) => {
             .map((c) => c.id)
             .filter((id) => {
               const num = parseInt(id.split('-')[1], 10);
-              return num <= 26;
+              return num <= 36;
             });
           const randomId = availableCreatureIds[Math.floor(Math.random() * availableCreatureIds.length)];
           generatedOpponent = generateWildMon(randomId, raw.level);
@@ -315,14 +315,20 @@ export const useBattle = (_playerId: string, _opponentId: string) => {
       if (!ref) return;
       const ctx = useStore.getState().battleContext;
       const isTrainer = ctx?.kind === 'trainer';
+      const isCombatMode = ctx?.mode === 'combat';
       const matDrop = rollMaterialDropFromTypes(oClone.types.map(String));
       const rewards = calculateRewards({
         enemy: oClone,
         isTrainer,
         dropItem: matDrop,
       });
-      const xp = isTrainer ? expFallback : Math.max(rewards.xpGained, expGainFromBattle({ id: oClone.id, level: oClone.level }));
-      const coins = rewards.coinsGained;
+      let xp = isTrainer ? expFallback : Math.max(rewards.xpGained, expGainFromBattle({ id: oClone.id, level: oClone.level }));
+      let coins = rewards.coinsGained;
+
+      if (isCombatMode) {
+        xp = Math.floor(xp * 1.5);
+        coins = Math.floor(coins * 2);
+      }
 
       setStatus('idle');
       if (import.meta.env.DEV) {
