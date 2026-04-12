@@ -9,7 +9,7 @@ function cn(...inputs: ClassValue[]) {
 }
 
 const NeoNavBar: React.FC = () => {
-  const { currentScreen, setScreen } = useStore();
+  const { currentScreen, setScreen, enterInventory } = useStore();
 
   const navItems = [
     { id: 'hub', label: 'Hub', icon: Home, color: 'text-cyan-400' },
@@ -27,7 +27,10 @@ const NeoNavBar: React.FC = () => {
         return (
           <button
             key={item.id}
-            onClick={() => setScreen(item.id as any)}
+            onClick={() => {
+              if (item.id === 'inventory') enterInventory({ fromBattle: false });
+              else setScreen(item.id as any);
+            }}
             className={cn(
               "flex flex-col items-center justify-center gap-1 transition-all duration-300 relative px-4 py-2 rounded-xl group",
               isActive ? "scale-110" : "opacity-40 hover:opacity-80"

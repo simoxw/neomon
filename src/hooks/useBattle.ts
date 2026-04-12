@@ -1,236 +1,613 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { NeoMon, Move } from '../types';
-import { BattleEngine, BattleAction, FullTurnResult, TurnExecutionResult } from '../logic/BattleEngine';
+import {
+  BattleEngine,
+  BattleAction,
+  FullTurnResult,
+  TurnExecutionResult,
+  FloatEvent,
+} from '../logic/BattleEngine';
 import movesData from '../data/moves.json';
 import { db } from '../db';
 import { useStore } from '../context/useStore';
+import { expGainFromBattle } from '../logic/expFormula';
+import { calculateRewards, rollMaterialDropFromTypes } from '../logic/battleRewards';
 import creaturesData from '../data/creatures.json';
+import { generateWildMon, generateWildMonWithMoves } from '../logic/generateWildMon';
+import { resolveMoveById } from '../logic/moveLookup';
+import { calculateDamage } from '../logic/DamageCalc';
+import type { BattleLogEntry, BattleLogKind } from '../types/battleLog';
+import { ensureBattleFields } from '../logic/normalizeCreature';
+import { createDefaultStatStages } from '../logic/statStages';
+import { pickCreatureIdFromPool, randomLevelInZone } from '../logic/worldEncounters';
+import trainersData from '../data/trainers.json';
+import itemsCatalog from '../data/items.json';
+import type { TrainerData } from '../types/world';
+import type { BattleSummaryPayload } from '../types/battleSummary';
 
-/**
- * Neo-Mon Hook: Battle Logic Orchestrator
- * Gestisce l'interazione tra BattleEngine e UI.
- */
+const DEFAULT_MOVE_IDS = ['m-pri-01'] as const;
 
 interface BattleEntity extends NeoMon {
   currentHp: number;
   currentStamina: number;
 }
 
-import { generateWildMon } from '../logic/generateWildMon';
+function withMoves(mon: NeoMon): NeoMon {
+  const m = mon.moves;
+  if (Array.isArray(m) && m.length > 0) return mon;
+  return { ...mon, moves: [...DEFAULT_MOVE_IDS] };
+}
 
-export const useBattle = (playerId: string, opponentId: string) => {
-  const { grantExperience, updateCoins } = useStore();
+function mergeBattleFromClone<T extends BattleEntity | null>(prev: T, clone: BattleEntity | null): T {
+  if (!prev || !clone) return prev;
+  return {
+    ...prev,
+    currentHp: clone.currentHp,
+    currentStamina: clone.currentStamina,
+    status: clone.status ?? null,
+    statStages: clone.statStages ?? createDefaultStatStages(),
+    sleepTurnsRemaining: clone.sleepTurnsRemaining ?? 0,
+    statBoostHistory: (clone as any).statBoostHistory ?? [],
+  } as T;
+}
+
+export type DamageFloat = FloatEvent & { id: string };
+
+function buildTrainerOpponent(trainer: TrainerData, monIndex: number, allMoves: Move[]): BattleEntity {
+  const slot = trainer.team[monIndex];
+  if (!slot) throw new Error('Trainer team slot missing');
+  const gen = generateWildMonWithMoves(slot.creatureId, slot.level, slot.moves);
+  const opp = ensureBattleFields(gen as any) as NeoMon;
+  return {
+    ...(opp as BattleEntity),
+    moves: opp.moves ?? [...DEFAULT_MOVE_IDS],
+    currentHp: opp.currentStats!.hp,
+    currentStamina: opp.currentStats!.stamina,
+  };
+}
+
+export const useBattle = (_playerId: string, _opponentId: string) => {
+  const battleSessionKey = useStore((s) => s.battleSessionKey);
+  const {
+    grantExperience,
+    updateCoins,
+    persistNeoMon,
+    setLastBattleSummary,
+    recordBattleWin,
+    markTrainerDefeated,
+    addBadge,
+    grantInventoryItem,
+  } = useStore();
+
   const [playerMon, setPlayerMon] = useState<BattleEntity | null>(null);
   const [opponentMon, setOpponentMon] = useState<BattleEntity | null>(null);
-  const [battleLog, setBattleLog] = useState<string[]>([]);
+  const [battleLog, setBattleLog] = useState<BattleLogEntry[]>([]);
   const [isTurnInProgress, setIsTurnInProgress] = useState(false);
-  const [status, setStatus] = useState<'idle' | 'fighting' | 'won' | 'lost'>('idle');
+  const [status, setStatus] = useState<'idle' | 'fighting' | 'won' | 'lost' | 'escaped'>('idle');
   const [allMoves, setAllMoves] = useState<Move[]>([]);
+  const [damageFloats, setDamageFloats] = useState<DamageFloat[]>([]);
+  const playerMonRef = useRef<BattleEntity | null>(null);
+  const opponentMonRef = useRef<BattleEntity | null>(null);
+  playerMonRef.current = playerMon;
+  opponentMonRef.current = opponentMon;
 
-  // Caricamento Iniziale
+  const pushFloats = useCallback((events: FloatEvent[] | undefined) => {
+    if (!events?.length) return;
+    const stamp = `${Date.now()}_${Math.random().toString(36).slice(2)}`;
+    const next: DamageFloat[] = events.map((e, i) => ({ ...e, id: `${stamp}_${i}` }));
+    setDamageFloats((prev) => [...prev, ...next]);
+    setTimeout(() => {
+      setDamageFloats((prev) => prev.filter((x) => !next.some((n) => n.id === x.id)));
+    }, 1100);
+  }, []);
+
   useEffect(() => {
     let isCancelled = false;
 
     const initBattle = async () => {
+      setStatus('idle');
+      setIsTurnInProgress(false);
+      setBattleLog([]);
+      setDamageFloats([]);
+      setPlayerMon(null);
+      setOpponentMon(null);
+
       try {
-        // Carica mosse
-        const flattenedMoves: Move[] = (movesData as any).flat();
+        const flattenedMoves: Move[] = (movesData as unknown as Move[][]).flat();
         if (isCancelled) return;
         setAllMoves(flattenedMoves);
 
-        // Carica Player dalla squadra
         const team = await db.team.toArray();
         if (isCancelled) return;
 
-        // Se la squadra è vuota, torna all'hub
         if (team.length === 0) {
-          setBattleLog(['⚠ Nessun Neo-Mon in squadra!']);
+          setBattleLog([{ text: '⚠ Nessun Neo-Mon in squadra!', kind: 'system' }]);
           setStatus('lost');
           return;
         }
 
-        const pMon = team[0];
-        if (!pMon) {
-          setBattleLog(['⚠ Errore: impossibile caricare il Neo-Mon.']);
+        const raw = team[0];
+        if (!raw) {
+          setBattleLog([{ text: '⚠ Errore: impossibile caricare il Neo-Mon.', kind: 'system' }]);
           setStatus('lost');
           return;
         }
 
+        const pMon = ensureBattleFields(withMoves(raw) as any) as NeoMon;
         const stats = pMon.currentStats || pMon.baseStats;
         if (isCancelled) return;
+
         setPlayerMon({
-          ...pMon,
+          ...(pMon as BattleEntity),
+          moves: pMon.moves ?? [...DEFAULT_MOVE_IDS],
           currentHp: stats.hp,
-          currentStamina: stats.stamina
+          currentStamina: stats.stamina,
         });
 
-        // Genera avversario casuale pescando solo dalle creature con immagine disponibile (fino a n-026)
-        const availableCreatureIds = (creaturesData as any[])
-          .map((c: any) => c.id as string)
-          .filter((id: string) => {
-            const num = parseInt(id.split('-')[1]);
-            return num <= 26;
-          });
-        
-        const randomId = availableCreatureIds[Math.floor(Math.random() * availableCreatureIds.length)];
-        const generatedOpponent = generateWildMon(randomId, pMon.level);
+        const ctx = useStore.getState().battleContext;
+        let generatedOpponent: NeoMon;
+
+        if (ctx?.kind === 'trainer') {
+          const trainer = (trainersData as TrainerData[]).find((t) => t.id === ctx.trainerId);
+          if (!trainer || !trainer.team[ctx.monIndex]) {
+            setBattleLog([{ text: '⚠ Allenatore non valido.', kind: 'system' }]);
+            setStatus('lost');
+            return;
+          }
+          const slot = trainer.team[ctx.monIndex];
+          generatedOpponent = generateWildMonWithMoves(slot.creatureId, slot.level, slot.moves);
+        } else if (ctx?.kind === 'zone') {
+          const cid = pickCreatureIdFromPool(ctx.encounterPool, ctx.encounterRates);
+          const lv = randomLevelInZone({ minLevel: ctx.minLevel, maxLevel: ctx.maxLevel });
+          generatedOpponent = generateWildMon(cid, lv);
+        } else {
+          const availableCreatureIds = (creaturesData as { id: string }[])
+            .map((c) => c.id)
+            .filter((id) => {
+              const num = parseInt(id.split('-')[1], 10);
+              return num <= 26;
+            });
+          const randomId = availableCreatureIds[Math.floor(Math.random() * availableCreatureIds.length)];
+          generatedOpponent = generateWildMon(randomId, pMon.level);
+        }
+
         if (isCancelled) return;
 
+        const opp = ensureBattleFields(generatedOpponent as any) as NeoMon;
         setOpponentMon({
-          ...generatedOpponent,
-          currentHp: generatedOpponent.currentStats!.hp,
-          currentStamina: generatedOpponent.currentStats!.stamina
+          ...(opp as BattleEntity),
+          moves: opp.moves ?? [...DEFAULT_MOVE_IDS],
+          currentHp: opp.currentStats!.hp,
+          currentStamina: opp.currentStats!.stamina,
         });
 
         setStatus('fighting');
-        setBattleLog([`Inizia la battaglia contro ${generatedOpponent.name} selvatico!`]);
+        const wildLabel =
+          ctx?.kind === 'trainer'
+            ? `${(trainersData as TrainerData[]).find((t) => t.id === ctx.trainerId)?.name ?? 'Allenatore'}`
+            : 'selvatico';
+        setBattleLog([
+          {
+            text:
+              ctx?.kind === 'trainer'
+                ? `Sfida! ${wildLabel} invia ${generatedOpponent.name}!`
+                : `Inizia la battaglia contro ${generatedOpponent.name} ${ctx?.kind === 'zone' ? 'nel distretto' : 'selvatico'}!`,
+            kind: 'neutral',
+          },
+        ]);
       } catch (err) {
         console.error('Errore inizializzazione battaglia:', err);
         if (!isCancelled) {
-          setBattleLog(['⚠ Errore durante il caricamento della battaglia.']);
+          setBattleLog([{ text: '⚠ Errore durante il caricamento della battaglia.', kind: 'system' }]);
           setStatus('lost');
         }
       }
     };
 
-    initBattle();
+    void initBattle();
 
     return () => {
       isCancelled = true;
     };
+  }, [battleSessionKey]);
+
+  const addLog = useCallback((msg: string, kind: BattleLogKind = 'neutral') => {
+    setBattleLog((prev) => [...prev.slice(-4), { text: msg, kind }]);
   }, []);
 
-  const addLog = (msg: string) => {
-    setBattleLog(prev => [...prev.slice(-4), msg]); // Mantieni ultimi 5 log
+  const logKindForResult = (res: TurnExecutionResult): BattleLogKind => {
+    if (res.action.type === 'rest') return 'status';
+    if (res.isStaminaFailure) return 'status';
+    if (res.damage > 0 && res.playerId === 'player') return 'damageOut';
+    if (res.damage > 0 && res.playerId === 'ai') return 'damageIn';
+    return 'neutral';
   };
 
-  const handleAction = useCallback(async (actionType: 'move' | 'rest' | 'switch', moveId?: string) => {
-    if (!playerMon || !opponentMon || isTurnInProgress || status !== 'fighting') return;
+  const openSummary = useCallback(
+    (payload: BattleSummaryPayload) => {
+      setLastBattleSummary(payload);
+      setStatus('won');
+    },
+    [setLastBattleSummary]
+  );
 
-    // SWITCH: cambia il Neo-Mon in campo senza turno di attacco del giocatore
-    if (actionType === 'switch' && moveId) {
-      setIsTurnInProgress(true);
-      const team = await db.team.toArray();
-      const newMon = team.find(m => m.id === moveId);
-      if (newMon) {
-        const stats = newMon.currentStats || newMon.baseStats;
-        setPlayerMon({
-          ...newMon,
-          currentHp: stats.hp,
-          currentStamina: stats.stamina
-        });
-        addLog(`Vai ${newMon.name}! Cambiato in campo!`);
-        // L'avversario attacca durante il cambio
-        const aiAction = BattleEngine.getBestMoveAI(opponentMon, { ...newMon, currentHp: stats.hp, currentStamina: stats.stamina } as any, allMoves);
-        const oClone = JSON.parse(JSON.stringify(opponentMon));
-        oClone.currentHp = opponentMon.currentHp;
-        oClone.currentStamina = opponentMon.currentStamina;
-        const newMonClone = { ...newMon, currentHp: stats.hp, currentStamina: stats.stamina };
-        // Applica danno AI al nuovo Neo-Mon
-        await new Promise(resolve => setTimeout(resolve, 800));
-        if (aiAction.move) {
-          addLog(`${opponentMon.name} usa ${aiAction.move.name}!`);
-          const dmg = Math.max(1, Math.floor((oClone.currentStats?.potenza || oClone.baseStats.potenza) * 0.5));
-          setPlayerMon(prev => prev ? { ...prev, currentHp: Math.max(0, prev.currentHp - dmg) } : null);
+  const handleWildOrZoneVictory = useCallback(
+    async (oClone: BattleEntity, expFallback: number) => {
+      const ref = playerMonRef.current;
+      if (!ref) return;
+      const ctx = useStore.getState().battleContext;
+      const isTrainer = ctx?.kind === 'trainer';
+      const matDrop = rollMaterialDropFromTypes(oClone.types.map(String));
+      const rewards = calculateRewards({
+        enemy: oClone,
+        isTrainer,
+        dropItem: matDrop,
+      });
+      const xp = isTrainer ? expFallback : Math.max(rewards.xpGained, expGainFromBattle({ id: oClone.id, level: oClone.level }));
+      const coins = rewards.coinsGained;
+
+      setStatus('idle');
+      if (import.meta.env.DEV) {
+        console.debug('[Battle] victory rewards', { xp, coins, itemDrop: rewards.itemDrop });
+      }
+      updateCoins(coins);
+      await grantExperience(ref.id, xp);
+      if (rewards.itemDrop) await grantInventoryItem(rewards.itemDrop, 1);
+
+      recordBattleWin({ foeTypes: oClone.types.map(String), zoneId: ctx?.kind === 'zone' ? ctx.zoneId : undefined });
+
+      const live = useStore.getState().team.find((m) => m.id === ref.id);
+      const levelUp =
+        live && live.level > ref.level
+          ? { monName: live.name, fromLv: ref.level, toLv: live.level }
+          : null;
+
+      const dropMeta = rewards.itemDrop
+        ? {
+            itemId: rewards.itemDrop,
+            name: (itemsCatalog as { id: string; name: string }[]).find((i) => i.id === rewards.itemDrop)?.name ?? rewards.itemDrop,
+          }
+        : null;
+
+      openSummary({
+        foeName: oClone.name,
+        xpGained: xp,
+        coinsGained: coins,
+        itemDrop: dropMeta,
+        levelUp,
+        showExploreAgain: ctx?.kind === 'zone',
+        returnScreen: ctx?.kind === 'zone' || ctx?.kind === 'trainer' ? 'worldmap' : 'hub',
+      });
+    },
+    [grantExperience, updateCoins, grantInventoryItem, recordBattleWin, openSummary]
+  );
+
+  const handleTrainerMultiWin = useCallback(
+    async (trainer: TrainerData, oClone: BattleEntity, expAmt: number) => {
+      const ref = playerMonRef.current;
+      if (!ref) return;
+      const ctx = useStore.getState().battleContext;
+      if (ctx?.kind !== 'trainer') return;
+      const next = ctx.monIndex + 1;
+      await grantExperience(ref.id, expAmt);
+      if (next < trainer.team.length) {
+        useStore.getState().setBattleContext({ kind: 'trainer', trainerId: trainer.id, monIndex: next });
+        try {
+          const nextEnt = buildTrainerOpponent(trainer, next, allMoves);
+          setOpponentMon(nextEnt);
+          addLog(`${trainer.name} manda in campo ${nextEnt.name}!`, 'system');
+          setStatus('fighting');
+        } catch (e) {
+          console.error(e);
+        }
+        return;
+      }
+
+      updateCoins(trainer.reward.coins);
+      if (trainer.reward.items) {
+        for (const it of trainer.reward.items) {
+          await grantInventoryItem(it.id, it.qty);
         }
       }
+      if (trainer.reward.badge) await addBadge(trainer.reward.badge);
+      await markTrainerDefeated(trainer.id);
+      recordBattleWin({ foeTypes: oClone.types.map(String) });
+
+      openSummary({
+        foeName: trainer.name,
+        xpGained: expAmt,
+        coinsGained: trainer.reward.coins,
+        itemDrop: null,
+        levelUp: null,
+        trainerDialogueWin: trainer.dialogue.win,
+        trainerCoins: trainer.reward.coins,
+        trainerBadge: trainer.reward.badge ?? null,
+        showExploreAgain: false,
+        returnScreen: 'worldmap',
+      });
+    },
+    [
+      allMoves,
+      addBadge,
+      addLog,
+      grantExperience,
+      grantInventoryItem,
+      markTrainerDefeated,
+      openSummary,
+      recordBattleWin,
+      updateCoins,
+    ]
+  );
+
+  const processTurnResults = useCallback(
+    async (result: FullTurnResult, pClone: BattleEntity, oClone: BattleEntity) => {
+      const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
+
+      const executeAndLog = async (res: TurnExecutionResult) => {
+        addLog(res.message, logKindForResult(res));
+        pushFloats(res.floatEvents);
+
+        if (res.playerId === 'player') {
+          setPlayerMon((prev) =>
+            prev
+              ? {
+                  ...prev,
+                  currentStamina: Math.max(0, prev.currentStamina - res.consumedStamina + res.recoveredStamina),
+                }
+              : null
+          );
+          setOpponentMon((prev) =>
+            prev
+              ? {
+                  ...prev,
+                  currentHp: Math.max(0, prev.currentHp - res.damage),
+                }
+              : null
+          );
+        } else {
+          setOpponentMon((prev) =>
+            prev
+              ? {
+                  ...prev,
+                  currentStamina: Math.max(0, prev.currentStamina - res.consumedStamina + res.recoveredStamina),
+                }
+              : null
+          );
+          setPlayerMon((prev) =>
+            prev
+              ? {
+                  ...prev,
+                  currentHp: Math.max(0, prev.currentHp - res.damage),
+                }
+              : null
+          );
+        }
+
+        await sleep(1000);
+      };
+
+      await executeAndLog(result.first);
+
+      if (
+        !result.isBattleOver ||
+        (result.winner === 'player' && result.first.playerId === 'ai') ||
+        (result.winner === 'ai' && result.first.playerId === 'player')
+      ) {
+        if (!result.second.isKO) {
+          await executeAndLog(result.second);
+        }
+      }
+
+      pushFloats(result.endOfTurnFloats);
+      for (const m of result.endOfTurnMessages || []) addLog(m, 'status');
+
+      setPlayerMon((prev) => mergeBattleFromClone(prev, pClone));
+      setOpponentMon((prev) => mergeBattleFromClone(prev, oClone));
+
+      if (result.isBattleOver) {
+        if (result.winner === 'player') {
+          const ctx = useStore.getState().battleContext;
+          const expGained = expGainFromBattle({ id: oClone.id, level: oClone.level });
+          addLog(`Vittoria! +${expGained} EXP (sync calcolo).`, 'system');
+          if (import.meta.env.DEV) {
+            console.debug('[Battle] victory', { expGained, foeId: oClone.id, foeLevel: oClone.level, ctx });
+          }
+
+          if (ctx?.kind === 'trainer') {
+            const trainer = (trainersData as TrainerData[]).find((t) => t.id === ctx.trainerId);
+            if (trainer) {
+              await handleTrainerMultiWin(trainer, oClone, expGained);
+            }
+          } else {
+            await handleWildOrZoneVictory(oClone, expGained);
+          }
+        } else {
+          setStatus('lost');
+          addLog('Sei stato sconfitto... I tuoi Neo-Mon hanno bisogno di riposo.', 'damageIn');
+          const ctx = useStore.getState().battleContext;
+          if (ctx?.kind === 'trainer') {
+            const tr = (trainersData as TrainerData[]).find((t) => t.id === ctx.trainerId);
+            if (tr) addLog(tr.dialogue.lose, 'neutral');
+          }
+        }
+      }
+    },
+    [addLog, handleTrainerMultiWin, handleWildOrZoneVictory, pushFloats]
+  );
+
+  const handleAction = useCallback(
+    async (actionType: 'move' | 'rest' | 'switch', moveId?: string) => {
+      if (!playerMon || !opponentMon || isTurnInProgress || status !== 'fighting') return;
+
+      if (actionType === 'switch' && moveId) {
+        setIsTurnInProgress(true);
+        const team = await db.team.toArray();
+        const newMonRaw = team.find((m) => m.id === moveId);
+        if (newMonRaw) {
+          const newMon = ensureBattleFields(withMoves(newMonRaw) as any) as NeoMon;
+          const st = newMon.currentStats || newMon.baseStats;
+          let currentHp = st.hp;
+          const currentStamina = st.stamina;
+          addLog(`Vai ${newMon.name}! Cambiato in campo!`, 'system');
+          const aiAction = BattleEngine.getBestMoveAI(
+            opponentMon,
+            { ...newMon, currentHp, currentStamina } as BattleEntity,
+            allMoves
+          );
+          const oClone = JSON.parse(JSON.stringify(opponentMon));
+          oClone.currentHp = opponentMon.currentHp;
+          oClone.currentStamina = opponentMon.currentStamina;
+          await new Promise((resolve) => setTimeout(resolve, 800));
+          if (aiAction.move) {
+            addLog(`${opponentMon.name} usa ${aiAction.move.name}!`, 'damageIn');
+            const dmg = Math.max(1, Math.floor((oClone.currentStats?.potenza || oClone.baseStats.potenza) * 0.5));
+            currentHp = Math.max(0, currentHp - dmg);
+          }
+          const switched: BattleEntity = {
+            ...(newMon as BattleEntity),
+            moves: newMon.moves ?? [...DEFAULT_MOVE_IDS],
+            currentHp,
+            currentStamina,
+          };
+          setPlayerMon(switched);
+          await persistNeoMon({ ...switched, currentStats: switched.currentStats || switched.baseStats });
+        }
+        setIsTurnInProgress(false);
+        return;
+      }
+
+      setIsTurnInProgress(true);
+
+      const playerAction: BattleAction = {
+        type: actionType,
+        moveId,
+        move: moveId ? allMoves.find((m) => m.id === moveId) : undefined,
+      };
+
+      const aiAction = BattleEngine.getBestMoveAI(opponentMon, playerMon, allMoves);
+
+      const pClone = JSON.parse(JSON.stringify(playerMon)) as BattleEntity;
+      const oClone = JSON.parse(JSON.stringify(opponentMon)) as BattleEntity;
+
+      pClone.currentStamina = playerMon.currentStamina;
+      pClone.currentHp = playerMon.currentHp;
+      oClone.currentStamina = opponentMon.currentStamina;
+      oClone.currentHp = opponentMon.currentHp;
+
+      const turnResult = BattleEngine.executeTurn(pClone, oClone, playerAction, aiAction, allMoves);
+
+      await processTurnResults(turnResult, pClone, oClone);
+
+      const won = turnResult.isBattleOver && turnResult.winner === 'player';
+      const trainerCtx = useStore.getState().battleContext?.kind === 'trainer';
+      if (won && trainerCtx) {
+        const liveFromStore = useStore.getState().team.find((m) => m.id === playerMon.id) ?? playerMon;
+        const pFinal = {
+          ...liveFromStore,
+          currentHp: pClone.currentHp,
+          currentStamina: pClone.currentStamina,
+          currentStats: liveFromStore.currentStats ?? liveFromStore.baseStats,
+          status: pClone.status ?? null,
+          statStages: pClone.statStages ?? createDefaultStatStages(),
+          sleepTurnsRemaining: pClone.sleepTurnsRemaining ?? 0,
+        } as NeoMon;
+        await persistNeoMon(pFinal);
+        setIsTurnInProgress(false);
+        return;
+      }
+
+      const liveFromStore = won ? useStore.getState().team.find((m) => m.id === playerMon.id) : undefined;
+      const baseMon = liveFromStore ?? playerMon;
+
+      const pFinal = {
+        ...baseMon,
+        currentHp: pClone.currentHp,
+        currentStamina: pClone.currentStamina,
+        currentStats: baseMon.currentStats ?? baseMon.baseStats,
+        status: pClone.status ?? null,
+        statStages: pClone.statStages ?? createDefaultStatStages(),
+        sleepTurnsRemaining: pClone.sleepTurnsRemaining ?? 0,
+      } as NeoMon;
+
+      if (import.meta.env.DEV) {
+        console.debug('[Battle] persistNeoMon', {
+          won,
+          exp: pFinal.exp,
+          level: pFinal.level,
+          hp: pClone.currentHp,
+        });
+      }
+
+      await persistNeoMon(pFinal);
+
       setIsTurnInProgress(false);
+    },
+    [playerMon, opponentMon, isTurnInProgress, status, allMoves, persistNeoMon, processTurnResults, addLog]
+  );
+
+  const handleSelectMove = useCallback(
+    (move: Move) => {
+      void handleAction('move', move.id);
+    },
+    [handleAction]
+  );
+
+  const handleFlee = useCallback(() => {
+    if (!playerMon || !opponentMon || isTurnInProgress || status !== 'fighting') return;
+    const ctx = useStore.getState().battleContext;
+    if (ctx?.kind === 'trainer') {
+      addLog('Non puoi fuggire da una sfida ufficiale!', 'system');
       return;
     }
-
-    setIsTurnInProgress(true);
-
-    // 1. Prepara Azione Giocatore
-    const playerAction: BattleAction = {
-      type: actionType,
-      moveId,
-      move: moveId ? allMoves.find(m => m.id === moveId) : undefined
-    };
-
-    // 2. Prepara Azione IA
-    const aiAction = BattleEngine.getBestMoveAI(opponentMon, playerMon, allMoves);
-
-    // 3. Esegui Turno (Clone per evitare mutazioni dirette prima di set state)
-    const pClone = JSON.parse(JSON.stringify(playerMon));
-    const oClone = JSON.parse(JSON.stringify(opponentMon));
-
-    // Inseriamo stamina/hp dinamici nell'oggetto per l'engine (che usa (mon as any).currentStamina)
-    pClone.currentStamina = playerMon.currentStamina;
-    pClone.currentHp = playerMon.currentHp;
-    oClone.currentStamina = opponentMon.currentStamina;
-    oClone.currentHp = opponentMon.currentHp;
-
-    const turnResult: FullTurnResult = BattleEngine.executeTurn(pClone, oClone, playerAction, aiAction);
-
-    // 4. Esegui Log con Delay per fluidità
-    await processTurnResults(turnResult);
-
-    setIsTurnInProgress(false);
-  }, [playerMon, opponentMon, isTurnInProgress, status, allMoves]);
-
-  const processTurnResults = async (result: FullTurnResult) => {
-    const sleep = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
-
-    const executeAndLog = async (res: TurnExecutionResult) => {
-      addLog(res.message);
-
-      // Aggiorna stati visibili gradualmente
-      if (res.playerId === 'player') {
-        setPlayerMon(prev => prev ? {
-          ...prev,
-          currentStamina: Math.max(0, prev.currentStamina - res.consumedStamina + res.recoveredStamina)
-        } : null);
-        setOpponentMon(prev => prev ? {
-          ...prev,
-          currentHp: Math.max(0, prev.currentHp - res.damage)
-        } : null);
-      } else {
-        setOpponentMon(prev => prev ? {
-          ...prev,
-          currentStamina: Math.max(0, prev.currentStamina - res.consumedStamina + res.recoveredStamina)
-        } : null);
-        setPlayerMon(prev => prev ? {
-          ...prev,
-          currentHp: Math.max(0, prev.currentHp - res.damage)
-        } : null);
-      }
-
-      await sleep(1000); // Pausa tra azioni
-    };
-
-    // Esegui prima azione
-    await executeAndLog(result.first);
-
-    // Se la battaglia non è finita dopo la prima azione, esegui la seconda
-    if (!result.isBattleOver || (result.winner === 'player' && result.first.playerId === 'ai') || (result.winner === 'ai' && result.first.playerId === 'player')) {
-      // Se il secondo attore non è quello che è andato KO nel primo step (già gestito dall'engine)
-      if (!result.second.isKO) {
-        await executeAndLog(result.second);
-      }
+    const pSp = BattleEngine.effectiveSpeed(playerMon);
+    const eSp = BattleEngine.effectiveSpeed(opponentMon);
+    const rollCap = Math.min(192, Math.floor((pSp / Math.max(1, eSp)) * 128));
+    if (Math.random() * 256 < rollCap) {
+      addLog('Sei riuscito a fuggire dalla battaglia!', 'system');
+      setStatus('escaped');
+    } else {
+      addLog('Non sei riuscito a fuggire!', 'system');
     }
+  }, [playerMon, opponentMon, isTurnInProgress, status, addLog]);
 
-    // 5. Controllo Fine Battaglia
-    if (result.isBattleOver) {
-      if (result.winner === 'player') {
-        setStatus('won');
-        addLog('Hai vinto la battaglia! Guadagnati 50 Monete e 100 EXP.');
-        await handleVittoria();
-      } else {
-        setStatus('lost');
-        addLog('Sei stato sconfitto... I tuoi Neo-Mon hanno bisogno di riposo.');
-      }
+  const afterCatchFailure = useCallback(async () => {
+    const p = playerMonRef.current;
+    const o = opponentMonRef.current;
+    if (!p || !o || status !== 'fighting') return;
+
+    const aiAction = BattleEngine.getBestMoveAI(o, p, allMoves);
+    if (aiAction.type === 'rest' || !aiAction.moveId) {
+      addLog(`${o.name} osserva il Prisma cadere...`, 'neutral');
+      return;
     }
-  };
+    const move = resolveMoveById(aiAction.moveId, allMoves);
+    const oClone = JSON.parse(JSON.stringify(o)) as BattleEntity;
+    const pClone = JSON.parse(JSON.stringify(p)) as BattleEntity;
+    oClone.currentHp = o.currentHp;
+    oClone.currentStamina = o.currentStamina;
+    pClone.currentHp = p.currentHp;
+    pClone.currentStamina = p.currentStamina;
 
-  const handleVittoria = async () => {
-    if (!playerMon) return;
+    const dmg = Math.max(1, Math.floor(calculateDamage(oClone, pClone, move)));
+    addLog(`${o.name} contrattacca con ${move.name}!`, 'damageIn');
+    pushFloats([{ side: 'player', amount: dmg, variant: 'damage' }]);
+    const nextHp = Math.max(0, p.currentHp - dmg);
+    const nextEnemyStam = Math.max(0, o.currentStamina - move.staminaCost);
+    setPlayerMon((prev) => (prev ? { ...prev, currentHp: nextHp } : null));
+    setOpponentMon((prev) => (prev ? { ...prev, currentStamina: nextEnemyStam } : null));
 
-    // Aggiorna monete tramite store (si riflette immediatamente nell'UI)
-    updateCoins(50);
+    if (nextHp <= 0) {
+      setStatus('lost');
+      addLog('Il tuo Neo-Mon non regge più...', 'damageIn');
+    }
+    const merged = { ...p, currentHp: nextHp, currentStats: p.currentStats || p.baseStats };
+    await persistNeoMon(merged);
+  }, [allMoves, status, addLog, persistNeoMon, pushFloats]);
 
-    // Guadagno Esperienza centralizzato tramite Store
-    await grantExperience(playerMon.id, 100);
-  };
+  const activeMoves = (playerMon?.moves ?? [])
+    .slice(0, 4)
+    .map((id) => allMoves.find((m) => m.id === id))
+    .filter((m): m is Move => !!m);
 
   return {
     playerMon,
@@ -239,6 +616,11 @@ export const useBattle = (playerId: string, opponentId: string) => {
     isTurnInProgress,
     status,
     allMoves,
-    handleAction
+    handleAction,
+    handleSelectMove,
+    handleFlee,
+    afterCatchFailure,
+    damageFloats,
+    activeMoves,
   };
 };

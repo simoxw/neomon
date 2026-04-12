@@ -8,7 +8,8 @@
             "staminaCost": 12,
             "accuracy": 100,
             "category": "Physical",
-            "effect": null
+            "effect": null,
+            "learnLevel": 1
         },
         {
             "id": "m-bio-02",
@@ -18,7 +19,8 @@
             "staminaCost": 15,
             "accuracy": 100,
             "category": "Sintonia",
-            "effect": null
+            "effect": null,
+            "learnLevel": 1
         },
         {
             "id": "m-bio-03",
@@ -28,7 +30,8 @@
             "staminaCost": 8,
             "accuracy": 100,
             "category": "Sintonia",
-            "effect": null
+            "effect": null,
+            "learnLevel": 1
         },
         {
             "id": "m-bio-04",
@@ -38,7 +41,8 @@
             "staminaCost": 30,
             "accuracy": 95,
             "category": "Physical",
-            "effect": null
+            "effect": null,
+            "learnLevel": 15
         },
         {
             "id": "m-bio-05",
@@ -48,7 +52,9 @@
             "staminaCost": 35,
             "accuracy": 90,
             "category": "Sintonia",
-            "effect": "10% prob. Paralisi"
+            "effect": null,
+            "description": "10% prob. Paralisi",
+            "learnLevel": 15
         },
         {
             "id": "m-bio-06",
@@ -58,7 +64,8 @@
             "staminaCost": 25,
             "accuracy": 95,
             "category": "Sintonia",
-            "effect": null
+            "effect": null,
+            "learnLevel": 15
         },
         {
             "id": "m-bio-07",
@@ -68,7 +75,9 @@
             "staminaCost": 75,
             "accuracy": 80,
             "category": "Sintonia",
-            "effect": "Danno massiccio"
+            "effect": null,
+            "description": "Danno massiccio",
+            "learnLevel": 45
         },
         {
             "id": "m-bio-08",
@@ -78,7 +87,8 @@
             "staminaCost": 65,
             "accuracy": 85,
             "category": "Physical",
-            "effect": null
+            "effect": null,
+            "learnLevel": 30
         },
         {
             "id": "m-bio-09",
@@ -88,7 +98,9 @@
             "staminaCost": 20,
             "accuracy": 100,
             "category": "Status",
-            "effect": "Aumenta Sintonia"
+            "effect": null,
+            "description": "Aumenta Sintonia",
+            "learnLevel": 10
         },
         {
             "id": "m-bio-10",
@@ -98,7 +110,9 @@
             "staminaCost": 25,
             "accuracy": 100,
             "category": "Status",
-            "effect": "Danno nel tempo"
+            "effect": null,
+            "description": "Danno nel tempo",
+            "learnLevel": 10
         },
         {
             "id": "m-inc-01",
@@ -108,7 +122,8 @@
             "staminaCost": 10,
             "accuracy": 100,
             "category": "Sintonia",
-            "effect": null
+            "effect": null,
+            "learnLevel": 1
         },
         {
             "id": "m-inc-02",
@@ -118,7 +133,8 @@
             "staminaCost": 12,
             "accuracy": 100,
             "category": "Physical",
-            "effect": null
+            "effect": null,
+            "learnLevel": 1
         },
         {
             "id": "m-inc-03",
@@ -128,7 +144,8 @@
             "staminaCost": 15,
             "accuracy": 100,
             "category": "Sintonia",
-            "effect": null
+            "effect": null,
+            "learnLevel": 1
         },
         {
             "id": "m-inc-04",
@@ -138,7 +155,9 @@
             "staminaCost": 35,
             "accuracy": 95,
             "category": "Physical",
-            "effect": "30% prob. Scottatura"
+            "effect": null,
+            "description": "30% prob. Scottatura",
+            "learnLevel": 15
         },
         {
             "id": "m-inc-05",
@@ -148,7 +167,8 @@
             "staminaCost": 30,
             "accuracy": 95,
             "category": "Sintonia",
-            "effect": null
+            "effect": null,
+            "learnLevel": 15
         },
         {
             "id": "m-inc-06",
@@ -158,7 +178,8 @@
             "staminaCost": 25,
             "accuracy": 95,
             "category": "Sintonia",
-            "effect": null
+            "effect": null,
+            "learnLevel": 15
         },
         {
             "id": "m-inc-07",
@@ -168,7 +189,8 @@
             "staminaCost": 85,
             "accuracy": 70,
             "category": "Sintonia",
-            "effect": null
+            "effect": null,
+            "learnLevel": 45
         },
         {
             "id": "m-inc-08",
@@ -178,7 +200,8 @@
             "staminaCost": 75,
             "accuracy": 80,
             "category": "Physical",
-            "effect": null
+            "effect": null,
+            "learnLevel": 30
         },
         {
             "id": "m-inc-09",
@@ -188,7 +211,9 @@
             "staminaCost": 20,
             "accuracy": 100,
             "category": "Status",
-            "effect": "Aumenta Potenza"
+            "effect": null,
+            "description": "Aumenta Potenza",
+            "learnLevel": 10
         },
         {
             "id": "m-inc-10",
@@ -198,7 +223,9 @@
             "staminaCost": 15,
             "accuracy": 100,
             "category": "Status",
-            "effect": "Aumenta Resistenza"
+            "effect": null,
+            "description": "Aumenta Resistenza",
+            "learnLevel": 10
         },
         {
             "id": "m-idr-01",
@@ -208,7 +235,8 @@
             "staminaCost": 8,
             "accuracy": 100,
             "category": "Sintonia",
-            "effect": null
+            "effect": null,
+            "learnLevel": 1
         },
         {
             "id": "m-idr-02",
@@ -218,7 +246,8 @@
             "staminaCost": 12,
             "accuracy": 100,
             "category": "Physical",
-            "effect": null
+            "effect": null,
+            "learnLevel": 1
         },
         {
             "id": "m-idr-03",
@@ -228,7 +257,8 @@
             "staminaCost": 15,
             "accuracy": 100,
             "category": "Sintonia",
-            "effect": null
+            "effect": null,
+            "learnLevel": 1
         },
         {
             "id": "m-idr-04",
@@ -238,7 +268,9 @@
             "staminaCost": 30,
             "accuracy": 95,
             "category": "Sintonia",
-            "effect": "Può confondere"
+            "effect": null,
+            "description": "Può confondere",
+            "learnLevel": 15
         },
         {
             "id": "m-idr-05",
@@ -248,7 +280,8 @@
             "staminaCost": 35,
             "accuracy": 95,
             "category": "Physical",
-            "effect": null
+            "effect": null,
+            "learnLevel": 15
         },
         {
             "id": "m-idr-06",
@@ -258,7 +291,8 @@
             "staminaCost": 25,
             "accuracy": 95,
             "category": "Sintonia",
-            "effect": null
+            "effect": null,
+            "learnLevel": 15
         },
         {
             "id": "m-idr-07",
@@ -268,7 +302,8 @@
             "staminaCost": 80,
             "accuracy": 75,
             "category": "Sintonia",
-            "effect": null
+            "effect": null,
+            "learnLevel": 45
         },
         {
             "id": "m-idr-08",
@@ -278,7 +313,8 @@
             "staminaCost": 65,
             "accuracy": 85,
             "category": "Sintonia",
-            "effect": null
+            "effect": null,
+            "learnLevel": 30
         },
         {
             "id": "m-idr-09",
@@ -288,7 +324,9 @@
             "staminaCost": 18,
             "accuracy": 100,
             "category": "Status",
-            "effect": "Riduce Velocità"
+            "effect": null,
+            "description": "Riduce Velocità",
+            "learnLevel": 10
         },
         {
             "id": "m-idr-10",
@@ -298,7 +336,9 @@
             "staminaCost": 22,
             "accuracy": 100,
             "category": "Status",
-            "effect": "Rimuove Debuff"
+            "effect": null,
+            "description": "Rimuove Debuff",
+            "learnLevel": 10
         },
         {
             "id": "m-ful-01",
@@ -308,7 +348,8 @@
             "staminaCost": 10,
             "accuracy": 100,
             "category": "Sintonia",
-            "effect": null
+            "effect": null,
+            "learnLevel": 6
         },
         {
             "id": "m-ful-02",
@@ -318,7 +359,9 @@
             "staminaCost": 12,
             "accuracy": 100,
             "category": "Sintonia",
-            "effect": "Priorità alta"
+            "effect": null,
+            "description": "Priorità alta",
+            "learnLevel": 1
         },
         {
             "id": "m-ful-03",
@@ -328,7 +371,8 @@
             "staminaCost": 15,
             "accuracy": 100,
             "category": "Physical",
-            "effect": null
+            "effect": null,
+            "learnLevel": 1
         },
         {
             "id": "m-ful-04",
@@ -338,7 +382,9 @@
             "staminaCost": 38,
             "accuracy": 90,
             "category": "Sintonia",
-            "effect": "Catena fulmini"
+            "effect": null,
+            "description": "Catena fulmini",
+            "learnLevel": 20
         },
         {
             "id": "m-ful-05",
@@ -348,7 +394,9 @@
             "staminaCost": 30,
             "accuracy": 95,
             "category": "Sintonia",
-            "effect": "10% prob. Paralisi"
+            "effect": null,
+            "description": "10% prob. Paralisi",
+            "learnLevel": 15
         },
         {
             "id": "m-ful-06",
@@ -358,7 +406,8 @@
             "staminaCost": 25,
             "accuracy": 95,
             "category": "Sintonia",
-            "effect": null
+            "effect": null,
+            "learnLevel": 15
         },
         {
             "id": "m-ful-07",
@@ -368,7 +417,8 @@
             "staminaCost": 80,
             "accuracy": 70,
             "category": "Sintonia",
-            "effect": null
+            "effect": null,
+            "learnLevel": 45
         },
         {
             "id": "m-ful-08",
@@ -378,7 +428,8 @@
             "staminaCost": 60,
             "accuracy": 85,
             "category": "Sintonia",
-            "effect": null
+            "effect": null,
+            "learnLevel": 30
         },
         {
             "id": "m-ful-09",
@@ -388,7 +439,9 @@
             "staminaCost": 30,
             "accuracy": 100,
             "category": "Status",
-            "effect": "Aumenta Sintonia"
+            "effect": null,
+            "description": "Aumenta Sintonia",
+            "learnLevel": 10
         },
         {
             "id": "m-ful-10",
@@ -398,7 +451,9 @@
             "staminaCost": 15,
             "accuracy": 100,
             "category": "Status",
-            "effect": "Applica Paralisi"
+            "effect": null,
+            "description": "Applica Paralisi",
+            "learnLevel": 10
         },
         {
             "id": "m-tet-01",
@@ -408,7 +463,8 @@
             "staminaCost": 10,
             "accuracy": 100,
             "category": "Physical",
-            "effect": null
+            "effect": null,
+            "learnLevel": 6
         },
         {
             "id": "m-tet-02",
@@ -418,7 +474,8 @@
             "staminaCost": 12,
             "accuracy": 100,
             "category": "Sintonia",
-            "effect": null
+            "effect": null,
+            "learnLevel": 1
         },
         {
             "id": "m-tet-03",
@@ -428,7 +485,8 @@
             "staminaCost": 8,
             "accuracy": 100,
             "category": "Physical",
-            "effect": null
+            "effect": null,
+            "learnLevel": 1
         },
         {
             "id": "m-tet-04",
@@ -438,7 +496,8 @@
             "staminaCost": 35,
             "accuracy": 90,
             "category": "Sintonia",
-            "effect": null
+            "effect": null,
+            "learnLevel": 15
         },
         {
             "id": "m-tet-05",
@@ -448,7 +507,8 @@
             "staminaCost": 30,
             "accuracy": 95,
             "category": "Sintonia",
-            "effect": null
+            "effect": null,
+            "learnLevel": 15
         },
         {
             "id": "m-tet-06",
@@ -458,7 +518,8 @@
             "staminaCost": 28,
             "accuracy": 95,
             "category": "Physical",
-            "effect": null
+            "effect": null,
+            "learnLevel": 15
         },
         {
             "id": "m-tet-07",
@@ -468,7 +529,8 @@
             "staminaCost": 75,
             "accuracy": 80,
             "category": "Sintonia",
-            "effect": null
+            "effect": null,
+            "learnLevel": 45
         },
         {
             "id": "m-tet-08",
@@ -478,7 +540,8 @@
             "staminaCost": 60,
             "accuracy": 85,
             "category": "Physical",
-            "effect": null
+            "effect": null,
+            "learnLevel": 30
         },
         {
             "id": "m-tet-09",
@@ -488,7 +551,9 @@
             "staminaCost": 25,
             "accuracy": 100,
             "category": "Status",
-            "effect": "Danno timer"
+            "effect": null,
+            "description": "Danno timer",
+            "learnLevel": 10
         },
         {
             "id": "m-tet-10",
@@ -498,7 +563,9 @@
             "staminaCost": 20,
             "accuracy": 100,
             "category": "Status",
-            "effect": "Riduce Attacco"
+            "effect": null,
+            "description": "Riduce Attacco",
+            "learnLevel": 10
         },
         {
             "id": "m-mec-01",
@@ -508,7 +575,8 @@
             "staminaCost": 12,
             "accuracy": 100,
             "category": "Physical",
-            "effect": null
+            "effect": null,
+            "learnLevel": 6
         },
         {
             "id": "m-mec-02",
@@ -518,7 +586,8 @@
             "staminaCost": 10,
             "accuracy": 100,
             "category": "Sintonia",
-            "effect": null
+            "effect": null,
+            "learnLevel": 1
         },
         {
             "id": "m-mec-03",
@@ -528,7 +597,8 @@
             "staminaCost": 15,
             "accuracy": 100,
             "category": "Physical",
-            "effect": null
+            "effect": null,
+            "learnLevel": 1
         },
         {
             "id": "m-mec-04",
@@ -538,7 +608,9 @@
             "staminaCost": 40,
             "accuracy": 90,
             "category": "Physical",
-            "effect": "+Velocità"
+            "effect": null,
+            "description": "+Velocità",
+            "learnLevel": 15
         },
         {
             "id": "m-mec-05",
@@ -548,7 +620,8 @@
             "staminaCost": 30,
             "accuracy": 95,
             "category": "Sintonia",
-            "effect": null
+            "effect": null,
+            "learnLevel": 15
         },
         {
             "id": "m-mec-06",
@@ -558,7 +631,8 @@
             "staminaCost": 35,
             "accuracy": 95,
             "category": "Physical",
-            "effect": null
+            "effect": null,
+            "learnLevel": 15
         },
         {
             "id": "m-mec-07",
@@ -568,7 +642,9 @@
             "staminaCost": 85,
             "accuracy": 70,
             "category": "Sintonia",
-            "effect": "Carica turno 1"
+            "effect": null,
+            "description": "Carica turno 1",
+            "learnLevel": 50
         },
         {
             "id": "m-mec-08",
@@ -578,7 +654,8 @@
             "staminaCost": 75,
             "accuracy": 80,
             "category": "Physical",
-            "effect": null
+            "effect": null,
+            "learnLevel": 30
         },
         {
             "id": "m-mec-09",
@@ -588,7 +665,9 @@
             "staminaCost": 15,
             "accuracy": 100,
             "category": "Status",
-            "effect": "+Prec/Pot"
+            "effect": null,
+            "description": "+Prec/Pot",
+            "learnLevel": 10
         },
         {
             "id": "m-mec-10",
@@ -598,7 +677,9 @@
             "staminaCost": 20,
             "accuracy": 100,
             "category": "Status",
-            "effect": "+Resistenza"
+            "effect": null,
+            "description": "+Resistenza",
+            "learnLevel": 15
         },
         {
             "id": "m-ete-01",
@@ -608,7 +689,8 @@
             "staminaCost": 10,
             "accuracy": 100,
             "category": "Sintonia",
-            "effect": null
+            "effect": null,
+            "learnLevel": 6
         },
         {
             "id": "m-ete-02",
@@ -618,7 +700,8 @@
             "staminaCost": 12,
             "accuracy": 100,
             "category": "Physical",
-            "effect": null
+            "effect": null,
+            "learnLevel": 6
         },
         {
             "id": "m-ete-03",
@@ -628,7 +711,8 @@
             "staminaCost": 15,
             "accuracy": 100,
             "category": "Sintonia",
-            "effect": null
+            "effect": null,
+            "learnLevel": 6
         },
         {
             "id": "m-ete-04",
@@ -638,7 +722,9 @@
             "staminaCost": 38,
             "accuracy": 90,
             "category": "Sintonia",
-            "effect": "Ignora scudi"
+            "effect": null,
+            "description": "Ignora scudi",
+            "learnLevel": 15
         },
         {
             "id": "m-ete-05",
@@ -648,7 +734,8 @@
             "staminaCost": 28,
             "accuracy": 95,
             "category": "Sintonia",
-            "effect": null
+            "effect": null,
+            "learnLevel": 15
         },
         {
             "id": "m-ete-06",
@@ -658,7 +745,8 @@
             "staminaCost": 30,
             "accuracy": 95,
             "category": "Physical",
-            "effect": null
+            "effect": null,
+            "learnLevel": 15
         },
         {
             "id": "m-ete-07",
@@ -668,7 +756,8 @@
             "staminaCost": 80,
             "accuracy": 75,
             "category": "Sintonia",
-            "effect": null
+            "effect": null,
+            "learnLevel": 45
         },
         {
             "id": "m-ete-08",
@@ -678,7 +767,8 @@
             "staminaCost": 60,
             "accuracy": 85,
             "category": "Physical",
-            "effect": null
+            "effect": null,
+            "learnLevel": 30
         },
         {
             "id": "m-ete-09",
@@ -688,7 +778,9 @@
             "staminaCost": 25,
             "accuracy": 100,
             "category": "Status",
-            "effect": "Evasione +2"
+            "effect": null,
+            "description": "Evasione +2",
+            "learnLevel": 10
         },
         {
             "id": "m-ete-10",
@@ -698,7 +790,9 @@
             "staminaCost": 30,
             "accuracy": 100,
             "category": "Status",
-            "effect": "+Spirito"
+            "effect": null,
+            "description": "+Spirito",
+            "learnLevel": 10
         },
         {
             "id": "m-cin-01",
@@ -708,7 +802,8 @@
             "staminaCost": 12,
             "accuracy": 100,
             "category": "Physical",
-            "effect": null
+            "effect": null,
+            "learnLevel": 6
         },
         {
             "id": "m-cin-02",
@@ -718,7 +813,8 @@
             "staminaCost": 10,
             "accuracy": 100,
             "category": "Sintonia",
-            "effect": null
+            "effect": null,
+            "learnLevel": 1
         },
         {
             "id": "m-cin-03",
@@ -728,7 +824,8 @@
             "staminaCost": 15,
             "accuracy": 100,
             "category": "Physical",
-            "effect": null
+            "effect": null,
+            "learnLevel": 6
         },
         {
             "id": "m-cin-04",
@@ -738,7 +835,8 @@
             "staminaCost": 40,
             "accuracy": 90,
             "category": "Physical",
-            "effect": null
+            "effect": null,
+            "learnLevel": 15
         },
         {
             "id": "m-cin-05",
@@ -748,7 +846,9 @@
             "staminaCost": 30,
             "accuracy": 95,
             "category": "Sintonia",
-            "effect": "-Velocità avv."
+            "effect": null,
+            "description": "-Velocità avv.",
+            "learnLevel": 15
         },
         {
             "id": "m-cin-06",
@@ -758,7 +858,8 @@
             "staminaCost": 25,
             "accuracy": 95,
             "category": "Physical",
-            "effect": null
+            "effect": null,
+            "learnLevel": 15
         },
         {
             "id": "m-cin-07",
@@ -768,7 +869,8 @@
             "staminaCost": 85,
             "accuracy": 70,
             "category": "Physical",
-            "effect": null
+            "effect": null,
+            "learnLevel": 50
         },
         {
             "id": "m-cin-08",
@@ -778,7 +880,8 @@
             "staminaCost": 60,
             "accuracy": 85,
             "category": "Sintonia",
-            "effect": null
+            "effect": null,
+            "learnLevel": 30
         },
         {
             "id": "m-cin-09",
@@ -788,7 +891,9 @@
             "staminaCost": 20,
             "accuracy": 100,
             "category": "Status",
-            "effect": "+Flusso"
+            "effect": null,
+            "description": "+Flusso",
+            "learnLevel": 10
         },
         {
             "id": "m-cin-10",
@@ -798,7 +903,9 @@
             "staminaCost": 15,
             "accuracy": 100,
             "category": "Status",
-            "effect": "-Difesa avv."
+            "effect": null,
+            "description": "-Difesa avv.",
+            "learnLevel": 10
         },
         {
             "id": "m-geo-01",
@@ -808,7 +915,8 @@
             "staminaCost": 10,
             "accuracy": 100,
             "category": "Sintonia",
-            "effect": null
+            "effect": null,
+            "learnLevel": 1
         },
         {
             "id": "m-geo-02",
@@ -818,7 +926,8 @@
             "staminaCost": 12,
             "accuracy": 100,
             "category": "Physical",
-            "effect": null
+            "effect": null,
+            "learnLevel": 6
         },
         {
             "id": "m-geo-03",
@@ -828,7 +937,8 @@
             "staminaCost": 15,
             "accuracy": 100,
             "category": "Sintonia",
-            "effect": null
+            "effect": null,
+            "learnLevel": 1
         },
         {
             "id": "m-geo-04",
@@ -838,7 +948,9 @@
             "staminaCost": 40,
             "accuracy": 90,
             "category": "Physical",
-            "effect": "Area"
+            "effect": null,
+            "description": "Area",
+            "learnLevel": 20
         },
         {
             "id": "m-geo-05",
@@ -848,7 +960,8 @@
             "staminaCost": 30,
             "accuracy": 95,
             "category": "Physical",
-            "effect": null
+            "effect": null,
+            "learnLevel": 20
         },
         {
             "id": "m-geo-06",
@@ -858,7 +971,8 @@
             "staminaCost": 28,
             "accuracy": 95,
             "category": "Sintonia",
-            "effect": null
+            "effect": null,
+            "learnLevel": 15
         },
         {
             "id": "m-geo-07",
@@ -868,7 +982,8 @@
             "staminaCost": 85,
             "accuracy": 70,
             "category": "Sintonia",
-            "effect": null
+            "effect": null,
+            "learnLevel": 50
         },
         {
             "id": "m-geo-08",
@@ -878,7 +993,8 @@
             "staminaCost": 60,
             "accuracy": 85,
             "category": "Physical",
-            "effect": null
+            "effect": null,
+            "learnLevel": 30
         },
         {
             "id": "m-geo-09",
@@ -888,7 +1004,9 @@
             "staminaCost": 20,
             "accuracy": 100,
             "category": "Status",
-            "effect": "++Resistenza"
+            "effect": null,
+            "description": "++Resistenza",
+            "learnLevel": 10
         },
         {
             "id": "m-geo-10",
@@ -898,7 +1016,9 @@
             "staminaCost": 15,
             "accuracy": 100,
             "category": "Status",
-            "effect": "-Precisione avv."
+            "effect": null,
+            "description": "-Precisione avv.",
+            "learnLevel": 10
         },
         {
             "id": "m-aer-01",
@@ -908,7 +1028,8 @@
             "staminaCost": 8,
             "accuracy": 100,
             "category": "Sintonia",
-            "effect": null
+            "effect": null,
+            "learnLevel": 1
         },
         {
             "id": "m-aer-02",
@@ -918,7 +1039,8 @@
             "staminaCost": 12,
             "accuracy": 100,
             "category": "Physical",
-            "effect": null
+            "effect": null,
+            "learnLevel": 6
         },
         {
             "id": "m-aer-03",
@@ -928,7 +1050,8 @@
             "staminaCost": 15,
             "accuracy": 100,
             "category": "Sintonia",
-            "effect": null
+            "effect": null,
+            "learnLevel": 6
         },
         {
             "id": "m-aer-04",
@@ -938,7 +1061,8 @@
             "staminaCost": 35,
             "accuracy": 90,
             "category": "Sintonia",
-            "effect": null
+            "effect": null,
+            "learnLevel": 20
         },
         {
             "id": "m-aer-05",
@@ -948,7 +1072,8 @@
             "staminaCost": 40,
             "accuracy": 90,
             "category": "Physical",
-            "effect": null
+            "effect": null,
+            "learnLevel": 15
         },
         {
             "id": "m-aer-06",
@@ -958,7 +1083,8 @@
             "staminaCost": 25,
             "accuracy": 95,
             "category": "Sintonia",
-            "effect": null
+            "effect": null,
+            "learnLevel": 15
         },
         {
             "id": "m-aer-07",
@@ -968,7 +1094,8 @@
             "staminaCost": 75,
             "accuracy": 80,
             "category": "Sintonia",
-            "effect": null
+            "effect": null,
+            "learnLevel": 50
         },
         {
             "id": "m-aer-08",
@@ -978,7 +1105,8 @@
             "staminaCost": 70,
             "accuracy": 85,
             "category": "Sintonia",
-            "effect": null
+            "effect": null,
+            "learnLevel": 30
         },
         {
             "id": "m-aer-09",
@@ -988,7 +1116,9 @@
             "staminaCost": 20,
             "accuracy": 100,
             "category": "Status",
-            "effect": "+Flusso/+Evasione"
+            "effect": null,
+            "description": "+Flusso/+Evasione",
+            "learnLevel": 10
         },
         {
             "id": "m-aer-10",
@@ -998,7 +1128,9 @@
             "staminaCost": 15,
             "accuracy": 100,
             "category": "Status",
-            "effect": "Applica Confusione"
+            "effect": null,
+            "description": "Applica Confusione",
+            "learnLevel": 10
         },
         {
             "id": "m-cri-01",
@@ -1008,7 +1140,9 @@
             "staminaCost": 10,
             "accuracy": 100,
             "category": "Physical",
-            "effect": "Sempre primo"
+            "effect": null,
+            "description": "Sempre primo",
+            "learnLevel": 6
         },
         {
             "id": "m-cri-02",
@@ -1018,7 +1152,8 @@
             "staminaCost": 12,
             "accuracy": 100,
             "category": "Sintonia",
-            "effect": null
+            "effect": null,
+            "learnLevel": 1
         },
         {
             "id": "m-cri-03",
@@ -1028,7 +1163,8 @@
             "staminaCost": 15,
             "accuracy": 100,
             "category": "Physical",
-            "effect": null
+            "effect": null,
+            "learnLevel": 6
         },
         {
             "id": "m-cri-04",
@@ -1038,7 +1174,9 @@
             "staminaCost": 40,
             "accuracy": 90,
             "category": "Sintonia",
-            "effect": "10% prob. Congelam."
+            "effect": null,
+            "description": "10% prob. Congelam.",
+            "learnLevel": 15
         },
         {
             "id": "m-cri-05",
@@ -1048,7 +1186,8 @@
             "staminaCost": 35,
             "accuracy": 95,
             "category": "Physical",
-            "effect": null
+            "effect": null,
+            "learnLevel": 15
         },
         {
             "id": "m-cri-06",
@@ -1058,7 +1197,8 @@
             "staminaCost": 30,
             "accuracy": 95,
             "category": "Sintonia",
-            "effect": null
+            "effect": null,
+            "learnLevel": 15
         },
         {
             "id": "m-cri-07",
@@ -1068,7 +1208,8 @@
             "staminaCost": 85,
             "accuracy": 70,
             "category": "Sintonia",
-            "effect": null
+            "effect": null,
+            "learnLevel": 45
         },
         {
             "id": "m-cri-08",
@@ -1078,7 +1219,8 @@
             "staminaCost": 75,
             "accuracy": 80,
             "category": "Physical",
-            "effect": null
+            "effect": null,
+            "learnLevel": 30
         },
         {
             "id": "m-cri-09",
@@ -1088,7 +1230,9 @@
             "staminaCost": 25,
             "accuracy": 100,
             "category": "Status",
-            "effect": "Applica Congelam."
+            "effect": null,
+            "description": "Applica Congelam.",
+            "learnLevel": 10
         },
         {
             "id": "m-cri-10",
@@ -1098,7 +1242,9 @@
             "staminaCost": 20,
             "accuracy": 100,
             "category": "Status",
-            "effect": "+Difesa/+Spirito"
+            "effect": null,
+            "description": "+Difesa/+Spirito",
+            "learnLevel": 10
         },
         {
             "id": "m-pri-01",
@@ -1108,7 +1254,8 @@
             "staminaCost": 10,
             "accuracy": 100,
             "category": "Sintonia",
-            "effect": null
+            "effect": null,
+            "learnLevel": 1
         },
         {
             "id": "m-pri-02",
@@ -1118,7 +1265,8 @@
             "staminaCost": 12,
             "accuracy": 100,
             "category": "Physical",
-            "effect": null
+            "effect": null,
+            "learnLevel": 1
         },
         {
             "id": "m-pri-03",
@@ -1128,7 +1276,8 @@
             "staminaCost": 8,
             "accuracy": 100,
             "category": "Sintonia",
-            "effect": null
+            "effect": null,
+            "learnLevel": 6
         },
         {
             "id": "m-pri-04",
@@ -1138,7 +1287,8 @@
             "staminaCost": 35,
             "accuracy": 95,
             "category": "Sintonia",
-            "effect": null
+            "effect": null,
+            "learnLevel": 15
         },
         {
             "id": "m-pri-05",
@@ -1148,7 +1298,8 @@
             "staminaCost": 30,
             "accuracy": 95,
             "category": "Physical",
-            "effect": null
+            "effect": null,
+            "learnLevel": 20
         },
         {
             "id": "m-pri-06",
@@ -1158,7 +1309,8 @@
             "staminaCost": 25,
             "accuracy": 95,
             "category": "Sintonia",
-            "effect": null
+            "effect": null,
+            "learnLevel": 15
         },
         {
             "id": "m-pri-07",
@@ -1168,7 +1320,8 @@
             "staminaCost": 80,
             "accuracy": 80,
             "category": "Sintonia",
-            "effect": null
+            "effect": null,
+            "learnLevel": 45
         },
         {
             "id": "m-pri-08",
@@ -1178,7 +1331,8 @@
             "staminaCost": 60,
             "accuracy": 85,
             "category": "Physical",
-            "effect": null
+            "effect": null,
+            "learnLevel": 30
         },
         {
             "id": "m-pri-09",
@@ -1188,7 +1342,9 @@
             "staminaCost": 20,
             "accuracy": 100,
             "category": "Status",
-            "effect": "+Sintonia/+Spirito"
+            "effect": null,
+            "description": "+Sintonia/+Spirito",
+            "learnLevel": 10
         },
         {
             "id": "m-pri-10",
@@ -1198,7 +1354,176 @@
             "staminaCost": 15,
             "accuracy": 100,
             "category": "Status",
-            "effect": "Rimuove Buff/Debuff"
+            "effect": null,
+            "description": "Rimuove Buff/Debuff",
+            "learnLevel": 10
+        },
+        {
+            "id": "m-bio-11",
+            "name": "Rigenerazione Clorotica",
+            "type": "Bio",
+            "category": "status",
+            "power": 0,
+            "staminaCost": 10,
+            "accuracy": 100,
+            "effect": {
+                "type": "stat_change",
+                "selfStatChanges": {
+                    "defense": 1
+                },
+                "bypassAccuracy": true
+            },
+            "description": "Stimola le cellule, aumentando la Difesa di 1 stadio.",
+            "learnLevel": 10
+        },
+        {
+            "id": "m-bio-12",
+            "name": "Spore Paralizzanti",
+            "type": "Bio",
+            "category": "status",
+            "power": 0,
+            "staminaCost": 14,
+            "accuracy": 75,
+            "effect": {
+                "type": "status",
+                "statusCondition": "paralysis"
+            },
+            "description": "Paralizza il bersaglio.",
+            "learnLevel": 10
+        },
+        {
+            "id": "m-bio-13",
+            "name": "Veleno Simbiotico",
+            "type": "Bio",
+            "category": "physical",
+            "power": 55,
+            "staminaCost": 18,
+            "accuracy": 100,
+            "effect": {
+                "type": "damage_status",
+                "statusChance": 40,
+                "statusCondition": "poison"
+            },
+            "description": "Infligge danno e può avvelenare.",
+            "learnLevel": 15
+        },
+        {
+            "id": "m-bio-14",
+            "name": "Assorbimento Solare",
+            "type": "Bio",
+            "category": "special",
+            "power": 75,
+            "staminaCost": 32,
+            "accuracy": 100,
+            "effect": {
+                "type": "drain",
+                "drainPercent": 50
+            },
+            "description": "Assorbe metà del danno inflitto come HP.",
+            "learnLevel": 15
+        },
+        {
+            "id": "m-bio-15",
+            "name": "Secrezione Acida",
+            "type": "Bio",
+            "category": "status",
+            "power": 0,
+            "staminaCost": 12,
+            "accuracy": 100,
+            "effect": {
+                "type": "stat_change",
+                "statChanges": {
+                    "defense": -1
+                },
+                "bypassAccuracy": true
+            },
+            "description": "Riduce la Difesa del bersaglio.",
+            "learnLevel": 10
+        },
+        {
+            "id": "m-bio-16",
+            "name": "Urlo Primordiale",
+            "type": "Bio",
+            "category": "status",
+            "power": 0,
+            "staminaCost": 12,
+            "accuracy": 100,
+            "effect": {
+                "type": "stat_change",
+                "statChanges": {
+                    "attack": -1
+                },
+                "bypassAccuracy": true
+            },
+            "description": "Riduce l’Attacco del bersaglio.",
+            "learnLevel": 10
+        },
+        {
+            "id": "m-bio-17",
+            "name": "Rafforzamento Radicale",
+            "type": "Bio",
+            "category": "status",
+            "power": 0,
+            "staminaCost": 16,
+            "accuracy": 100,
+            "effect": {
+                "type": "stat_change",
+                "selfStatChanges": {
+                    "attack": 2
+                },
+                "bypassAccuracy": true
+            },
+            "description": "Aumenta il proprio Attacco di 2 stadi.",
+            "learnLevel": 10
+        },
+        {
+            "id": "m-bio-18",
+            "name": "Frenesia di Polline",
+            "type": "Bio",
+            "category": "physical",
+            "power": 60,
+            "staminaCost": 20,
+            "accuracy": 90,
+            "effect": {
+                "type": "recoil",
+                "recoilPercent": 25
+            },
+            "description": "Colpo potente con rinculo.",
+            "learnLevel": 15
+        },
+        {
+            "id": "m-bio-19",
+            "name": "Tocco Sonnifero",
+            "type": "Bio",
+            "category": "status",
+            "power": 0,
+            "staminaCost": 16,
+            "accuracy": 55,
+            "effect": {
+                "type": "status",
+                "statusCondition": "sleep"
+            },
+            "description": "Addormenta il bersaglio.",
+            "learnLevel": 10
+        },
+        {
+            "id": "m-bio-20",
+            "name": "Sacrificio Florale",
+            "type": "Bio",
+            "category": "status",
+            "power": 0,
+            "staminaCost": 18,
+            "accuracy": 100,
+            "effect": {
+                "type": "stat_change",
+                "selfStatChanges": {
+                    "attack": 2,
+                    "defense": -1
+                },
+                "bypassAccuracy": true
+            },
+            "description": "Potenzia l’Attacco ma indebolisce la Difesa.",
+            "learnLevel": 10
         }
     ]
 ]

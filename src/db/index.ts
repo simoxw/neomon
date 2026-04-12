@@ -13,8 +13,18 @@ export class NeoMonDB extends Dexie {
       player: '++id, name',
       team: '++id, name, level',
       box: '++id, name, level',
-      inventory: 'itemId, quantity'
+      inventory: 'itemId, quantity',
     });
+    this.version(2)
+      .stores({
+        player: '++id, name',
+        team: '++id, name, level',
+        box: '++id, name, level',
+        inventory: 'itemId, quantity',
+      })
+      .upgrade(async () => {
+        /* Migrazione conservativa: schema invariato, solo bump versione per future colonne. */
+      });
   }
 
   async exportSaveData(): Promise<string> {
@@ -23,7 +33,7 @@ export class NeoMonDB extends Dexie {
       team: await this.team.toArray(),
       box: await this.box.toArray(),
       inventory: await this.inventory.toArray(),
-      version: 1,
+      version: 2,
       exportedAt: Date.now()
     };
     return JSON.stringify(data);

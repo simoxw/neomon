@@ -30,11 +30,24 @@ export const restAction = (current: number, max: number): number => {
   return Math.min(max, current + recoveryAmount);
 };
 
+export type CanUseMoveResult = { ok: true } | { ok: false; message: string };
+
+/**
+ * Verifica se c'è abbastanza stamina per la mossa (costi non numerici = non utilizzabile).
+ */
+export const canUseMove = (current: number, cost: number | undefined): CanUseMoveResult => {
+  if (typeof cost !== 'number' || Number.isNaN(cost)) {
+    return { ok: false, message: 'Stamina insufficiente' };
+  }
+  if (current < cost) return { ok: false, message: 'Stamina insufficiente' };
+  return { ok: true };
+};
+
 /**
  * Restituisce true se la stamina attuale è sufficiente per coprire il costo richiesto.
  */
 export const canPerformMove = (current: number, cost: number): boolean => {
-  return current >= cost;
+  return canUseMove(current, cost).ok;
 };
 
 /**

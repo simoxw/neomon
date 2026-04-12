@@ -1,63 +1,75 @@
-import { NeoMon, Move } from '../types';
+import { NeoMon, CreatureSpecies, SpeciesEvolutionTarget } from '../types';
 import creaturesData from '../data/creatures.json';
 
+function resolveSpeciesRow(monId: string): CreatureSpecies | undefined {
+  return (creaturesData as CreatureSpecies[]).find((c) => c.id === monId);
+}
+
+function resolveEvolutionTarget(row: CreatureSpecies): { creatureId: string; level: number } | null {
+  const ev = row.evolvesTo as SpeciesEvolutionTarget | undefined;
+  if (ev == null) return null;
+  if (typeof ev === 'string') {
+    const lvl = row.evolutionLevel != null ? row.evolutionLevel : 999;
+    return { creatureId: ev, level: lvl };
+  }
+  return { creatureId: ev.creatureId, level: ev.level };
+}
+
+export function speciesNextFormId(row: CreatureSpecies): string | null {
+  const t = resolveEvolutionTarget(row);
+  return t?.creatureId ?? null;
+}
+
 /**
- * Neo-Mon Evolution & Growth System
- * @version 1.0.0
+ * Controlla se l'istanza ha raggiunto il livello per evolvere nella forma successiva (PROMPT 16).
  */
+export function checkEvolution(mon: NeoMon): { shouldEvolve: boolean; evolvesTo: string | null } {
+  const row = resolveSpeciesRow(mon.id);
+  if (!row) return { shouldEvolve: false, evolvesTo: null };
+  const tgt = resolveEvolutionTarget(row);
+  if (!tgt) return { shouldEvolve: false, evolvesTo: null };
+  if (mon.level < tgt.level) return { shouldEvolve: false, evolvesTo: null };
+  return { shouldEvolve: true, evolvesTo: tgt.creatureId };
+}
 
 export class EvolutionSystem {
-  /**
-   * Controlla se un Neo-Mon ha raggiunto il livello richiesto per l'evoluzione.
-   */
-  static checkEvolution(mon: NeoMon): boolean {
-    return mon.evolutionLevel !== null && mon.level >= (mon.evolutionLevel || 999);
+  static checkEvolution(mon: NeoMon): { shouldEvolve: boolean; evolvesTo: string | null } {
+    return checkEvolution(mon);
   }
 
-  /**
-   * Evolve un Neo-Mon nella sua forma successiva.
-   * Mantiene: ID, Potenziale, Sviluppo, Amicizia, EXP.
-   * Aggiorna: Nome, Tipi, Evoluzione Successiva, Statistiche Base.
-   */
-  static evolve(mon: NeoMon): NeoMon | null {
-    if (!this.checkEvolution(mon) || !mon.evolvesTo) return null;
+  static checkEvolutionLegacy(mon: NeoMon): boolean {
+    return checkEvolution(mon).shouldEvolve;
+  }
 
-    const allCreatures: any[] = creaturesData;
-    const nextForm = allCreatures.find(c => c.id === mon.evolvesTo);
-    
+  static evolve(mon: NeoMon): NeoMon | null {
+    const { shouldEvolve, evolvesTo } = checkEvolution(mon);
+    if (!shouldEvolve || !evolvesTo) return null;
+
+    const nextForm = (creaturesData as CreatureSpecies[]).find((c) => c.id === evolvesTo);
     if (!nextForm) return null;
 
     return {
       ...mon,
+      id: nextForm.id,
       name: nextForm.name,
       types: nextForm.types,
       baseStats: nextForm.baseStats,
-      evolutionLevel: nextForm.evolutionLevel,
-      evolvesTo: nextForm.evolvesTo,
-      // Mantiene ID e progressi
+      evolutionLevel: nextForm.evolutionLevel ?? undefined,
+      evolvesTo: typeof nextForm.evolvesTo === 'string' ? nextForm.evolvesTo : nextForm.evolvesTo ?? undefined,
+      canEvolve: false,
     };
   }
 
-  /**
-   * Controlla se il Neo-Mon impara nuove mosse a un determinato livello.
-   * Solitamente multipli di 10 (10, 20, 30, 40).
-   */
   static learnMoves(mon: NeoMon): string[] {
-    const allCreatures: any[] = creaturesData;
-    const creatureInfo = allCreatures.find(c => c.id === mon.id);
-    
-    if (!creatureInfo || !creatureInfo.moves_learned) return mon.moves;
+    const creatureInfo = resolveSpeciesRow(mon.id);
+    if (!creatureInfo?.moves_learned) return mon.moves;
 
     const newMoves = [...mon.moves];
-    const learnable = creatureInfo.moves_learned.filter((ml: any) => ml.level <= mon.level);
+    const learnable = creatureInfo.moves_learned.filter((ml) => ml.level <= mon.level);
 
-    learnable.forEach((ml: any) => {
-      if (!newMoves.includes(ml.moveId)) {
-        // Se ha meno di 4 mosse, aggiungi direttamente, altrimenti logica di swap? 
-        // Per ora aggiungiamo se c'è spazio o ritorna la lista disponibile.
-        if (newMoves.length < 4) {
-           newMoves.push(ml.moveId);
-        }
+    learnable.forEach((ml) => {
+      if (!newMoves.includes(ml.moveId) && newMoves.length < 4) {
+        newMoves.push(ml.moveId);
       }
     });
 

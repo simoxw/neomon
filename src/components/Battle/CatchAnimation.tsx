@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Hexagon, Zap, X, Check } from 'lucide-react';
 
@@ -10,69 +10,71 @@ interface CatchAnimationProps {
 
 const CatchAnimation: React.FC<CatchAnimationProps> = ({ attemptResult, onComplete, neoMonName }) => {
   const [phase, setPhase] = useState<'toss' | 'shakes' | 'result'>('toss');
-  const [currentShake, setCurrentShake] = useState(0);
+  const [shakeIndex, setShakeIndex] = useState(0);
+  const onCompleteRef = useRef(onComplete);
+  onCompleteRef.current = onComplete;
 
   useEffect(() => {
-    // Sequenza Animazione
-    const tossTimer = setTimeout(() => setPhase('shakes'), 1000);
-    
-    let shakeTimer: any;
-    if (phase === 'shakes') {
-      let count = 0;
-      shakeTimer = setInterval(() => {
-        if (count < attemptResult.shakes) {
-          setCurrentShake(prev => prev + 1);
-          count++;
-        } else {
-          clearInterval(shakeTimer);
-          setTimeout(() => setPhase('result'), 800);
-        }
-      }, 1000);
-    }
+    setPhase('toss');
+    setShakeIndex(0);
+    let cancelled = false;
 
-    if (phase === 'result') {
-      setTimeout(onComplete, 3000);
-    }
+    const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
+
+    (async () => {
+      await sleep(1000);
+      if (cancelled) return;
+      setPhase('shakes');
+      for (let i = 0; i < attemptResult.shakes; i++) {
+        setShakeIndex(i + 1);
+        await sleep(600);
+        if (cancelled) return;
+      }
+      await sleep(200);
+      if (cancelled) return;
+      setPhase('result');
+      await sleep(attemptResult.success ? 1800 : 1200);
+      if (cancelled) return;
+      onCompleteRef.current();
+    })();
 
     return () => {
-      clearTimeout(tossTimer);
-      if (shakeTimer) clearInterval(shakeTimer);
+      cancelled = true;
     };
-  }, [phase, attemptResult.shakes, onComplete]);
+  }, [attemptResult.shakes, attemptResult.success]);
 
   return (
     <div className="fixed inset-0 z-[1000] flex items-center justify-center pointer-events-none">
       <AnimatePresence>
-        {/* Lancio e Scosse */}
         {(phase === 'toss' || phase === 'shakes') && (
           <motion.div
+            key="ball"
             initial={{ y: 500, scale: 0.5, opacity: 0 }}
-            animate={{ 
-              y: 0, 
-              scale: 1, 
+            animate={{
+              y: 0,
+              scale: 1,
               opacity: 1,
-              x: phase === 'shakes' && currentShake > 0 ? [0, -10, 10, -10, 10, 0] : 0
+              x: phase === 'shakes' && shakeIndex > 0 ? [0, -10, 10, -10, 10, 0] : 0,
             }}
-            transition={{ 
-              y: { duration: 0.8, ease: "easeOut" },
-              x: { repeat: currentShake > 0 ? 1 : 0, duration: 0.4 }
+            transition={{
+              y: { duration: 0.8, ease: 'easeOut' },
+              x: { repeat: shakeIndex > 0 ? 1 : 0, duration: 0.35 },
             }}
             className="relative"
           >
             <div className="relative">
               <Hexagon className="w-24 h-24 text-cyan-400 fill-cyan-400/20 drop-shadow-[0_0_20px_rgba(34,211,238,0.8)]" />
-              <motion.div 
+              <motion.div
                 animate={{ rotate: 360 }}
-                transition={{ repeat: Infinity, duration: 4, ease: "linear" }}
+                transition={{ repeat: Infinity, duration: 4, ease: 'linear' }}
                 className="absolute inset-0 flex items-center justify-center"
               >
                 <Zap className="w-8 h-8 text-cyan-100 opacity-50" />
               </motion.div>
             </div>
 
-            {/* Particelle di Risucchio (solo al lancio) */}
             {phase === 'toss' && (
-              <motion.div 
+              <motion.div
                 initial={{ scale: 2, opacity: 0 }}
                 animate={{ scale: 0, opacity: 1 }}
                 className="absolute inset-x-0 -top-20 flex justify-center"
@@ -83,9 +85,9 @@ const CatchAnimation: React.FC<CatchAnimationProps> = ({ attemptResult, onComple
           </motion.div>
         )}
 
-        {/* Risultato Successo */}
         {phase === 'result' && attemptResult.success && (
           <motion.div
+            key="ok"
             initial={{ scale: 0, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
             className="flex flex-col items-center gap-6"
@@ -101,15 +103,15 @@ const CatchAnimation: React.FC<CatchAnimationProps> = ({ attemptResult, onComple
               </div>
             </div>
             <div className="text-center">
-              <h2 className="text-4xl font-black italic uppercase italic tracking-tighter text-white drop-shadow-md">Sincronia Completa!</h2>
+              <h2 className="text-4xl font-black italic uppercase tracking-tighter text-white drop-shadow-md">Sincronia Completa!</h2>
               <p className="text-green-400 font-mono text-sm tracking-widest mt-2">{neoMonName.toUpperCase()} AGGIUNTO AL BOX</p>
             </div>
           </motion.div>
         )}
 
-        {/* Risultato Fallimento */}
         {phase === 'result' && !attemptResult.success && (
           <motion.div
+            key="fail"
             initial={{ scale: 0, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
             className="flex flex-col items-center gap-6"
@@ -122,7 +124,7 @@ const CatchAnimation: React.FC<CatchAnimationProps> = ({ attemptResult, onComple
               <X className="w-16 h-16 text-white" />
             </motion.div>
             <div className="text-center">
-              <h2 className="text-4xl font-black italic uppercase italic tracking-tighter text-white drop-shadow-md">Sincronia Fallita</h2>
+              <h2 className="text-4xl font-black italic uppercase tracking-tighter text-white drop-shadow-md">Sincronia Fallita</h2>
               <p className="text-red-400 font-mono text-sm tracking-widest mt-2">LINK INTERROTTO</p>
             </div>
           </motion.div>

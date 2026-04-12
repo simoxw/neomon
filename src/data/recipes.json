@@ -1,0 +1,37 @@
+[
+  {
+    "id": "recipe-01",
+    "name": "Prisma Neon",
+    "description": "Prisma potenziato con frequenze neon. Tasso cattura 1.5x.",
+    "result": { "itemId": "i-prism-02", "qty": 1 },
+    "ingredients": [
+      { "itemId": "i-prism-01", "qty": 3 },
+      { "itemId": "i-mat-neon", "qty": 2 }
+    ],
+    "craftTime": 0,
+    "unlockLevel": 10
+  },
+  {
+    "id": "recipe-02",
+    "name": "Curativo Avanzato",
+    "description": "Kit di recupero potenziato.",
+    "result": { "itemId": "i-cure-03", "qty": 1 },
+    "ingredients": [
+      { "itemId": "i-cure-01", "qty": 2 },
+      { "itemId": "i-mat-pollen", "qty": 1 }
+    ],
+    "unlockLevel": 1
+  },
+  {
+    "id": "recipe-03",
+    "name": "Prisma Master",
+    "description": "Sincronizzazione quasi assoluta.",
+    "result": { "itemId": "i-prism-03", "qty": 1 },
+    "ingredients": [
+      { "itemId": "i-prism-02", "qty": 5 },
+      { "itemId": "i-mat-ether", "qty": 1 },
+      { "itemId": "i-mat-neon", "qty": 5 }
+    ],
+    "unlockLevel": 30
+  }
+]

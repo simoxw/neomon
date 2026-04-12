@@ -12,12 +12,16 @@ import {
   ScrollText,
   Shield,
   Terminal,
-  X
+  X,
+  Map,
+  Hammer,
 } from 'lucide-react';
 import { clsx, type ClassValue } from 'clsx';
 import { twMerge } from 'tailwind-merge';
 import missionsData from '../../data/missions.json';
 import { getCreatureSprite } from '../../utils/imageLoader';
+import NeoMonDetailModal from '../Common/NeoMonDetailModal';
+import type { NeoMon } from '../../types';
 
 function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -47,11 +51,12 @@ const TerminalIcon = ({ icon: Icon, label, color, onClick, badge }: { icon: any,
 );
 
 const MainHub: React.FC = () => {
-  const { player, team, box, setScreen, setBoxTab, updateCoins, grantExperience, healTeam } = useStore();
+  const { player, team, box, setScreen, setBoxTab, updateCoins, grantExperience, healTeam, setBattleContext, bumpBattleSession } = useStore();
   const [showMissions, setShowMissions] = React.useState(false);
   const [showCodes, setShowCodes] = React.useState(false);
   const [inputCode, setInputCode] = React.useState('');
   const [missions, setMissions] = React.useState(missionsData);
+  const [detailMon, setDetailMon] = React.useState<NeoMon | null>(null);
 
   const redeemMission = (id: string, reward: number) => {
     updateCoins(reward);
@@ -100,7 +105,11 @@ const MainHub: React.FC = () => {
       {/* Battle & Catch Quick Actions */}
       <div className="grid grid-cols-2 gap-4 mb-8">
         <button 
-          onClick={() => setScreen('battle')}
+          onClick={() => {
+            setBattleContext({ kind: 'hub' });
+            bumpBattleSession();
+            setScreen('battle');
+          }}
           className={cn(
             "relative h-32 rounded-3xl overflow-hidden group shadow-2xl",
             "border-2 border-red-500/30 hover:border-red-500 transition-all duration-500 active:scale-95"
@@ -115,7 +124,11 @@ const MainHub: React.FC = () => {
         </button>
 
         <button 
-          onClick={() => setScreen('battle')}
+          onClick={() => {
+            setBattleContext({ kind: 'hub' });
+            bumpBattleSession();
+            setScreen('battle');
+          }}
           className={cn(
             "relative h-32 rounded-3xl overflow-hidden group shadow-2xl",
             "border-2 border-cyan-400/30 hover:border-cyan-400 transition-all duration-500 active:scale-95"
@@ -168,39 +181,78 @@ const MainHub: React.FC = () => {
          <div className="grid grid-cols-4 gap-3">
             {Array.from({ length: 4 }).map((_, i) => {
               const mon = team[i];
+              const stats = mon?.currentStats || mon?.baseStats;
+              const hpMax = stats?.hp || 1;
+              const spMax = stats?.stamina || 1;
+              const hpCur = (mon as NeoMon & { currentHp?: number })?.currentHp ?? hpMax;
+              const spCur = (mon as NeoMon & { currentStamina?: number })?.currentStamina ?? spMax;
+              const primaryType = mon?.types?.[0] || 'Bio';
+              const ring =
+                primaryType === 'Bio'
+                  ? 'border-emerald-500/40'
+                  : primaryType === 'Incandescente'
+                    ? 'border-orange-500/40'
+                    : primaryType === 'Idrico'
+                      ? 'border-sky-500/40'
+                      : 'border-cyan-500/30';
               return (
-                <button 
-                  key={i} 
+                <button
+                  key={i}
+                  type="button"
                   disabled={!mon}
-                  onClick={() => { setBoxTab('team'); setScreen('box'); }}
+                  onClick={() => {
+                    if (mon) setDetailMon(mon);
+                    else {
+                      setBoxTab('team');
+                      setScreen('box');
+                    }
+                  }}
                   className={cn(
-                    "aspect-square rounded-[1.5rem] border flex flex-col items-center justify-center relative group overflow-hidden transition-all shadow-lg",
-                    mon ? "border-white/10 bg-white/5 hover:border-cyan-400/40 active:scale-95 shadow-inner" : "border-dashed border-white/5 bg-transparent opacity-40"
+                    'aspect-square rounded-[1.25rem] border flex flex-col items-stretch justify-between relative group overflow-hidden transition-all shadow-lg backdrop-blur-md',
+                    mon
+                      ? cn('bg-black/60 hover:border-cyan-400/50 active:scale-95 shadow-inner', ring)
+                      : 'border-dashed border-white/5 bg-transparent opacity-40 items-center justify-center'
                   )}
                 >
-                   {mon ? (
-                     <>
-                       <div className="absolute top-1 right-2 text-[8px] font-black text-white/20 italic">LV.{mon.level}</div>
-                       <motion.img 
-                         src={getCreatureSprite(mon.id)} 
-                         alt={mon.name}
-                         animate={{ y: [0, -4, 0] }}
-                         transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
-                         className="w-[70%] h-[70%] object-contain drop-shadow-[0_0_10px_rgba(34,211,238,0.3)] group-hover:scale-110 transition-all mb-2"
-                       />
-                       
-                       <div className="absolute bottom-0 left-0 right-0 h-2 bg-black/80">
-                          <div 
-                            className="h-full bg-cyan-400 shadow-[0_0_15px_rgba(34,211,238,1)] transition-all duration-1000 p-[1px]" 
-                            style={{ width: `${Math.min(100, (mon.exp / (mon.level * 100)) * 100)}%` }}
-                          >
-                             <div className="w-full h-full bg-white/20" />
-                          </div>
-                       </div>
-                     </>
-                   ) : (
-                     <div className="w-3 h-3 rounded-full border border-white/10 border-dashed" />
-                   )}
+                  {mon ? (
+                    <>
+                      <div className="absolute top-1 right-1 text-[7px] font-orbitron font-black text-cyan-300/90 bg-black/50 px-1 rounded">
+                        {mon.level}
+                      </div>
+                      <div className="absolute top-1 left-1 text-[6px] font-black uppercase px-1 rounded bg-black/50 text-white/50">
+                        {primaryType.slice(0, 3)}
+                      </div>
+                      <div className="flex flex-col items-center pt-5 px-1 flex-1 min-h-0">
+                        <img
+                          src={getCreatureSprite(mon.id)}
+                          alt={mon.name}
+                          className="w-12 h-12 object-contain drop-shadow-[0_0_8px_rgba(34,211,238,0.35)]"
+                        />
+                        <span className="mt-1 text-[8px] font-black uppercase tracking-tight text-white/90 truncate w-full text-center font-rajdhani">
+                          {mon.name}
+                        </span>
+                      </div>
+                      <div className="px-1.5 pb-1.5 space-y-0.5">
+                        <div className="h-1 w-full bg-black/70 rounded-full overflow-hidden border border-white/5">
+                          <div
+                            className={cn(
+                              'h-full rounded-full transition-all duration-300',
+                              hpCur / hpMax < 0.25 ? 'bg-rose-500' : hpCur / hpMax < 0.5 ? 'bg-yellow-400' : 'bg-cyan-400'
+                            )}
+                            style={{ width: `${Math.min(100, (hpCur / hpMax) * 100)}%` }}
+                          />
+                        </div>
+                        <div className="h-1 w-full bg-black/70 rounded-full overflow-hidden border border-white/5">
+                          <div
+                            className="h-full rounded-full bg-emerald-400 transition-all duration-300"
+                            style={{ width: `${Math.min(100, (spCur / spMax) * 100)}%` }}
+                          />
+                        </div>
+                      </div>
+                    </>
+                  ) : (
+                    <div className="w-3 h-3 rounded-full border border-white/10 border-dashed" />
+                  )}
                 </button>
               );
             })}
@@ -213,6 +265,10 @@ const MainHub: React.FC = () => {
          <TerminalIcon icon={Shield} label="Squadra" color="border-purple-500/40 text-purple-500" onClick={() => { setBoxTab('team'); setScreen('box'); }} />
          <TerminalIcon icon={Dna} label="Link-Dex" color="border-pink-500/40 text-pink-500" onClick={() => setScreen('linkdex')} />
          <TerminalIcon icon={ScrollText} label="Quests" color="border-amber-400/40 text-amber-400" badge={pendingMissions} onClick={() => setShowMissions(true)} />
+      </div>
+      <div className="grid grid-cols-2 gap-4 mt-4">
+        <TerminalIcon icon={Map} label="Mappa" color="border-emerald-500/40 text-emerald-400" onClick={() => setScreen('worldmap')} />
+        <TerminalIcon icon={Hammer} label="Craft" color="border-orange-500/40 text-orange-400" onClick={() => setScreen('crafting')} />
       </div>
 
       {/* Debug Codes Drawer */}
@@ -288,6 +344,8 @@ const MainHub: React.FC = () => {
           </motion.div>
         )}
       </AnimatePresence>
+
+      {detailMon && <NeoMonDetailModal mon={detailMon} onClose={() => setDetailMon(null)} />}
     </div>
   );
 };

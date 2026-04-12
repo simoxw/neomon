@@ -21,6 +21,41 @@ export enum ElementType {
   Prismatico = 'Prismatico',
 }
 
+/** Condizioni di stato in battaglia */
+export type StatusCondition =
+  | 'burn'
+  | 'freeze'
+  | 'paralysis'
+  | 'poison'
+  | 'sleep'
+  | 'confuse'
+  | null;
+
+/** Stage statistiche da -6 a +6 */
+export interface StatStages {
+  attack: number;
+  defense: number;
+  speed: number;
+  specialAtk: number;
+  specialDef: number;
+}
+
+/** Effetto strutturato di una mossa (JSON `effect` può essere oggetto o legacy string/null) */
+export interface MoveEffect {
+  type: 'status' | 'stat_change' | 'damage_only' | 'drain' | 'recoil' | 'damage_status';
+  statusCondition?: StatusCondition;
+  statusChance?: number;
+  selfStatusCondition?: StatusCondition;
+  statChanges?: Partial<StatStages>;
+  selfStatChanges?: Partial<StatStages>;
+  drainPercent?: number;
+  recoilPercent?: number;
+  priority?: number;
+  bypassAccuracy?: boolean;
+}
+
+export type MoveCategory = 'Physical' | 'Sintonia' | 'Status' | 'physical' | 'special' | 'status';
+
 /**
  * Definizione delle mosse (tecniche di combattimento)
  */
@@ -30,9 +65,15 @@ export interface Move {
   type: ElementType;
   power: number;
   staminaCost: number;
-  accuracy: number;
-  category: 'Physical' | 'Sintonia' | 'Status';
-  effect?: string; // Descrizione opzionale dell'effetto della mossa
+  /** 0–100; se assente la mossa è considerata sempre precisa (salvo bypass) */
+  accuracy?: number;
+  category: MoveCategory;
+  /** Legacy: testo flavor; oppure oggetto MoveEffect per il motore di battaglia */
+  effect?: string | MoveEffect | null;
+  /** Descrizione mostrata in UI (Neural Uplink, tooltip) */
+  description?: string;
+  /** Livello minimo per apprendere / installare via Neural Uplink */
+  learnLevel?: number;
 }
 
 /**
@@ -51,6 +92,24 @@ export interface Stats {
 /**
  * Interfaccia principale della creatura Neo-Mon
  */
+/** Obiettivo evoluzione (creatures.json): string legacy o { creatureId, level } */
+export type SpeciesEvolutionTarget = string | { creatureId: string; level: number } | null;
+
+/** Dati statici da creatures.json (specie) */
+export interface CreatureSpecies {
+  id: string;
+  name: string;
+  types: ElementType[];
+  baseStats: Stats;
+  moves: string[];
+  /** Pool apprendibile (include mosse attive + extra) */
+  learnPool?: string[];
+  catchRate?: number;
+  moves_learned?: { level: number; moveId: string }[];
+  evolutionLevel?: number | null;
+  evolvesTo?: SpeciesEvolutionTarget;
+}
+
 export interface NeoMon {
   id: string;
   name: string;
@@ -79,8 +138,26 @@ export interface NeoMon {
   level: number;
   exp: number;
   
-  /** Lista degli ID delle 3 mosse equipaggiate attualmente */
-  moves: string[]; 
+  /** ID mosse equipaggiate (max 4 in battaglia) */
+  moves: string[];
+
+  /** Pool mosse apprendibili (specie + istanza) */
+  learnPool?: string[];
+
+  /** Stato alterato attuale (default null in useStore / battaglia) */
+  status?: StatusCondition;
+
+  /** Stage modificatori in battaglia (default tutti 0) */
+  statStages?: StatStages;
+
+  /** Turni di sonno rimanenti (solo se status === 'sleep') */
+  sleepTurnsRemaining?: number;
+
+  /** Solo in battaglia: cronologia potenziamenti stat per AI */
+  statBoostHistory?: string[];
+
+  /** Tasso cattura base specie (0–255), presente sui dati statici selvatici */
+  catchRate?: number;
   
   /** Livello di affinità tra 0 e 100 */
   friendship: number; 
@@ -89,7 +166,7 @@ export interface NeoMon {
   caughtAt?: number;
 
   evolutionLevel?: number;
-  evolvesTo?: string; // ID del Neo-Mon nello stadio successivo
+  evolvesTo?: string | { creatureId: string; level: number };
 }
 
 /**
@@ -102,6 +179,11 @@ export interface PlayerData {
   badges: string[];
   unlockedNodes: string[];
   lastSave: number;
+  defeatedTrainerIds?: string[];
+  totalBattles?: number;
+  totalBattlesWon?: number;
+  totalCaptures?: number;
+  playtimeMs?: number;
 }
 
 /**

@@ -1,9 +1,14 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import { NeoMon, PlayerData, InventoryItem } from '../types';
+import { NeoMon, PlayerData, InventoryItem, CreatureSpecies } from '../types';
 import { db } from '../db';
 import { recalculateAllStats } from '../logic/StatsCalculator';
 import creaturesData from '../data/creatures.json';
+import { normalizeNeoMon } from '../logic/normalizeCreature';
+import { EvolutionSystem } from '../logic/EvolutionSystem';
+import type { BattleContext } from '../types/world';
+import type { BattleSummaryPayload } from '../types/battleSummary';
+import missionsData from '../data/missions.json';
 
 /**
  * Neo-Mon Link Central Store
@@ -18,14 +23,43 @@ interface NeoState {
   seenIds: string[];
   coins: number;
   selectedBoxIndex: number;
-  currentScreen: 'hub' | 'battle' | 'box' | 'settings' | 'shop' | 'linkdex' | 'evolution' | 'inventory';
+  currentScreen:
+    | 'hub'
+    | 'battle'
+    | 'box'
+    | 'settings'
+    | 'shop'
+    | 'linkdex'
+    | 'evolution'
+    | 'inventory'
+    | 'worldmap'
+    | 'trainer'
+    | 'crafting';
+  /** Se l'inventario è stato aperto dall'Arena, il pulsante Indietro torna alla lotta */
+  inventoryReturnTarget: 'battle' | null;
   boxTab: 'box' | 'team';
   evolvingMonId: string | null;
   volMuted: boolean;
   volume: number;
-  
+
+  battleContext: BattleContext | null;
+  battleSessionKey: number;
+  pendingTrainerId: string | null;
+  pendingTrainerZone: string | null;
+  defeatedTrainerIds: string[];
+  evolutionQueue: { monId: string; evolvesToId: string }[];
+  lastBattleSummary: BattleSummaryPayload | null;
+  missionProgress: Record<string, { completed?: boolean; count?: number }>;
+  totalBattles: number;
+  totalBattlesWon: number;
+  totalCaptures: number;
+  playtimeMs: number;
+  toastMessage: string | null;
+
   // Actions
   loadData: () => Promise<void>;
+  enterInventory: (opts?: { fromBattle?: boolean }) => void;
+  returnToBattleFromInventory: () => void;
   toggleMute: () => void;
   setVolume: (val: number) => void;
   setScreen: (screen: NeoState['currentScreen']) => void;
@@ -44,6 +78,26 @@ interface NeoState {
   grantExperience: (monId: string, amount: number) => Promise<void>;
   evolveNeoMon: (monId: string) => Promise<void>;
   healTeam: () => Promise<void>;
+  persistNeoMon: (mon: NeoMon) => Promise<void>;
+  installNeuralMove: (
+    monId: string,
+    newMoveId: string,
+    slotIndex: number
+  ) => Promise<{ ok: boolean; message?: string }>;
+
+  setBattleContext: (ctx: BattleContext | null) => void;
+  bumpBattleSession: () => void;
+  setPendingTrainerId: (id: string | null) => void;
+  setPendingTrainerZone: (zoneId: string | null) => void;
+  markTrainerDefeated: (trainerId: string) => Promise<void>;
+  addBadge: (badgeId: string) => Promise<void>;
+  dequeueEvolution: () => void;
+  setLastBattleSummary: (s: BattleSummaryPayload | null) => void;
+  recordBattleWin: (opts: { foeTypes: string[]; zoneId?: string }) => void;
+  recordCapture: (types: string[]) => void;
+  addPlaytime: (ms: number) => void;
+  setToast: (msg: string | null) => void;
+  grantInventoryItem: (itemId: string, qty: number) => Promise<void>;
 }
 
 export const useStore = create<NeoState>()(
@@ -57,14 +111,157 @@ export const useStore = create<NeoState>()(
       coins: 500,
       selectedBoxIndex: 0,
       currentScreen: 'hub',
+      inventoryReturnTarget: null,
       boxTab: 'box',
       evolvingMonId: null,
       volMuted: false,
       volume: 0.5,
 
+      battleContext: null,
+      battleSessionKey: 0,
+      pendingTrainerId: null,
+      pendingTrainerZone: null,
+      defeatedTrainerIds: [],
+      evolutionQueue: [],
+      lastBattleSummary: null,
+      missionProgress: {},
+      totalBattles: 0,
+      totalBattlesWon: 0,
+      totalCaptures: 0,
+      playtimeMs: 0,
+      toastMessage: null,
+
+      setBattleContext: (ctx) => set({ battleContext: ctx }),
+      bumpBattleSession: () => set((s) => ({ battleSessionKey: s.battleSessionKey + 1 })),
+      setPendingTrainerId: (id) => set({ pendingTrainerId: id }),
+      setPendingTrainerZone: (zoneId) => set({ pendingTrainerZone: zoneId }),
+
+      setLastBattleSummary: (s) => set({ lastBattleSummary: s }),
+      dequeueEvolution: () =>
+        set((s) => ({
+          evolutionQueue: s.evolutionQueue.slice(1),
+        })),
+      setToast: (msg) => set({ toastMessage: msg }),
+
+      addPlaytime: (ms) => {
+        const next = (get().playtimeMs || 0) + ms;
+        set({ playtimeMs: next });
+        const p = get().player;
+        if (p)
+          void db.player.update(p.id, { playtimeMs: next } as Partial<PlayerData>);
+      },
+
+      grantInventoryItem: async (itemId, qty) => {
+        const existing = await db.inventory.get(itemId);
+        if (existing) {
+          await db.inventory.update(itemId, { quantity: existing.quantity + qty });
+        } else {
+          await db.inventory.add({ itemId, quantity: qty });
+        }
+        await get().updateInventory();
+      },
+
+      markTrainerDefeated: async (trainerId) => {
+        const ids = new Set([...get().defeatedTrainerIds, trainerId]);
+        const arr = [...ids];
+        set({ defeatedTrainerIds: arr });
+        const p = get().player;
+        if (p) await db.player.update(p.id, { defeatedTrainerIds: arr } as Partial<PlayerData>);
+      },
+
+      addBadge: async (badgeId) => {
+        const p = get().player;
+        if (!p) return;
+        const badges = p.badges.includes(badgeId) ? p.badges : [...p.badges, badgeId];
+        await db.player.update(p.id, { badges });
+        set({ player: { ...p, badges } });
+      },
+
+      recordBattleWin: ({ foeTypes, zoneId: _zoneId }) => {
+        const tb = get().totalBattles + 1;
+        const tw = get().totalBattlesWon + 1;
+        set({ totalBattles: tb, totalBattlesWon: tw });
+        const p = get().player;
+        if (p) void db.player.update(p.id, { totalBattles: tb, totalBattlesWon: tw } as Partial<PlayerData>);
+
+        const mp = { ...get().missionProgress };
+        const bump = (key: string) => {
+          const cur = mp[key]?.count ?? 0;
+          mp[key] = { ...mp[key], count: cur + 1 };
+        };
+        bump('battles_won');
+        if (foeTypes.some((t) => t === 'Idrico')) bump('defeated_water');
+
+        const missions = missionsData as {
+          id: string;
+          requirement: string;
+          rewardCoins: number;
+          title: string;
+        }[];
+        let newToast: string | null = null;
+        for (const m of missions) {
+          if (mp[m.id]?.completed) continue;
+          let done = false;
+          if (m.requirement === 'battles_won >= 1' && (mp['battles_won']?.count ?? 0) >= 1) done = true;
+          if (m.requirement === 'defeated_water >= 5' && (mp['defeated_water']?.count ?? 0) >= 5) done = true;
+          if (done) {
+            mp[m.id] = { ...mp[m.id], completed: true };
+            get().updateCoins(m.rewardCoins);
+            newToast = `Missione completata: ${m.title} (+${m.rewardCoins} ◈)`;
+          }
+        }
+        set({ missionProgress: mp });
+        if (newToast) {
+          set({ toastMessage: newToast });
+          setTimeout(() => get().setToast(null), 3200);
+        }
+      },
+
+      recordCapture: (types) => {
+        const tc = get().totalCaptures + 1;
+        set({ totalCaptures: tc });
+        const p = get().player;
+        if (p) void db.player.update(p.id, { totalCaptures: tc } as Partial<PlayerData>);
+        const mp = { ...get().missionProgress };
+        const bio = types.some((t) => t === 'Bio');
+        if (bio) {
+          const k = 'captured_bio';
+          const c = (mp[k]?.count ?? 0) + 1;
+          mp[k] = { ...mp[k], count: c };
+        }
+
+        const missions = missionsData as { id: string; requirement: string; rewardCoins: number; title: string }[];
+        let toast: string | null = null;
+        for (const m of missions) {
+          if (mp[m.id]?.completed) continue;
+          if (m.requirement === 'captured_bio >= 3' && (mp['captured_bio']?.count ?? 0) >= 3) {
+            mp[m.id] = { ...mp[m.id], completed: true };
+            get().updateCoins(m.rewardCoins);
+            toast = `Missione completata: ${m.title} (+${m.rewardCoins} ◈)`;
+          }
+        }
+        if (toast) {
+          set({ missionProgress: mp, toastMessage: toast });
+          setTimeout(() => get().setToast(null), 3200);
+        } else {
+          set({ missionProgress: mp });
+        }
+      },
+
+      enterInventory: (opts) => {
+        set({
+          inventoryReturnTarget: opts?.fromBattle ? 'battle' : null,
+          currentScreen: 'inventory',
+        });
+      },
+
+      returnToBattleFromInventory: () => {
+        set({ inventoryReturnTarget: null, currentScreen: 'battle' });
+      },
+
       loadData: async () => {
-        let team = await db.team.toArray();
-        let box = await db.box.toArray();
+        let team = (await db.team.toArray()).map((m) => normalizeNeoMon(m as NeoMon));
+        let box = (await db.box.toArray()).map((m) => normalizeNeoMon(m as NeoMon));
         let inventory = await db.inventory.toArray();
         let player = (await db.player.toArray())[0];
         
@@ -79,13 +276,24 @@ export const useStore = create<NeoState>()(
             coins: 500,
             badges: [],
             unlockedNodes: [],
-            lastSave: Date.now()
+            lastSave: Date.now(),
+            defeatedTrainerIds: [],
+            totalBattles: 0,
+            totalBattlesWon: 0,
+            totalCaptures: 0,
+            playtimeMs: 0,
           };
           await db.player.add(player);
           
           // Crea Starter Neo-Mon (Floris n-001)
-          const starterData = creaturesData[0]; // Floris
-          const starter: NeoMon = {
+          const starterData = creaturesData[0] as CreatureSpecies;
+          const starterMoves =
+            starterData.moves?.length > 0
+              ? [...starterData.moves]
+              : [starterData.moves_learned?.[0]?.moveId || 'm-pri-01'];
+          const learnPool = starterData.learnPool;
+          const starterPool = learnPool && learnPool.length > 0 ? [...learnPool] : [...starterMoves];
+          const starter: NeoMon = normalizeNeoMon({
             ...starterData,
             uniqueId: `starter-${Date.now()}`,
             level: 5,
@@ -94,13 +302,14 @@ export const useStore = create<NeoState>()(
             currentHp: starterData.baseStats.hp,
             currentStamina: starterData.baseStats.stamina,
             currentStats: starterData.baseStats,
-            moves: [starterData.moves_learned[0].moveId],
+            moves: starterMoves,
+            learnPool: starterPool,
             development: { hp: 0, potenza: 0, resistenza: 0, sintonia: 0, spirito: 0, flusso: 0 },
             friendship: 50,
-            caughtAt: Date.now()
-          } as any;
+            caughtAt: Date.now(),
+          } as NeoMon & { uniqueId?: string });
           
-          await db.team.add(starter);
+          await db.team.add(starter as unknown as NeoMon);
           team = [starter];
           
           // Crea item iniziali (3 Prismi Base)
@@ -111,14 +320,45 @@ export const useStore = create<NeoState>()(
           inventory = initialItems;
         }
 
-        set({ 
-          team, 
-          box, 
+        set({
+          team,
+          box,
           inventory,
-          player, 
+          player,
           coins: player?.coins || 500,
-          seenIds: Array.from(new Set([...team.map(m => m.id), ...box.map(m => m.id)])) 
+          seenIds: Array.from(new Set([...team.map((m) => m.id), ...box.map((m) => m.id)])),
+          defeatedTrainerIds: player?.defeatedTrainerIds ?? [],
+          totalBattles: player?.totalBattles ?? 0,
+          totalBattlesWon: player?.totalBattlesWon ?? 0,
+          totalCaptures: player?.totalCaptures ?? 0,
+          playtimeMs: player?.playtimeMs ?? 0,
         });
+      },
+
+      persistNeoMon: async (mon) => {
+        const { team, box } = get();
+        const normalized = normalizeNeoMon(mon);
+        if (team.some((m) => m.id === mon.id)) {
+          await db.team.put(normalized);
+          set({ team: team.map((m) => (m.id === mon.id ? normalized : m)) });
+        } else if (box.some((m) => m.id === mon.id)) {
+          await db.box.put(normalized);
+          set({ box: box.map((m) => (m.id === mon.id ? normalized : m)) });
+        }
+      },
+
+      installNeuralMove: async (monId, newMoveId, slotIndex) => {
+        if (get().coins < 50) return { ok: false, message: 'Crediti insufficienti' };
+        const { team, box } = get();
+        const mon = [...team, ...box].find((m) => m.id === monId);
+        if (!mon) return { ok: false, message: 'Neo-Mon non trovato' };
+        const moves = [...(mon.moves || [])];
+        if (slotIndex < 0 || slotIndex > 3 || moves.length < 4) return { ok: false, message: 'Slot non valido' };
+        moves[slotIndex] = newMoveId;
+        const updated = normalizeNeoMon({ ...mon, moves });
+        get().updateCoins(-50);
+        await get().persistNeoMon(updated);
+        return { ok: true };
       },
 
       toggleMute: () => set((state) => ({ volMuted: !state.volMuted })),
@@ -215,18 +455,23 @@ export const useStore = create<NeoState>()(
 
       captureNeoMon: async (wildMon, prismId) => {
         const { box, seenIds } = get();
-        const existing = await db.inventory.get(prismId);
-        if (existing && existing.quantity > 0) {
-          if (existing.quantity === 1) await db.inventory.delete(prismId);
-          else await db.inventory.update(prismId, { quantity: existing.quantity - 1 });
-        }
-        
-        const capturedMon = { ...wildMon, caughtAt: Date.now() };
-        await db.box.add(capturedMon);
+        const capturedMon = normalizeNeoMon({ ...wildMon, caughtAt: Date.now() } as NeoMon);
+        const nextSeen = seenIds.includes(wildMon.id) ? seenIds : [...seenIds, wildMon.id];
+
+        await db.transaction('rw', db.box, db.inventory, async () => {
+          const existing = await db.inventory.get(prismId);
+          if (existing && existing.quantity > 0) {
+            if (existing.quantity === 1) await db.inventory.delete(prismId);
+            else await db.inventory.update(prismId, { quantity: existing.quantity - 1 });
+          }
+          await db.box.add(capturedMon);
+        });
+
         set({
           box: [...box, capturedMon],
-          seenIds: seenIds.includes(wildMon.id) ? seenIds : [...seenIds, wildMon.id]
+          seenIds: nextSeen,
         });
+        get().recordCapture(capturedMon.types.map(String));
         await get().updateInventory();
       },
 
@@ -269,23 +514,24 @@ export const useStore = create<NeoState>()(
         
         if (leveledUp) {
           updatedMon = recalculateAllStats(updatedMon);
-          const staticData = (creaturesData as any[]).find(d => d.id === mon?.id);
-          if (staticData && staticData.evolutionLevel && newLevel >= staticData.evolutionLevel) {
-            updatedMon.canEvolve = true;
-          }
         }
 
-        const isInTeam = team.some(m => m.id === monId);
-        const targetTable = isInTeam ? db.team : db.box;
-        await targetTable.update(monId, { 
-          exp: updatedMon.exp, 
-          level: updatedMon.level, 
-          currentStats: updatedMon.currentStats,
-          canEvolve: updatedMon.canEvolve 
-        });
+        const evo = EvolutionSystem.checkEvolution(updatedMon);
+        updatedMon = { ...updatedMon, canEvolve: evo.shouldEvolve };
+        if (evo.shouldEvolve && evo.evolvesTo) {
+          set({
+            evolutionQueue: [...get().evolutionQueue, { monId: updatedMon.id, evolvesToId: evo.evolvesTo }],
+          });
+        }
 
-        if (isInTeam) set({ team: team.map(m => m.id === monId ? updatedMon : m) });
-        else set({ box: box.map(m => m.id === monId ? updatedMon : m) });
+        const isInTeam = team.some((m) => m.id === monId);
+        const targetTable = isInTeam ? db.team : db.box;
+        const existing = await targetTable.get(monId);
+        const merged = { ...(existing ?? mon), ...updatedMon } as NeoMon;
+        await targetTable.put(merged);
+
+        if (isInTeam) set({ team: team.map((m) => (m.id === monId ? merged : m)) });
+        else set({ box: box.map((m) => (m.id === monId ? merged : m)) });
       },
 
       evolveNeoMon: async (monId) => {
@@ -293,8 +539,15 @@ export const useStore = create<NeoState>()(
         const mon = [...team, ...box].find(m => m.id === monId);
         if (!mon || !mon.canEvolve) return;
 
-        const staticData = (creaturesData as any[]).find(d => d.id === mon.id);
-        const nextStageData = (creaturesData as any[]).find(d => d.id === staticData.evolvesTo);
+        const staticData = (creaturesData as CreatureSpecies[]).find((d) => d.id === mon.id);
+        if (!staticData) return;
+        const nextId =
+          typeof staticData.evolvesTo === 'string'
+            ? staticData.evolvesTo
+            : staticData.evolvesTo && typeof staticData.evolvesTo === 'object'
+              ? staticData.evolvesTo.creatureId
+              : null;
+        const nextStageData = (creaturesData as CreatureSpecies[]).find((d) => d.id === nextId);
         
         if (!nextStageData) return;
 
@@ -335,16 +588,14 @@ export const useStore = create<NeoState>()(
           };
         });
 
-        // Persisti le cure nel DB per ogni membro
         await db.transaction('rw', db.team, async () => {
           for (const mon of healedTeam) {
-            await db.team.update(mon.id, { currentStats: mon.currentStats });
+            await db.team.put(mon);
           }
         });
 
-        // Aggiorna lo stato immediatamente senza reload
         set({ team: healedTeam });
-      }
+      },
     }),
     {
       name: 'neomon-storage',

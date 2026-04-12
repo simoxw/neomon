@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useStore } from '../../context/useStore';
 import { db } from '../../db';
 import itemsData from '../../data/items.json';
-import { Package, Heart, Zap, Boxes, ChevronRight } from 'lucide-react';
+import { Package, Heart, Zap, Boxes, ChevronRight, Sword } from 'lucide-react';
 import { clsx, type ClassValue } from 'clsx';
 import { twMerge } from 'tailwind-merge';
 
@@ -13,7 +13,7 @@ function cn(...inputs: ClassValue[]) {
 type TabType = 'cure' | 'catture' | 'utili';
 
 const Inventory: React.FC = () => {
-  const { setScreen } = useStore();
+  const { setScreen, inventoryReturnTarget, returnToBattleFromInventory } = useStore();
   const [activeTab, setActiveTab] = useState<TabType>('cure');
   const [inventory, setInventory] = useState<any[]>([]);
 
@@ -47,6 +47,16 @@ const Inventory: React.FC = () => {
       
       {/* Header */}
       <div className="mb-8">
+        {inventoryReturnTarget === 'battle' && (
+          <button
+            type="button"
+            onClick={() => returnToBattleFromInventory()}
+            className="mb-4 flex items-center gap-2 px-4 py-2 rounded-xl bg-emerald-950/80 border border-emerald-500/40 text-emerald-300 text-[10px] font-black uppercase tracking-widest hover:bg-emerald-600 hover:text-white transition-colors"
+          >
+            <Sword className="w-4 h-4" />
+            Indietro alla lotta
+          </button>
+        )}
         <h2 className="text-4xl font-black italic uppercase tracking-tighter text-white text-glow-amber">Zaino</h2>
         <p className="text-[10px] text-white/30 font-mono uppercase tracking-[0.3em] mt-1">Gestione Risorse Neurali</p>
       </div>

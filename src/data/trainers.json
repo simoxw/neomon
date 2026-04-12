@@ -1,0 +1,51 @@
+[
+  {
+    "id": "trainer-01",
+    "name": "Link-Runner Kai",
+    "zone": "zone-01",
+    "sprite": "trainer_kai",
+    "dialogue": {
+      "intro": "Nel Nexus sopravvive chi agisce per primo. Preparati!",
+      "win": "Impossibile... il mio Bolt-Hound è stato battuto?",
+      "lose": "Dovevi allenarti di più. Torna quando sei pronto."
+    },
+    "team": [
+      {
+        "creatureId": "n-016",
+        "level": 5,
+        "moves": ["m-cin-01", "m-ful-01", "m-cin-03", "m-cin-09"]
+      },
+      {
+        "creatureId": "n-013",
+        "level": 6,
+        "moves": ["m-tet-01", "m-cin-01", "m-tet-03", "m-tet-09"]
+      }
+    ],
+    "reward": { "coins": 150, "items": [{ "id": "i-prism-01", "qty": 2 }] },
+    "badge": null,
+    "defeated": false,
+    "isBoss": false
+  },
+  {
+    "id": "trainer-boss-01",
+    "name": "Synapse Vera — Maestra del Nexus",
+    "zone": "zone-01",
+    "sprite": "trainer_vera",
+    "isBoss": true,
+    "dialogue": {
+      "intro": "Mostrami se il tuo Link regge il flusso del Nexus centrale.",
+      "win": "Hai piegato la Maestra... il badge è tuo.",
+      "lose": "Il Nexus non perdona l'impreparazione."
+    },
+    "team": [
+      {
+        "creatureId": "n-017",
+        "level": 12,
+        "moves": ["m-cin-04", "m-ful-04", "m-cin-07", "m-ful-10"]
+      }
+    ],
+    "reward": { "coins": 500, "badge": "badge-01" },
+    "badge": "badge-01",
+    "defeated": false
+  }
+]

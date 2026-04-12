@@ -1,63 +1,45 @@
 export type PrismType = 'base' | 'neon' | 'master';
-export type StatusCondition = 'paralisi' | 'sonno' | null;
+/** Bonus cattura da stato (naming legacy italiano) */
+export type CatchAilmentBonus = 'paralisi' | 'sonno' | null;
 
-/**
- * Calcola la probabilità di successo della sincronizzazione (cattura).
- * Formula ispirata ai classici RPG di mostri, ottimizzata per il Nexus.
- */
-export const calculateCatchChance = (
-  maxHp: number,
-  currentHp: number,
-  prismType: PrismType,
-  statusCondition: StatusCondition = null
-): number => {
-  // Moltiplicatori Prismi
-  const prismMultipliers: Record<PrismType, number> = {
-    base: 1,
-    neon: 1.5,
-    master: 255 // Cattura garantita
-  };
-
-  // Bonus Stato
-  const statusBonus = (statusCondition === 'paralisi' || statusCondition === 'sonno') ? 1.5 : 1;
-
-  // Formula Core: Chance = ((3 * maxHp - 2 * currentHp) * prismMultiplier * statusBonus) / (3 * maxHp)
-  // Nota: Moltiplichiamo per 255 per standardizzare il valore (0-255)
-  const baseChance = ((3 * maxHp - 2 * currentHp) * prismMultipliers[prismType] * statusBonus) / (3 * maxHp);
-  
-  return Math.min(Math.max(baseChance, 0), 255);
+const prismMultipliers: Record<PrismType, number> = {
+  base: 1,
+  neon: 1.5,
+  master: 255,
 };
 
-/**
- * Esegue il tentativo di cattura e calcola il numero di scosse (shake).
- * Utile per l'animazione di suspense.
- */
+export const calculateCatchRate = (
+  maxHp: number,
+  currentHp: number,
+  baseRate: number,
+  prismType: PrismType,
+  statusCondition: CatchAilmentBonus = null
+): number => {
+  const prism = prismMultipliers[prismType];
+  const statusBonus = statusCondition === 'paralisi' || statusCondition === 'sonno' ? 1.5 : 1;
+  const safeMax = Math.max(1, maxHp);
+  const hpTerm = (safeMax * 3 - currentHp * 2) / (safeMax * 3);
+  const raw = baseRate * prism * statusBonus * hpTerm;
+  return Math.min(255, Math.max(1, Math.floor(raw)));
+};
+
 export const performCatchAttempt = (
   maxHp: number,
   currentHp: number,
+  baseRate: number,
   prismType: PrismType,
-  statusCondition: StatusCondition = null
+  statusCondition: CatchAilmentBonus = null
 ): { success: boolean; shakes: number } => {
-  // Il Prisma Master non fallisce mai
   if (prismType === 'master') return { success: true, shakes: 3 };
 
-  const catchValue = calculateCatchChance(maxHp, currentHp, prismType, statusCondition);
-  
-  // Per ogni scossa (max 3), il sistema verifica se il Prisma tiene.
-  // Se tutti i controlli passano, la cattura è riuscita.
+  const rate = calculateCatchRate(maxHp, currentHp, baseRate, prismType, statusCondition);
+  const shakeCheck = 65536 / Math.pow(255 / rate, 0.1875);
+
   let shakes = 0;
   for (let i = 0; i < 3; i++) {
-    // Generiamo un seed casuale per ogni scossa
-    const roll = Math.random() * 255;
-    if (roll < catchValue) {
-      shakes++;
-    } else {
-      break;
-    }
+    if (Math.random() * 65536 >= shakeCheck) break;
+    shakes++;
   }
 
-  return {
-    success: shakes === 3,
-    shakes
-  };
+  return { success: shakes === 3, shakes };
 };

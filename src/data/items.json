@@ -63,5 +63,26 @@
     "type": "evolutive",
     "description": "Essenza termica pura per evoluzioni di tipo Fuoco.",
     "price": 500
+  },
+  {
+    "id": "i-mat-neon",
+    "name": "Frammento Neon",
+    "type": "material",
+    "description": "Residuo ad alta frequenza da Fulgido o Meccanico.",
+    "price": 40
+  },
+  {
+    "id": "i-mat-pollen",
+    "name": "Polline Digitale",
+    "type": "material",
+    "description": "Micro-particelle organiche da creature Bio.",
+    "price": 35
+  },
+  {
+    "id": "i-mat-ether",
+    "name": "Nucleo Etereo",
+    "type": "material",
+    "description": "Condensato dimensionale da Etereo o Prismatico.",
+    "price": 120
   }
 ]

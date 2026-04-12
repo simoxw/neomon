@@ -2,555 +2,2282 @@
   {
     "id": "n-001",
     "name": "Floris",
-    "types": ["Bio"],
-    "baseStats": { "hp": 55, "stamina": 100, "potenza": 45, "resistenza": 50, "sintonia": 60, "spirito": 55, "flusso": 45 },
+    "types": [
+      "Bio"
+    ],
+    "baseStats": {
+      "hp": 55,
+      "stamina": 100,
+      "potenza": 45,
+      "resistenza": 50,
+      "sintonia": 60,
+      "spirito": 55,
+      "flusso": 45
+    },
     "evolutionLevel": 20,
     "evolvesTo": "n-002",
     "moves_learned": [
-      { "level": 1, "moveId": "m-bio-01" },
-      { "level": 10, "moveId": "m-bio-03" },
-      { "level": 20, "moveId": "m-bio-09" },
-      { "level": 30, "moveId": "m-bio-05" },
-      { "level": 40, "moveId": "m-bio-07" }
+      {
+        "level": 1,
+        "moveId": "m-bio-01"
+      },
+      {
+        "level": 10,
+        "moveId": "m-bio-03"
+      },
+      {
+        "level": 20,
+        "moveId": "m-bio-09"
+      },
+      {
+        "level": 30,
+        "moveId": "m-bio-05"
+      },
+      {
+        "level": 40,
+        "moveId": "m-bio-07"
+      }
+    ],
+    "moves": [
+      "m-bio-01",
+      "m-bio-04",
+      "m-bio-11",
+      "m-bio-07"
+    ],
+    "catchRate": 255,
+    "learnPool": [
+      "m-bio-01",
+      "m-bio-04",
+      "m-bio-11",
+      "m-bio-07",
+      "m-bio-02",
+      "m-bio-03",
+      "m-bio-05",
+      "m-bio-06",
+      "m-bio-08",
+      "m-bio-09",
+      "m-bio-10",
+      "m-bio-12",
+      "m-bio-14",
+      "m-aer-02"
     ]
   },
   {
     "id": "n-002",
     "name": "Floragile",
-    "types": ["Bio"],
-    "baseStats": { "hp": 75, "stamina": 100, "potenza": 60, "resistenza": 65, "sintonia": 85, "spirito": 80, "flusso": 65 },
+    "types": [
+      "Bio"
+    ],
+    "baseStats": {
+      "hp": 75,
+      "stamina": 100,
+      "potenza": 60,
+      "resistenza": 65,
+      "sintonia": 85,
+      "spirito": 80,
+      "flusso": 65
+    },
     "evolutionLevel": 40,
     "evolvesTo": "n-003",
     "moves_learned": [
-      { "level": 1, "moveId": "m-bio-01" },
-      { "level": 10, "moveId": "m-bio-03" },
-      { "level": 20, "moveId": "m-bio-06" },
-      { "level": 30, "moveId": "m-bio-04" },
-      { "level": 40, "moveId": "m-bio-08" }
+      {
+        "level": 1,
+        "moveId": "m-bio-01"
+      },
+      {
+        "level": 10,
+        "moveId": "m-bio-03"
+      },
+      {
+        "level": 20,
+        "moveId": "m-bio-06"
+      },
+      {
+        "level": 30,
+        "moveId": "m-bio-04"
+      },
+      {
+        "level": 40,
+        "moveId": "m-bio-08"
+      }
+    ],
+    "moves": [
+      "m-bio-01",
+      "m-bio-04",
+      "m-bio-11",
+      "m-bio-07"
+    ],
+    "catchRate": 180,
+    "learnPool": [
+      "m-bio-01",
+      "m-bio-04",
+      "m-bio-11",
+      "m-bio-07",
+      "m-bio-02",
+      "m-bio-03",
+      "m-bio-05",
+      "m-bio-06",
+      "m-bio-08",
+      "m-bio-09",
+      "m-bio-10",
+      "m-bio-12",
+      "m-bio-14",
+      "m-aer-03"
     ]
   },
   {
     "id": "n-003",
     "name": "Aether-Vernant",
-    "types": ["Bio", "Etereo"],
-    "baseStats": { "hp": 95, "stamina": 100, "potenza": 75, "resistenza": 85, "sintonia": 115, "spirito": 105, "flusso": 85 },
+    "types": [
+      "Bio",
+      "Etereo"
+    ],
+    "baseStats": {
+      "hp": 95,
+      "stamina": 100,
+      "potenza": 75,
+      "resistenza": 85,
+      "sintonia": 115,
+      "spirito": 105,
+      "flusso": 85
+    },
     "evolutionLevel": null,
     "evolvesTo": null,
     "moves_learned": [
-      { "level": 1, "moveId": "m-bio-04" },
-      { "level": 10, "moveId": "m-ete-01" },
-      { "level": 20, "moveId": "m-bio-07" },
-      { "level": 30, "moveId": "m-ete-07" },
-      { "level": 40, "moveId": "m-ete-10" }
+      {
+        "level": 1,
+        "moveId": "m-bio-04"
+      },
+      {
+        "level": 10,
+        "moveId": "m-ete-01"
+      },
+      {
+        "level": 20,
+        "moveId": "m-bio-07"
+      },
+      {
+        "level": 30,
+        "moveId": "m-ete-07"
+      },
+      {
+        "level": 40,
+        "moveId": "m-ete-10"
+      }
+    ],
+    "moves": [
+      "m-bio-01",
+      "m-bio-04",
+      "m-bio-11",
+      "m-ete-07"
+    ],
+    "catchRate": 45,
+    "learnPool": [
+      "m-bio-01",
+      "m-bio-04",
+      "m-bio-11",
+      "m-ete-07",
+      "m-bio-02",
+      "m-bio-03",
+      "m-bio-05",
+      "m-bio-06",
+      "m-bio-07",
+      "m-bio-08",
+      "m-bio-09",
+      "m-bio-10",
+      "m-ete-01",
+      "m-ete-02"
     ]
   },
   {
     "id": "n-004",
     "name": "Ignis",
-    "types": ["Incandescente"],
-    "baseStats": { "hp": 50, "stamina": 100, "potenza": 65, "resistenza": 45, "sintonia": 55, "spirito": 45, "flusso": 50 },
+    "types": [
+      "Incandescente"
+    ],
+    "baseStats": {
+      "hp": 50,
+      "stamina": 100,
+      "potenza": 65,
+      "resistenza": 45,
+      "sintonia": 55,
+      "spirito": 45,
+      "flusso": 50
+    },
     "evolutionLevel": 20,
     "evolvesTo": "n-005",
     "moves_learned": [
-      { "level": 1, "moveId": "m-inc-01" },
-      { "level": 10, "moveId": "m-inc-03" },
-      { "level": 20, "moveId": "m-inc-09" },
-      { "level": 30, "moveId": "m-inc-04" },
-      { "level": 40, "moveId": "m-inc-07" }
+      {
+        "level": 1,
+        "moveId": "m-inc-01"
+      },
+      {
+        "level": 10,
+        "moveId": "m-inc-03"
+      },
+      {
+        "level": 20,
+        "moveId": "m-inc-09"
+      },
+      {
+        "level": 30,
+        "moveId": "m-inc-04"
+      },
+      {
+        "level": 40,
+        "moveId": "m-inc-07"
+      }
+    ],
+    "moves": [
+      "m-inc-01",
+      "m-inc-04",
+      "m-inc-09",
+      "m-inc-07"
+    ],
+    "catchRate": 255,
+    "learnPool": [
+      "m-inc-01",
+      "m-inc-04",
+      "m-inc-09",
+      "m-inc-07",
+      "m-inc-02",
+      "m-inc-03",
+      "m-inc-05",
+      "m-inc-06",
+      "m-inc-08",
+      "m-inc-10",
+      "m-geo-02"
     ]
   },
   {
     "id": "n-005",
     "name": "Pyrosauro",
-    "types": ["Incandescente"],
-    "baseStats": { "hp": 70, "stamina": 100, "potenza": 85, "resistenza": 60, "sintonia": 75, "spirito": 65, "flusso": 75 },
+    "types": [
+      "Incandescente"
+    ],
+    "baseStats": {
+      "hp": 70,
+      "stamina": 100,
+      "potenza": 85,
+      "resistenza": 60,
+      "sintonia": 75,
+      "spirito": 65,
+      "flusso": 75
+    },
     "evolutionLevel": 40,
     "evolvesTo": "n-006",
     "moves_learned": [
-      { "level": 1, "moveId": "m-inc-01" },
-      { "level": 10, "moveId": "m-inc-03" },
-      { "level": 20, "moveId": "m-inc-02" },
-      { "level": 30, "moveId": "m-inc-05" },
-      { "level": 40, "moveId": "m-inc-08" }
+      {
+        "level": 1,
+        "moveId": "m-inc-01"
+      },
+      {
+        "level": 10,
+        "moveId": "m-inc-03"
+      },
+      {
+        "level": 20,
+        "moveId": "m-inc-02"
+      },
+      {
+        "level": 30,
+        "moveId": "m-inc-05"
+      },
+      {
+        "level": 40,
+        "moveId": "m-inc-08"
+      }
+    ],
+    "moves": [
+      "m-inc-01",
+      "m-inc-04",
+      "m-inc-09",
+      "m-inc-07"
+    ],
+    "catchRate": 180,
+    "learnPool": [
+      "m-inc-01",
+      "m-inc-04",
+      "m-inc-09",
+      "m-inc-07",
+      "m-inc-02",
+      "m-inc-03",
+      "m-inc-05",
+      "m-inc-06",
+      "m-inc-08",
+      "m-inc-10",
+      "m-geo-04",
+      "m-mec-01"
     ]
   },
   {
     "id": "n-006",
     "name": "Magma-Core",
-    "types": ["Incandescente", "Meccanico"],
-    "baseStats": { "hp": 90, "stamina": 100, "potenza": 110, "resistenza": 100, "sintonia": 90, "spirito": 80, "flusso": 90 },
+    "types": [
+      "Incandescente",
+      "Meccanico"
+    ],
+    "baseStats": {
+      "hp": 90,
+      "stamina": 100,
+      "potenza": 110,
+      "resistenza": 100,
+      "sintonia": 90,
+      "spirito": 80,
+      "flusso": 90
+    },
     "evolutionLevel": null,
     "evolvesTo": null,
     "moves_learned": [
-      { "level": 1, "moveId": "m-inc-08" },
-      { "level": 10, "moveId": "m-mec-01" },
-      { "level": 20, "moveId": "m-inc-07" },
-      { "level": 30, "moveId": "m-mec-08" },
-      { "level": 40, "moveId": "m-mec-10" }
+      {
+        "level": 1,
+        "moveId": "m-inc-08"
+      },
+      {
+        "level": 10,
+        "moveId": "m-mec-01"
+      },
+      {
+        "level": 20,
+        "moveId": "m-inc-07"
+      },
+      {
+        "level": 30,
+        "moveId": "m-mec-08"
+      },
+      {
+        "level": 40,
+        "moveId": "m-mec-10"
+      }
+    ],
+    "moves": [
+      "m-inc-01",
+      "m-inc-04",
+      "m-inc-09",
+      "m-mec-07"
+    ],
+    "catchRate": 45,
+    "learnPool": [
+      "m-inc-01",
+      "m-inc-04",
+      "m-inc-09",
+      "m-mec-07",
+      "m-inc-02",
+      "m-inc-03",
+      "m-inc-05",
+      "m-inc-06",
+      "m-inc-07",
+      "m-inc-08",
+      "m-inc-10",
+      "m-mec-01",
+      "m-mec-02",
+      "m-mec-03"
     ]
   },
   {
     "id": "n-007",
     "name": "Hydros",
-    "types": ["Idrico"],
-    "baseStats": { "hp": 65, "stamina": 100, "potenza": 45, "resistenza": 55, "sintonia": 50, "spirito": 55, "flusso": 40 },
+    "types": [
+      "Idrico"
+    ],
+    "baseStats": {
+      "hp": 65,
+      "stamina": 100,
+      "potenza": 45,
+      "resistenza": 55,
+      "sintonia": 50,
+      "spirito": 55,
+      "flusso": 40
+    },
     "evolutionLevel": 20,
     "evolvesTo": "n-008",
     "moves_learned": [
-      { "level": 1, "moveId": "m-idr-01" },
-      { "level": 10, "moveId": "m-idr-02" },
-      { "level": 20, "moveId": "m-idr-09" },
-      { "level": 30, "moveId": "m-idr-04" },
-      { "level": 40, "moveId": "m-idr-07" }
+      {
+        "level": 1,
+        "moveId": "m-idr-01"
+      },
+      {
+        "level": 10,
+        "moveId": "m-idr-02"
+      },
+      {
+        "level": 20,
+        "moveId": "m-idr-09"
+      },
+      {
+        "level": 30,
+        "moveId": "m-idr-04"
+      },
+      {
+        "level": 40,
+        "moveId": "m-idr-07"
+      }
+    ],
+    "moves": [
+      "m-idr-01",
+      "m-idr-04",
+      "m-idr-09",
+      "m-idr-07"
+    ],
+    "catchRate": 255,
+    "learnPool": [
+      "m-idr-01",
+      "m-idr-04",
+      "m-idr-09",
+      "m-idr-07",
+      "m-idr-02",
+      "m-idr-03",
+      "m-idr-05",
+      "m-idr-06",
+      "m-idr-08",
+      "m-idr-10",
+      "m-cri-01"
     ]
   },
   {
     "id": "n-008",
     "name": "Aquastream",
-    "types": ["Idrico"],
-    "baseStats": { "hp": 85, "stamina": 100, "potenza": 60, "resistenza": 75, "sintonia": 70, "spirito": 80, "flusso": 60 },
+    "types": [
+      "Idrico"
+    ],
+    "baseStats": {
+      "hp": 85,
+      "stamina": 100,
+      "potenza": 60,
+      "resistenza": 75,
+      "sintonia": 70,
+      "spirito": 80,
+      "flusso": 60
+    },
     "evolutionLevel": 40,
     "evolvesTo": "n-009",
     "moves_learned": [
-      { "level": 1, "moveId": "m-idr-01" },
-      { "level": 10, "moveId": "m-idr-03" },
-      { "level": 20, "moveId": "m-idr-06" },
-      { "level": 30, "moveId": "m-idr-05" },
-      { "level": 40, "moveId": "m-idr-10" }
+      {
+        "level": 1,
+        "moveId": "m-idr-01"
+      },
+      {
+        "level": 10,
+        "moveId": "m-idr-03"
+      },
+      {
+        "level": 20,
+        "moveId": "m-idr-06"
+      },
+      {
+        "level": 30,
+        "moveId": "m-idr-05"
+      },
+      {
+        "level": 40,
+        "moveId": "m-idr-10"
+      }
+    ],
+    "moves": [
+      "m-idr-01",
+      "m-idr-04",
+      "m-idr-09",
+      "m-idr-07"
+    ],
+    "catchRate": 180,
+    "learnPool": [
+      "m-idr-01",
+      "m-idr-04",
+      "m-idr-09",
+      "m-idr-07",
+      "m-idr-02",
+      "m-idr-03",
+      "m-idr-05",
+      "m-idr-06",
+      "m-idr-08",
+      "m-idr-10",
+      "m-cri-03",
+      "m-aer-02"
     ]
   },
   {
     "id": "n-009",
     "name": "Tsunami-Titan",
-    "types": ["Idrico", "Geologico"],
-    "baseStats": { "hp": 110, "stamina": 100, "potenza": 85, "resistenza": 110, "sintonia": 95, "spirito": 100, "flusso": 60 },
+    "types": [
+      "Idrico",
+      "Geologico"
+    ],
+    "baseStats": {
+      "hp": 110,
+      "stamina": 100,
+      "potenza": 85,
+      "resistenza": 110,
+      "sintonia": 95,
+      "spirito": 100,
+      "flusso": 60
+    },
     "evolutionLevel": null,
     "evolvesTo": null,
     "moves_learned": [
-      { "level": 1, "moveId": "m-idr-07" },
-      { "level": 10, "moveId": "m-geo-02" },
-      { "level": 20, "moveId": "m-idr-08" },
-      { "level": 30, "moveId": "m-geo-07" },
-      { "level": 40, "moveId": "m-geo-09" }
+      {
+        "level": 1,
+        "moveId": "m-idr-07"
+      },
+      {
+        "level": 10,
+        "moveId": "m-geo-02"
+      },
+      {
+        "level": 20,
+        "moveId": "m-idr-08"
+      },
+      {
+        "level": 30,
+        "moveId": "m-geo-07"
+      },
+      {
+        "level": 40,
+        "moveId": "m-geo-09"
+      }
+    ],
+    "moves": [
+      "m-idr-01",
+      "m-idr-04",
+      "m-idr-09",
+      "m-geo-07"
+    ],
+    "catchRate": 45,
+    "learnPool": [
+      "m-idr-01",
+      "m-idr-04",
+      "m-idr-09",
+      "m-geo-07",
+      "m-idr-02",
+      "m-idr-03",
+      "m-idr-05",
+      "m-idr-06",
+      "m-idr-07",
+      "m-idr-08",
+      "m-idr-10",
+      "m-geo-01",
+      "m-geo-02",
+      "m-geo-03"
     ]
   },
   {
     "id": "n-010",
     "name": "Larva-Neon",
-    "types": ["Bio"],
-    "baseStats": { "hp": 45, "stamina": 100, "potenza": 40, "resistenza": 55, "sintonia": 45, "spirito": 50, "flusso": 75 },
+    "types": [
+      "Bio"
+    ],
+    "baseStats": {
+      "hp": 45,
+      "stamina": 100,
+      "potenza": 40,
+      "resistenza": 55,
+      "sintonia": 45,
+      "spirito": 50,
+      "flusso": 75
+    },
     "evolutionLevel": 15,
     "evolvesTo": "n-011",
     "moves_learned": [
-      { "level": 1, "moveId": "m-bio-01" },
-      { "level": 10, "moveId": "m-bio-10" },
-      { "level": 20, "moveId": "m-bio-03" },
-      { "level": 30, "moveId": "m-bio-06" },
-      { "level": 40, "moveId": "m-bio-05" }
+      {
+        "level": 1,
+        "moveId": "m-bio-01"
+      },
+      {
+        "level": 10,
+        "moveId": "m-bio-10"
+      },
+      {
+        "level": 20,
+        "moveId": "m-bio-03"
+      },
+      {
+        "level": 30,
+        "moveId": "m-bio-06"
+      },
+      {
+        "level": 40,
+        "moveId": "m-bio-05"
+      }
+    ],
+    "moves": [
+      "m-bio-01",
+      "m-bio-04",
+      "m-bio-11",
+      "m-bio-07"
+    ],
+    "catchRate": 180,
+    "learnPool": [
+      "m-bio-01",
+      "m-bio-04",
+      "m-bio-11",
+      "m-bio-07",
+      "m-bio-02",
+      "m-bio-03",
+      "m-bio-05",
+      "m-bio-06",
+      "m-bio-08",
+      "m-bio-09",
+      "m-bio-10",
+      "m-bio-12",
+      "m-bio-14",
+      "m-ete-01"
     ]
   },
   {
     "id": "n-011",
     "name": "Crisalide-Glow",
-    "types": ["Bio", "Meccanico"],
-    "baseStats": { "hp": 65, "stamina": 100, "potenza": 50, "resistenza": 100, "sintonia": 60, "spirito": 80, "flusso": 75 },
+    "types": [
+      "Bio",
+      "Meccanico"
+    ],
+    "baseStats": {
+      "hp": 65,
+      "stamina": 100,
+      "potenza": 50,
+      "resistenza": 100,
+      "sintonia": 60,
+      "spirito": 80,
+      "flusso": 75
+    },
     "evolutionLevel": 30,
     "evolvesTo": "n-012",
     "moves_learned": [
-      { "level": 1, "moveId": "m-mec-10" },
-      { "level": 10, "moveId": "m-mec-01" },
-      { "level": 20, "moveId": "m-mec-03" },
-      { "level": 30, "moveId": "m-bio-09" },
-      { "level": 40, "moveId": "m-mec-06" }
+      {
+        "level": 1,
+        "moveId": "m-mec-10"
+      },
+      {
+        "level": 10,
+        "moveId": "m-mec-01"
+      },
+      {
+        "level": 20,
+        "moveId": "m-mec-03"
+      },
+      {
+        "level": 30,
+        "moveId": "m-bio-09"
+      },
+      {
+        "level": 40,
+        "moveId": "m-mec-06"
+      }
+    ],
+    "moves": [
+      "m-bio-01",
+      "m-bio-04",
+      "m-bio-11",
+      "m-mec-07"
+    ],
+    "catchRate": 180,
+    "learnPool": [
+      "m-bio-01",
+      "m-bio-04",
+      "m-bio-11",
+      "m-mec-07",
+      "m-bio-02",
+      "m-bio-03",
+      "m-bio-05",
+      "m-bio-06",
+      "m-bio-07",
+      "m-bio-08",
+      "m-bio-09",
+      "m-bio-10",
+      "m-mec-01",
+      "m-mec-02"
     ]
   },
   {
     "id": "n-012",
     "name": "Farfalla-Prismatica",
-    "types": ["Bio", "Prismatico"],
-    "baseStats": { "hp": 80, "stamina": 100, "potenza": 70, "resistenza": 85, "sintonia": 110, "spirito": 100, "flusso": 115 },
+    "types": [
+      "Bio",
+      "Prismatico"
+    ],
+    "baseStats": {
+      "hp": 80,
+      "stamina": 100,
+      "potenza": 70,
+      "resistenza": 85,
+      "sintonia": 110,
+      "spirito": 100,
+      "flusso": 115
+    },
     "evolutionLevel": null,
     "evolvesTo": null,
     "moves_learned": [
-      { "level": 1, "moveId": "m-pri-01" },
-      { "level": 10, "moveId": "m-bio-05" },
-      { "level": 20, "moveId": "m-pri-04" },
-      { "level": 30, "moveId": "m-pri-09" },
-      { "level": 40, "moveId": "m-pri-07" }
+      {
+        "level": 1,
+        "moveId": "m-pri-01"
+      },
+      {
+        "level": 10,
+        "moveId": "m-bio-05"
+      },
+      {
+        "level": 20,
+        "moveId": "m-pri-04"
+      },
+      {
+        "level": 30,
+        "moveId": "m-pri-09"
+      },
+      {
+        "level": 40,
+        "moveId": "m-pri-07"
+      }
+    ],
+    "moves": [
+      "m-bio-01",
+      "m-bio-04",
+      "m-bio-11",
+      "m-pri-07"
+    ],
+    "catchRate": 45,
+    "learnPool": [
+      "m-bio-01",
+      "m-bio-04",
+      "m-bio-11",
+      "m-pri-07",
+      "m-bio-02",
+      "m-bio-03",
+      "m-bio-05",
+      "m-bio-06",
+      "m-bio-07",
+      "m-bio-08",
+      "m-bio-09",
+      "m-bio-10",
+      "m-pri-01",
+      "m-pri-02"
     ]
   },
   {
     "id": "n-013",
     "name": "Eco-Bit",
-    "types": ["Tetro"],
-    "baseStats": { "hp": 50, "stamina": 100, "potenza": 40, "resistenza": 45, "sintonia": 65, "spirito": 50, "flusso": 60 },
+    "types": [
+      "Tetro"
+    ],
+    "baseStats": {
+      "hp": 50,
+      "stamina": 100,
+      "potenza": 40,
+      "resistenza": 45,
+      "sintonia": 65,
+      "spirito": 50,
+      "flusso": 60
+    },
     "evolutionLevel": 22,
     "evolvesTo": "n-014",
     "moves_learned": [
-      { "level": 1, "moveId": "m-tet-02" },
-      { "level": 10, "moveId": "m-tet-01" },
-      { "level": 20, "moveId": "m-tet-10" },
-      { "level": 30, "moveId": "m-tet-04" },
-      { "level": 40, "moveId": "m-tet-07" }
+      {
+        "level": 1,
+        "moveId": "m-tet-02"
+      },
+      {
+        "level": 10,
+        "moveId": "m-tet-01"
+      },
+      {
+        "level": 20,
+        "moveId": "m-tet-10"
+      },
+      {
+        "level": 30,
+        "moveId": "m-tet-04"
+      },
+      {
+        "level": 40,
+        "moveId": "m-tet-07"
+      }
+    ],
+    "moves": [
+      "m-tet-01",
+      "m-tet-04",
+      "m-tet-09",
+      "m-tet-07"
+    ],
+    "catchRate": 180,
+    "learnPool": [
+      "m-tet-01",
+      "m-tet-04",
+      "m-tet-09",
+      "m-tet-07",
+      "m-tet-02",
+      "m-tet-03",
+      "m-tet-05",
+      "m-tet-06",
+      "m-tet-08",
+      "m-tet-10",
+      "m-cin-01"
     ]
   },
   {
     "id": "n-014",
     "name": "Radar-Wing",
-    "types": ["Tetro", "Aereo"],
-    "baseStats": { "hp": 75, "stamina": 100, "potenza": 65, "resistenza": 60, "sintonia": 85, "spirito": 70, "flusso": 105 },
+    "types": [
+      "Tetro",
+      "Aereo"
+    ],
+    "baseStats": {
+      "hp": 75,
+      "stamina": 100,
+      "potenza": 65,
+      "resistenza": 60,
+      "sintonia": 85,
+      "spirito": 70,
+      "flusso": 105
+    },
     "evolutionLevel": null,
     "evolvesTo": null,
     "moves_learned": [
-      { "level": 1, "moveId": "m-aer-01" },
-      { "level": 10, "moveId": "m-tet-05" },
-      { "level": 20, "moveId": "m-aer-04" },
-      { "level": 30, "moveId": "m-aer-09" },
-      { "level": 40, "moveId": "m-tet-07" }
+      {
+        "level": 1,
+        "moveId": "m-aer-01"
+      },
+      {
+        "level": 10,
+        "moveId": "m-tet-05"
+      },
+      {
+        "level": 20,
+        "moveId": "m-aer-04"
+      },
+      {
+        "level": 30,
+        "moveId": "m-aer-09"
+      },
+      {
+        "level": 40,
+        "moveId": "m-tet-07"
+      }
+    ],
+    "moves": [
+      "m-tet-01",
+      "m-tet-04",
+      "m-tet-09",
+      "m-aer-07"
+    ],
+    "catchRate": 45,
+    "learnPool": [
+      "m-tet-01",
+      "m-tet-04",
+      "m-tet-09",
+      "m-aer-07",
+      "m-tet-02",
+      "m-tet-03",
+      "m-tet-05",
+      "m-tet-06",
+      "m-tet-07",
+      "m-tet-08",
+      "m-tet-10",
+      "m-aer-01",
+      "m-aer-02",
+      "m-aer-03"
     ]
   },
   {
     "id": "n-015",
     "name": "Geo-Shell",
-    "types": ["Geologico"],
-    "baseStats": { "hp": 85, "stamina": 100, "potenza": 70, "resistenza": 120, "sintonia": 50, "spirito": 90, "flusso": 45 },
+    "types": [
+      "Geologico"
+    ],
+    "baseStats": {
+      "hp": 85,
+      "stamina": 100,
+      "potenza": 70,
+      "resistenza": 120,
+      "sintonia": 50,
+      "spirito": 90,
+      "flusso": 45
+    },
     "evolutionLevel": null,
     "evolvesTo": null,
     "moves_learned": [
-      { "level": 1, "moveId": "m-geo-02" },
-      { "level": 10, "moveId": "m-geo-01" },
-      { "level": 20, "moveId": "m-geo-09" },
-      { "level": 30, "moveId": "m-geo-05" },
-      { "level": 40, "moveId": "m-geo-08" }
+      {
+        "level": 1,
+        "moveId": "m-geo-02"
+      },
+      {
+        "level": 10,
+        "moveId": "m-geo-01"
+      },
+      {
+        "level": 20,
+        "moveId": "m-geo-09"
+      },
+      {
+        "level": 30,
+        "moveId": "m-geo-05"
+      },
+      {
+        "level": 40,
+        "moveId": "m-geo-08"
+      }
+    ],
+    "moves": [
+      "m-geo-01",
+      "m-geo-05",
+      "m-geo-09",
+      "m-geo-07"
+    ],
+    "catchRate": 45,
+    "learnPool": [
+      "m-geo-01",
+      "m-geo-05",
+      "m-geo-09",
+      "m-geo-07",
+      "m-geo-02",
+      "m-geo-03",
+      "m-geo-04",
+      "m-geo-06",
+      "m-geo-08",
+      "m-geo-10",
+      "m-mec-10"
     ]
   },
   {
     "id": "n-016",
     "name": "Cyber-Cane",
-    "types": ["Cinetico"],
-    "baseStats": { "hp": 55, "stamina": 100, "potenza": 60, "resistenza": 50, "sintonia": 45, "spirito": 45, "flusso": 55 },
+    "types": [
+      "Cinetico"
+    ],
+    "baseStats": {
+      "hp": 55,
+      "stamina": 100,
+      "potenza": 60,
+      "resistenza": 50,
+      "sintonia": 45,
+      "spirito": 45,
+      "flusso": 55
+    },
     "evolutionLevel": 25,
     "evolvesTo": "n-017",
     "moves_learned": [
-      { "level": 1, "moveId": "m-cin-01" },
-      { "level": 10, "moveId": "m-cin-03" },
-      { "level": 20, "moveId": "m-cin-09" },
-      { "level": 30, "moveId": "m-cin-05" },
-      { "level": 40, "moveId": "m-cin-07" }
+      {
+        "level": 1,
+        "moveId": "m-cin-01"
+      },
+      {
+        "level": 10,
+        "moveId": "m-cin-03"
+      },
+      {
+        "level": 20,
+        "moveId": "m-cin-09"
+      },
+      {
+        "level": 30,
+        "moveId": "m-cin-05"
+      },
+      {
+        "level": 40,
+        "moveId": "m-cin-07"
+      }
+    ],
+    "moves": [
+      "m-cin-01",
+      "m-cin-05",
+      "m-cin-09",
+      "m-cin-07"
+    ],
+    "catchRate": 180,
+    "learnPool": [
+      "m-cin-01",
+      "m-cin-05",
+      "m-cin-09",
+      "m-cin-07",
+      "m-cin-02",
+      "m-cin-03",
+      "m-cin-04",
+      "m-cin-06",
+      "m-cin-08",
+      "m-cin-10",
+      "m-ful-01"
     ]
   },
   {
     "id": "n-017",
     "name": "Bolt-Hound",
-    "types": ["Cinetico", "Fulgido"],
-    "baseStats": { "hp": 80, "stamina": 100, "potenza": 90, "resistenza": 70, "sintonia": 75, "spirito": 65, "flusso": 110 },
+    "types": [
+      "Cinetico",
+      "Fulgido"
+    ],
+    "baseStats": {
+      "hp": 80,
+      "stamina": 100,
+      "potenza": 90,
+      "resistenza": 70,
+      "sintonia": 75,
+      "spirito": 65,
+      "flusso": 110
+    },
     "evolutionLevel": null,
     "evolvesTo": null,
     "moves_learned": [
-      { "level": 1, "moveId": "m-ful-02" },
-      { "level": 10, "moveId": "m-cin-04" },
-      { "level": 20, "moveId": "m-ful-08" },
-      { "level": 30, "moveId": "m-ful-09" },
-      { "level": 40, "moveId": "m-cin-07" }
+      {
+        "level": 1,
+        "moveId": "m-ful-02"
+      },
+      {
+        "level": 10,
+        "moveId": "m-cin-04"
+      },
+      {
+        "level": 20,
+        "moveId": "m-ful-08"
+      },
+      {
+        "level": 30,
+        "moveId": "m-ful-09"
+      },
+      {
+        "level": 40,
+        "moveId": "m-cin-07"
+      }
+    ],
+    "moves": [
+      "m-cin-01",
+      "m-cin-05",
+      "m-cin-09",
+      "m-ful-07"
+    ],
+    "catchRate": 45,
+    "learnPool": [
+      "m-cin-01",
+      "m-cin-05",
+      "m-cin-09",
+      "m-ful-07",
+      "m-cin-02",
+      "m-cin-03",
+      "m-cin-04",
+      "m-cin-06",
+      "m-cin-07",
+      "m-cin-08",
+      "m-cin-10",
+      "m-ful-01",
+      "m-ful-02",
+      "m-ful-03"
     ]
   },
   {
     "id": "n-018",
     "name": "Mecha-Micio",
-    "types": ["Meccanico"],
-    "baseStats": { "hp": 65, "stamina": 100, "potenza": 75, "resistenza": 65, "sintonia": 80, "spirito": 60, "flusso": 90 },
+    "types": [
+      "Meccanico"
+    ],
+    "baseStats": {
+      "hp": 65,
+      "stamina": 100,
+      "potenza": 75,
+      "resistenza": 65,
+      "sintonia": 80,
+      "spirito": 60,
+      "flusso": 90
+    },
     "evolutionLevel": null,
     "evolvesTo": null,
     "moves_learned": [
-      { "level": 1, "moveId": "m-mec-01" },
-      { "level": 10, "moveId": "m-mec-02" },
-      { "level": 20, "moveId": "m-mec-05" },
-      { "level": 30, "moveId": "m-mec-04" },
-      { "level": 45, "moveId": "m-mec-08" }
+      {
+        "level": 1,
+        "moveId": "m-mec-01"
+      },
+      {
+        "level": 10,
+        "moveId": "m-mec-02"
+      },
+      {
+        "level": 20,
+        "moveId": "m-mec-05"
+      },
+      {
+        "level": 30,
+        "moveId": "m-mec-04"
+      },
+      {
+        "level": 45,
+        "moveId": "m-mec-08"
+      }
+    ],
+    "moves": [
+      "m-mec-01",
+      "m-mec-05",
+      "m-mec-09",
+      "m-mec-07"
+    ],
+    "catchRate": 45,
+    "learnPool": [
+      "m-mec-01",
+      "m-mec-05",
+      "m-mec-09",
+      "m-mec-07",
+      "m-mec-02",
+      "m-mec-03",
+      "m-mec-04",
+      "m-mec-06",
+      "m-mec-08",
+      "m-mec-10",
+      "m-cin-03"
     ]
   },
   {
     "id": "n-019",
     "name": "Crio-Lince",
-    "types": ["Criogenico"],
-    "baseStats": { "hp": 85, "stamina": 100, "potenza": 105, "resistenza": 75, "sintonia": 80, "spirito": 75, "flusso": 110 },
+    "types": [
+      "Criogenico"
+    ],
+    "baseStats": {
+      "hp": 85,
+      "stamina": 100,
+      "potenza": 105,
+      "resistenza": 75,
+      "sintonia": 80,
+      "spirito": 75,
+      "flusso": 110
+    },
     "evolutionLevel": null,
     "evolvesTo": null,
     "moves_learned": [
-      { "level": 1, "moveId": "m-cri-01" },
-      { "level": 10, "moveId": "m-cri-02" },
-      { "level": 20, "moveId": "m-cri-05" },
-      { "level": 30, "moveId": "m-cri-08" },
-      { "level": 40, "moveId": "m-cri-09" }
+      {
+        "level": 1,
+        "moveId": "m-cri-01"
+      },
+      {
+        "level": 10,
+        "moveId": "m-cri-02"
+      },
+      {
+        "level": 20,
+        "moveId": "m-cri-05"
+      },
+      {
+        "level": 30,
+        "moveId": "m-cri-08"
+      },
+      {
+        "level": 40,
+        "moveId": "m-cri-09"
+      }
+    ],
+    "moves": [
+      "m-cri-01",
+      "m-cri-05",
+      "m-cri-09",
+      "m-cri-07"
+    ],
+    "catchRate": 45,
+    "learnPool": [
+      "m-cri-01",
+      "m-cri-05",
+      "m-cri-09",
+      "m-cri-07",
+      "m-cri-02",
+      "m-cri-03",
+      "m-cri-04",
+      "m-cri-06",
+      "m-cri-08",
+      "m-cri-10",
+      "m-aer-03"
     ]
   },
   {
     "id": "n-020",
     "name": "Aura-Nebula",
-    "types": ["Etereo"],
-    "baseStats": { "hp": 100, "stamina": 100, "potenza": 60, "resistenza": 85, "sintonia": 115, "spirito": 110, "flusso": 70 },
+    "types": [
+      "Etereo"
+    ],
+    "baseStats": {
+      "hp": 100,
+      "stamina": 100,
+      "potenza": 60,
+      "resistenza": 85,
+      "sintonia": 115,
+      "spirito": 110,
+      "flusso": 70
+    },
     "evolutionLevel": null,
     "evolvesTo": null,
     "moves_learned": [
-      { "level": 1, "moveId": "m-ete-01" },
-      { "level": 10, "moveId": "m-ete-03" },
-      { "level": 20, "moveId": "m-ete-05" },
-      { "level": 30, "moveId": "m-ete-07" },
-      { "level": 40, "moveId": "m-ete-10" }
+      {
+        "level": 1,
+        "moveId": "m-ete-01"
+      },
+      {
+        "level": 10,
+        "moveId": "m-ete-03"
+      },
+      {
+        "level": 20,
+        "moveId": "m-ete-05"
+      },
+      {
+        "level": 30,
+        "moveId": "m-ete-07"
+      },
+      {
+        "level": 40,
+        "moveId": "m-ete-10"
+      }
+    ],
+    "moves": [
+      "m-ete-01",
+      "m-ete-04",
+      "m-ete-09",
+      "m-ete-07"
+    ],
+    "catchRate": 45,
+    "learnPool": [
+      "m-ete-01",
+      "m-ete-04",
+      "m-ete-09",
+      "m-ete-07",
+      "m-ete-02",
+      "m-ete-03",
+      "m-ete-05",
+      "m-ete-06",
+      "m-ete-08",
+      "m-ete-10",
+      "m-pri-03",
+      "m-tet-01"
     ]
   },
   {
     "id": "n-021",
     "name": "Volt-Achel",
-    "types": ["Fulgido"],
-    "baseStats": { "hp": 50, "stamina": 110, "potenza": 65, "resistenza": 45, "sintonia": 70, "spirito": 50, "flusso": 85 },
+    "types": [
+      "Fulgido"
+    ],
+    "baseStats": {
+      "hp": 50,
+      "stamina": 110,
+      "potenza": 65,
+      "resistenza": 45,
+      "sintonia": 70,
+      "spirito": 50,
+      "flusso": 85
+    },
     "evolutionLevel": 24,
     "evolvesTo": "n-022",
     "moves_learned": [
-      { "level": 1, "moveId": "m-ful-01" },
-      { "level": 10, "moveId": "m-ful-03" },
-      { "level": 20, "moveId": "m-ful-06" }
+      {
+        "level": 1,
+        "moveId": "m-ful-01"
+      },
+      {
+        "level": 10,
+        "moveId": "m-ful-03"
+      },
+      {
+        "level": 20,
+        "moveId": "m-ful-06"
+      }
+    ],
+    "moves": [
+      "m-ful-01",
+      "m-ful-04",
+      "m-ful-09",
+      "m-ful-07"
+    ],
+    "catchRate": 180,
+    "learnPool": [
+      "m-ful-01",
+      "m-ful-04",
+      "m-ful-09",
+      "m-ful-07",
+      "m-ful-02",
+      "m-ful-03",
+      "m-ful-05",
+      "m-ful-06",
+      "m-ful-08",
+      "m-ful-10"
     ]
   },
   {
     "id": "n-022",
     "name": "Tesla-Don",
-    "types": ["Fulgido"],
-    "baseStats": { "hp": 90, "stamina": 120, "potenza": 95, "resistenza": 85, "sintonia": 110, "spirito": 80, "flusso": 70 },
+    "types": [
+      "Fulgido"
+    ],
+    "baseStats": {
+      "hp": 90,
+      "stamina": 120,
+      "potenza": 95,
+      "resistenza": 85,
+      "sintonia": 110,
+      "spirito": 80,
+      "flusso": 70
+    },
     "evolutionLevel": null,
     "evolvesTo": null,
     "moves_learned": [
-      { "level": 1, "moveId": "m-ful-01" },
-      { "level": 25, "moveId": "m-ful-05" },
-      { "level": 35, "moveId": "m-ful-08" },
-      { "level": 50, "moveId": "m-ful-07" }
+      {
+        "level": 1,
+        "moveId": "m-ful-01"
+      },
+      {
+        "level": 25,
+        "moveId": "m-ful-05"
+      },
+      {
+        "level": 35,
+        "moveId": "m-ful-08"
+      },
+      {
+        "level": 50,
+        "moveId": "m-ful-07"
+      }
+    ],
+    "moves": [
+      "m-ful-01",
+      "m-ful-04",
+      "m-ful-09",
+      "m-ful-07"
+    ],
+    "catchRate": 45,
+    "learnPool": [
+      "m-ful-01",
+      "m-ful-04",
+      "m-ful-09",
+      "m-ful-07",
+      "m-ful-02",
+      "m-ful-03",
+      "m-ful-05",
+      "m-ful-06",
+      "m-ful-08",
+      "m-ful-10"
     ]
   },
   {
     "id": "n-023",
     "name": "Bit-Moth",
-    "types": ["Bio", "Meccanico"],
-    "baseStats": { "hp": 45, "stamina": 90, "potenza": 40, "resistenza": 40, "sintonia": 80, "spirito": 75, "flusso": 95 },
+    "types": [
+      "Bio",
+      "Meccanico"
+    ],
+    "baseStats": {
+      "hp": 45,
+      "stamina": 90,
+      "potenza": 40,
+      "resistenza": 40,
+      "sintonia": 80,
+      "spirito": 75,
+      "flusso": 95
+    },
     "evolutionLevel": 18,
     "evolvesTo": "n-024",
     "moves_learned": [
-      { "level": 1, "moveId": "m-mec-01" },
-      { "level": 12, "moveId": "m-mec-03" }
+      {
+        "level": 1,
+        "moveId": "m-mec-01"
+      },
+      {
+        "level": 12,
+        "moveId": "m-mec-03"
+      }
+    ],
+    "moves": [
+      "m-bio-01",
+      "m-bio-04",
+      "m-bio-11",
+      "m-mec-07"
+    ],
+    "catchRate": 180,
+    "learnPool": [
+      "m-bio-01",
+      "m-bio-04",
+      "m-bio-11",
+      "m-mec-07",
+      "m-bio-02",
+      "m-bio-03",
+      "m-bio-05",
+      "m-bio-06",
+      "m-bio-07",
+      "m-bio-08",
+      "m-bio-09",
+      "m-bio-10",
+      "m-mec-01",
+      "m-mec-02"
     ]
   },
   {
     "id": "n-024",
     "name": "Cyber-Os",
-    "types": ["Bio", "Meccanico"],
-    "baseStats": { "hp": 70, "stamina": 100, "potenza": 65, "resistenza": 60, "sintonia": 120, "spirito": 110, "flusso": 115 },
+    "types": [
+      "Bio",
+      "Meccanico"
+    ],
+    "baseStats": {
+      "hp": 70,
+      "stamina": 100,
+      "potenza": 65,
+      "resistenza": 60,
+      "sintonia": 120,
+      "spirito": 110,
+      "flusso": 115
+    },
     "evolutionLevel": null,
     "evolvesTo": null,
     "moves_learned": [
-      { "level": 1, "moveId": "m-mec-02" },
-      { "level": 20, "moveId": "m-mec-05" },
-      { "level": 40, "moveId": "m-mec-08" }
+      {
+        "level": 1,
+        "moveId": "m-mec-02"
+      },
+      {
+        "level": 20,
+        "moveId": "m-mec-05"
+      },
+      {
+        "level": 40,
+        "moveId": "m-mec-08"
+      }
+    ],
+    "moves": [
+      "m-bio-01",
+      "m-bio-04",
+      "m-bio-11",
+      "m-mec-07"
+    ],
+    "catchRate": 45,
+    "learnPool": [
+      "m-bio-01",
+      "m-bio-04",
+      "m-bio-11",
+      "m-mec-07",
+      "m-bio-02",
+      "m-bio-03",
+      "m-bio-05",
+      "m-bio-06",
+      "m-bio-07",
+      "m-bio-08",
+      "m-bio-09",
+      "m-bio-10",
+      "m-mec-01",
+      "m-mec-02"
     ]
   },
   {
     "id": "n-025",
     "name": "Magma-Core",
-    "types": ["Incandescente"],
-    "baseStats": { "hp": 60, "stamina": 80, "potenza": 85, "resistenza": 70, "sintonia": 50, "spirito": 40, "flusso": 45 },
+    "types": [
+      "Incandescente"
+    ],
+    "baseStats": {
+      "hp": 60,
+      "stamina": 80,
+      "potenza": 85,
+      "resistenza": 70,
+      "sintonia": 50,
+      "spirito": 40,
+      "flusso": 45
+    },
     "evolutionLevel": 30,
     "evolvesTo": "n-026",
     "moves_learned": [
-      { "level": 1, "moveId": "m-inc-01" },
-      { "level": 15, "moveId": "m-inc-03" },
-      { "level": 28, "moveId": "m-inc-04" }
+      {
+        "level": 1,
+        "moveId": "m-inc-01"
+      },
+      {
+        "level": 15,
+        "moveId": "m-inc-03"
+      },
+      {
+        "level": 28,
+        "moveId": "m-inc-04"
+      }
+    ],
+    "moves": [
+      "m-inc-01",
+      "m-inc-04",
+      "m-inc-09",
+      "m-inc-07"
+    ],
+    "catchRate": 180,
+    "learnPool": [
+      "m-inc-01",
+      "m-inc-04",
+      "m-inc-09",
+      "m-inc-07",
+      "m-inc-02",
+      "m-inc-03",
+      "m-inc-05",
+      "m-inc-06",
+      "m-inc-08",
+      "m-inc-10"
     ]
   },
   {
     "id": "n-026",
     "name": "Reactor-Gron",
-    "types": ["Incandescente", "Meccanico"],
-    "baseStats": { "hp": 110, "stamina": 100, "potenza": 120, "resistenza": 110, "sintonia": 60, "spirito": 70, "flusso": 40 },
+    "types": [
+      "Incandescente",
+      "Meccanico"
+    ],
+    "baseStats": {
+      "hp": 110,
+      "stamina": 100,
+      "potenza": 120,
+      "resistenza": 110,
+      "sintonia": 60,
+      "spirito": 70,
+      "flusso": 40
+    },
     "evolutionLevel": null,
     "evolvesTo": null,
     "moves_learned": [
-      { "level": 1, "moveId": "m-inc-05" },
-      { "level": 35, "moveId": "m-mec-05" },
-      { "level": 45, "moveId": "m-inc-08" },
-      { "level": 55, "moveId": "m-inc-07" }
+      {
+        "level": 1,
+        "moveId": "m-inc-05"
+      },
+      {
+        "level": 35,
+        "moveId": "m-mec-05"
+      },
+      {
+        "level": 45,
+        "moveId": "m-inc-08"
+      },
+      {
+        "level": 55,
+        "moveId": "m-inc-07"
+      }
+    ],
+    "moves": [
+      "m-inc-01",
+      "m-inc-04",
+      "m-inc-09",
+      "m-mec-07"
+    ],
+    "catchRate": 45,
+    "learnPool": [
+      "m-inc-01",
+      "m-inc-04",
+      "m-inc-09",
+      "m-mec-07",
+      "m-inc-02",
+      "m-inc-03",
+      "m-inc-05",
+      "m-inc-06",
+      "m-inc-07",
+      "m-inc-08",
+      "m-inc-10",
+      "m-mec-01",
+      "m-mec-02",
+      "m-mec-03"
     ]
   },
   {
     "id": "n-027",
     "name": "Neon-Puff",
-    "types": ["Prismatico"],
-    "baseStats": { "hp": 65, "stamina": 120, "potenza": 30, "resistenza": 55, "sintonia": 90, "spirito": 90, "flusso": 60 },
+    "types": [
+      "Prismatico"
+    ],
+    "baseStats": {
+      "hp": 65,
+      "stamina": 120,
+      "potenza": 30,
+      "resistenza": 55,
+      "sintonia": 90,
+      "spirito": 90,
+      "flusso": 60
+    },
     "evolutionLevel": 25,
     "evolvesTo": "n-028",
     "moves_learned": [
-      { "level": 1, "moveId": "m-pri-01" },
-      { "level": 15, "moveId": "m-pri-09" }
+      {
+        "level": 1,
+        "moveId": "m-pri-01"
+      },
+      {
+        "level": 15,
+        "moveId": "m-pri-09"
+      }
+    ],
+    "moves": [
+      "m-pri-01",
+      "m-pri-04",
+      "m-pri-09",
+      "m-pri-07"
+    ],
+    "catchRate": 180,
+    "learnPool": [
+      "m-pri-01",
+      "m-pri-04",
+      "m-pri-09",
+      "m-pri-07",
+      "m-pri-02",
+      "m-pri-03",
+      "m-pri-05",
+      "m-pri-06",
+      "m-pri-08",
+      "m-pri-10"
     ]
   },
   {
     "id": "n-028",
     "name": "Aura-Spectra",
-    "types": ["Prismatico", "Etereo"],
-    "baseStats": { "hp": 85, "stamina": 130, "potenza": 50, "resistenza": 70, "sintonia": 130, "spirito": 120, "flusso": 90 },
+    "types": [
+      "Prismatico",
+      "Etereo"
+    ],
+    "baseStats": {
+      "hp": 85,
+      "stamina": 130,
+      "potenza": 50,
+      "resistenza": 70,
+      "sintonia": 130,
+      "spirito": 120,
+      "flusso": 90
+    },
     "evolutionLevel": null,
     "evolvesTo": null,
     "moves_learned": [
-      { "level": 1, "moveId": "m-pri-04" },
-      { "level": 30, "moveId": "m-pri-07" },
-      { "level": 50, "moveId": "m-ete-07" }
+      {
+        "level": 1,
+        "moveId": "m-pri-04"
+      },
+      {
+        "level": 30,
+        "moveId": "m-pri-07"
+      },
+      {
+        "level": 50,
+        "moveId": "m-ete-07"
+      }
+    ],
+    "moves": [
+      "m-pri-01",
+      "m-pri-04",
+      "m-pri-09",
+      "m-ete-07"
+    ],
+    "catchRate": 45,
+    "learnPool": [
+      "m-pri-01",
+      "m-pri-04",
+      "m-pri-09",
+      "m-ete-07",
+      "m-pri-02",
+      "m-pri-03",
+      "m-pri-05",
+      "m-pri-06",
+      "m-pri-07",
+      "m-pri-08",
+      "m-pri-10",
+      "m-ete-01",
+      "m-ete-02",
+      "m-ete-03"
     ]
   },
   {
     "id": "n-029",
     "name": "Rusty",
-    "types": ["Meccanico"],
-    "baseStats": { "hp": 55, "stamina": 80, "potenza": 60, "resistenza": 75, "sintonia": 40, "spirito": 40, "flusso": 35 },
+    "types": [
+      "Meccanico"
+    ],
+    "baseStats": {
+      "hp": 55,
+      "stamina": 80,
+      "potenza": 60,
+      "resistenza": 75,
+      "sintonia": 40,
+      "spirito": 40,
+      "flusso": 35
+    },
     "evolutionLevel": 20,
     "evolvesTo": "n-030",
     "moves_learned": [
-      { "level": 1, "moveId": "m-mec-01" },
-      { "level": 12, "moveId": "m-mec-03" }
+      {
+        "level": 1,
+        "moveId": "m-mec-01"
+      },
+      {
+        "level": 12,
+        "moveId": "m-mec-03"
+      }
+    ],
+    "moves": [
+      "m-mec-01",
+      "m-mec-05",
+      "m-mec-09",
+      "m-mec-07"
+    ],
+    "catchRate": 180,
+    "learnPool": [
+      "m-mec-01",
+      "m-mec-05",
+      "m-mec-09",
+      "m-mec-07",
+      "m-mec-02",
+      "m-mec-03",
+      "m-mec-04",
+      "m-mec-06",
+      "m-mec-08",
+      "m-mec-10"
     ]
   },
   {
     "id": "n-030",
     "name": "Scrap-Titan",
-    "types": ["Meccanico"],
-    "baseStats": { "hp": 130, "stamina": 90, "potenza": 115, "resistenza": 130, "sintonia": 50, "spirito": 60, "flusso": 30 },
+    "types": [
+      "Meccanico"
+    ],
+    "baseStats": {
+      "hp": 130,
+      "stamina": 90,
+      "potenza": 115,
+      "resistenza": 130,
+      "sintonia": 50,
+      "spirito": 60,
+      "flusso": 30
+    },
     "evolutionLevel": null,
     "evolvesTo": null,
     "moves_learned": [
-      { "level": 1, "moveId": "m-mec-05" },
-      { "level": 25, "moveId": "m-mec-08" },
-      { "level": 45, "moveId": "m-mec-08" }
+      {
+        "level": 1,
+        "moveId": "m-mec-05"
+      },
+      {
+        "level": 25,
+        "moveId": "m-mec-08"
+      },
+      {
+        "level": 45,
+        "moveId": "m-mec-08"
+      }
+    ],
+    "moves": [
+      "m-mec-01",
+      "m-mec-05",
+      "m-mec-09",
+      "m-mec-07"
+    ],
+    "catchRate": 45,
+    "learnPool": [
+      "m-mec-01",
+      "m-mec-05",
+      "m-mec-09",
+      "m-mec-07",
+      "m-mec-02",
+      "m-mec-03",
+      "m-mec-04",
+      "m-mec-06",
+      "m-mec-08",
+      "m-mec-10"
     ]
   },
   {
     "id": "n-031",
     "name": "Hydro-Chip",
-    "types": ["Idrico"],
-    "baseStats": { "hp": 50, "stamina": 100, "potenza": 55, "resistenza": 50, "sintonia": 75, "spirito": 65, "flusso": 80 },
+    "types": [
+      "Idrico"
+    ],
+    "baseStats": {
+      "hp": 50,
+      "stamina": 100,
+      "potenza": 55,
+      "resistenza": 50,
+      "sintonia": 75,
+      "spirito": 65,
+      "flusso": 80
+    },
     "evolutionLevel": 22,
     "evolvesTo": "n-032",
     "moves_learned": [
-      { "level": 1, "moveId": "m-idr-01" },
-      { "level": 10, "moveId": "m-idr-03" }
+      {
+        "level": 1,
+        "moveId": "m-idr-01"
+      },
+      {
+        "level": 10,
+        "moveId": "m-idr-03"
+      }
+    ],
+    "moves": [
+      "m-idr-01",
+      "m-idr-04",
+      "m-idr-09",
+      "m-idr-07"
+    ],
+    "catchRate": 180,
+    "learnPool": [
+      "m-idr-01",
+      "m-idr-04",
+      "m-idr-09",
+      "m-idr-07",
+      "m-idr-02",
+      "m-idr-03",
+      "m-idr-05",
+      "m-idr-06",
+      "m-idr-08",
+      "m-idr-10"
     ]
   },
   {
     "id": "n-032",
     "name": "Tsunami-Node",
-    "types": ["Idrico", "Fulgido"],
-    "baseStats": { "hp": 85, "stamina": 110, "potenza": 85, "resistenza": 75, "sintonia": 115, "spirito": 90, "flusso": 105 },
+    "types": [
+      "Idrico",
+      "Fulgido"
+    ],
+    "baseStats": {
+      "hp": 85,
+      "stamina": 110,
+      "potenza": 85,
+      "resistenza": 75,
+      "sintonia": 115,
+      "spirito": 90,
+      "flusso": 105
+    },
     "evolutionLevel": null,
     "evolvesTo": null,
     "moves_learned": [
-      { "level": 1, "moveId": "m-idr-05" },
-      { "level": 28, "moveId": "m-ful-04" },
-      { "level": 48, "moveId": "m-idr-08" }
+      {
+        "level": 1,
+        "moveId": "m-idr-05"
+      },
+      {
+        "level": 28,
+        "moveId": "m-ful-04"
+      },
+      {
+        "level": 48,
+        "moveId": "m-idr-08"
+      }
+    ],
+    "moves": [
+      "m-idr-01",
+      "m-idr-04",
+      "m-idr-09",
+      "m-ful-07"
+    ],
+    "catchRate": 45,
+    "learnPool": [
+      "m-idr-01",
+      "m-idr-04",
+      "m-idr-09",
+      "m-ful-07",
+      "m-idr-02",
+      "m-idr-03",
+      "m-idr-05",
+      "m-idr-06",
+      "m-idr-07",
+      "m-idr-08",
+      "m-idr-10",
+      "m-ful-01",
+      "m-ful-02",
+      "m-ful-03"
     ]
   },
   {
     "id": "n-033",
     "name": "Gravel-Bot",
-    "types": ["Geologico"],
-    "baseStats": { "hp": 80, "stamina": 90, "potenza": 70, "resistenza": 100, "sintonia": 40, "spirito": 60, "flusso": 45 },
+    "types": [
+      "Geologico"
+    ],
+    "baseStats": {
+      "hp": 80,
+      "stamina": 90,
+      "potenza": 70,
+      "resistenza": 100,
+      "sintonia": 40,
+      "spirito": 60,
+      "flusso": 45
+    },
     "evolutionLevel": 28,
     "evolvesTo": "n-034",
     "moves_learned": [
-      { "level": 1, "moveId": "m-geo-01" },
-      { "level": 15, "moveId": "m-geo-03" }
+      {
+        "level": 1,
+        "moveId": "m-geo-01"
+      },
+      {
+        "level": 15,
+        "moveId": "m-geo-03"
+      }
+    ],
+    "moves": [
+      "m-geo-01",
+      "m-geo-05",
+      "m-geo-09",
+      "m-geo-07"
+    ],
+    "catchRate": 180,
+    "learnPool": [
+      "m-geo-01",
+      "m-geo-05",
+      "m-geo-09",
+      "m-geo-07",
+      "m-geo-02",
+      "m-geo-03",
+      "m-geo-04",
+      "m-geo-06",
+      "m-geo-08",
+      "m-geo-10"
     ]
   },
   {
     "id": "n-034",
     "name": "Terra-Drill",
-    "types": ["Geologico", "Meccanico"],
-    "baseStats": { "hp": 105, "stamina": 100, "potenza": 125, "resistenza": 120, "sintonia": 55, "spirito": 75, "flusso": 60 },
+    "types": [
+      "Geologico",
+      "Meccanico"
+    ],
+    "baseStats": {
+      "hp": 105,
+      "stamina": 100,
+      "potenza": 125,
+      "resistenza": 120,
+      "sintonia": 55,
+      "spirito": 75,
+      "flusso": 60
+    },
     "evolutionLevel": null,
     "evolvesTo": null,
     "moves_learned": [
-      { "level": 1, "moveId": "m-geo-05" },
-      { "level": 30, "moveId": "m-mec-04" },
-      { "level": 50, "moveId": "m-geo-08" }
+      {
+        "level": 1,
+        "moveId": "m-geo-05"
+      },
+      {
+        "level": 30,
+        "moveId": "m-mec-04"
+      },
+      {
+        "level": 50,
+        "moveId": "m-geo-08"
+      }
+    ],
+    "moves": [
+      "m-geo-01",
+      "m-geo-05",
+      "m-geo-09",
+      "m-mec-07"
+    ],
+    "catchRate": 45,
+    "learnPool": [
+      "m-geo-01",
+      "m-geo-05",
+      "m-geo-09",
+      "m-mec-07",
+      "m-geo-02",
+      "m-geo-03",
+      "m-geo-04",
+      "m-geo-06",
+      "m-geo-07",
+      "m-geo-08",
+      "m-geo-10",
+      "m-mec-01",
+      "m-mec-02",
+      "m-mec-03"
     ]
   },
   {
     "id": "n-035",
     "name": "Shadow-Byte",
-    "types": ["Tetro"],
-    "baseStats": { "hp": 45, "stamina": 110, "potenza": 80, "resistenza": 40, "sintonia": 85, "spirito": 50, "flusso": 110 },
+    "types": [
+      "Tetro"
+    ],
+    "baseStats": {
+      "hp": 45,
+      "stamina": 110,
+      "potenza": 80,
+      "resistenza": 40,
+      "sintonia": 85,
+      "spirito": 50,
+      "flusso": 110
+    },
     "evolutionLevel": 32,
     "evolvesTo": "n-036",
     "moves_learned": [
-      { "level": 1, "moveId": "m-tet-01" },
-      { "level": 18, "moveId": "m-tet-03" }
+      {
+        "level": 1,
+        "moveId": "m-tet-01"
+      },
+      {
+        "level": 18,
+        "moveId": "m-tet-03"
+      }
+    ],
+    "moves": [
+      "m-tet-01",
+      "m-tet-04",
+      "m-tet-09",
+      "m-tet-07"
+    ],
+    "catchRate": 180,
+    "learnPool": [
+      "m-tet-01",
+      "m-tet-04",
+      "m-tet-09",
+      "m-tet-07",
+      "m-tet-02",
+      "m-tet-03",
+      "m-tet-05",
+      "m-tet-06",
+      "m-tet-08",
+      "m-tet-10"
     ]
   },
   {
     "id": "n-036",
     "name": "Void-Zero",
-    "types": ["Tetro", "Meccanico"],
-    "baseStats": { "hp": 80, "stamina": 120, "potenza": 115, "resistenza": 75, "sintonia": 120, "spirito": 100, "flusso": 125 },
+    "types": [
+      "Tetro",
+      "Meccanico"
+    ],
+    "baseStats": {
+      "hp": 80,
+      "stamina": 120,
+      "potenza": 115,
+      "resistenza": 75,
+      "sintonia": 120,
+      "spirito": 100,
+      "flusso": 125
+    },
     "evolutionLevel": null,
     "evolvesTo": null,
     "moves_learned": [
-      { "level": 1, "moveId": "m-tet-05" },
-      { "level": 35, "moveId": "m-mec-07" },
-      { "level": 55, "moveId": "m-tet-08" }
+      {
+        "level": 1,
+        "moveId": "m-tet-05"
+      },
+      {
+        "level": 35,
+        "moveId": "m-mec-07"
+      },
+      {
+        "level": 55,
+        "moveId": "m-tet-08"
+      }
+    ],
+    "moves": [
+      "m-tet-01",
+      "m-tet-04",
+      "m-tet-09",
+      "m-mec-07"
+    ],
+    "catchRate": 45,
+    "learnPool": [
+      "m-tet-01",
+      "m-tet-04",
+      "m-tet-09",
+      "m-mec-07",
+      "m-tet-02",
+      "m-tet-03",
+      "m-tet-05",
+      "m-tet-06",
+      "m-tet-07",
+      "m-tet-08",
+      "m-tet-10",
+      "m-mec-01",
+      "m-mec-02",
+      "m-mec-03"
     ]
   },
   {
     "id": "n-037",
     "name": "Aero-Bit",
-    "types": ["Aereo"],
-    "baseStats": { "hp": 50, "stamina": 100, "potenza": 50, "resistenza": 45, "sintonia": 65, "spirito": 60, "flusso": 100 },
+    "types": [
+      "Aereo"
+    ],
+    "baseStats": {
+      "hp": 50,
+      "stamina": 100,
+      "potenza": 50,
+      "resistenza": 45,
+      "sintonia": 65,
+      "spirito": 60,
+      "flusso": 100
+    },
     "evolutionLevel": 20,
     "evolvesTo": "n-038",
     "moves_learned": [
-      { "level": 1, "moveId": "m-aer-01" },
-      { "level": 12, "moveId": "m-aer-03" }
+      {
+        "level": 1,
+        "moveId": "m-aer-01"
+      },
+      {
+        "level": 12,
+        "moveId": "m-aer-03"
+      }
+    ],
+    "moves": [
+      "m-aer-01",
+      "m-aer-04",
+      "m-aer-09",
+      "m-aer-07"
+    ],
+    "catchRate": 180,
+    "learnPool": [
+      "m-aer-01",
+      "m-aer-04",
+      "m-aer-09",
+      "m-aer-07",
+      "m-aer-02",
+      "m-aer-03",
+      "m-aer-05",
+      "m-aer-06",
+      "m-aer-08",
+      "m-aer-10"
     ]
   },
   {
     "id": "n-038",
     "name": "Sky-Server",
-    "types": ["Aereo", "Prismatico"],
-    "baseStats": { "hp": 80, "stamina": 110, "potenza": 90, "resistenza": 70, "sintonia": 105, "spirito": 95, "flusso": 120 },
+    "types": [
+      "Aereo",
+      "Prismatico"
+    ],
+    "baseStats": {
+      "hp": 80,
+      "stamina": 110,
+      "potenza": 90,
+      "resistenza": 70,
+      "sintonia": 105,
+      "spirito": 95,
+      "flusso": 120
+    },
     "evolutionLevel": null,
     "evolvesTo": null,
     "moves_learned": [
-      { "level": 1, "moveId": "m-aer-06" },
-      { "level": 25, "moveId": "m-pri-06" },
-      { "level": 45, "moveId": "m-aer-08" }
+      {
+        "level": 1,
+        "moveId": "m-aer-06"
+      },
+      {
+        "level": 25,
+        "moveId": "m-pri-06"
+      },
+      {
+        "level": 45,
+        "moveId": "m-aer-08"
+      }
+    ],
+    "moves": [
+      "m-aer-01",
+      "m-aer-04",
+      "m-aer-09",
+      "m-pri-07"
+    ],
+    "catchRate": 45,
+    "learnPool": [
+      "m-aer-01",
+      "m-aer-04",
+      "m-aer-09",
+      "m-pri-07",
+      "m-aer-02",
+      "m-aer-03",
+      "m-aer-05",
+      "m-aer-06",
+      "m-aer-07",
+      "m-aer-08",
+      "m-aer-10",
+      "m-pri-01",
+      "m-pri-02",
+      "m-pri-03"
     ]
   },
   {
     "id": "n-039",
     "name": "Crio-Mite",
-    "types": ["Criogenico"],
-    "baseStats": { "hp": 45, "stamina": 90, "potenza": 65, "resistenza": 55, "sintonia": 70, "spirito": 60, "flusso": 75 },
+    "types": [
+      "Criogenico"
+    ],
+    "baseStats": {
+      "hp": 45,
+      "stamina": 90,
+      "potenza": 65,
+      "resistenza": 55,
+      "sintonia": 70,
+      "spirito": 60,
+      "flusso": 75
+    },
     "evolutionLevel": 25,
     "evolvesTo": "n-040",
     "moves_learned": [
-      { "level": 1, "moveId": "m-cri-01" },
-      { "level": 15, "moveId": "m-cri-03" }
+      {
+        "level": 1,
+        "moveId": "m-cri-01"
+      },
+      {
+        "level": 15,
+        "moveId": "m-cri-03"
+      }
+    ],
+    "moves": [
+      "m-cri-01",
+      "m-cri-05",
+      "m-cri-09",
+      "m-cri-07"
+    ],
+    "catchRate": 180,
+    "learnPool": [
+      "m-cri-01",
+      "m-cri-05",
+      "m-cri-09",
+      "m-cri-07",
+      "m-cri-02",
+      "m-cri-03",
+      "m-cri-04",
+      "m-cri-06",
+      "m-cri-08",
+      "m-cri-10"
     ]
   },
   {
     "id": "n-040",
     "name": "Frost-Frame",
-    "types": ["Criogenico", "Idrico"],
-    "baseStats": { "hp": 95, "stamina": 110, "potenza": 105, "resistenza": 90, "sintonia": 110, "spirito": 100, "flusso": 85 },
+    "types": [
+      "Criogenico",
+      "Idrico"
+    ],
+    "baseStats": {
+      "hp": 95,
+      "stamina": 110,
+      "potenza": 105,
+      "resistenza": 90,
+      "sintonia": 110,
+      "spirito": 100,
+      "flusso": 85
+    },
     "evolutionLevel": null,
     "evolvesTo": null,
     "moves_learned": [
-      { "level": 1, "moveId": "m-cri-05" },
-      { "level": 30, "moveId": "m-idr-04" },
-      { "level": 50, "moveId": "m-cri-07" }
+      {
+        "level": 1,
+        "moveId": "m-cri-05"
+      },
+      {
+        "level": 30,
+        "moveId": "m-idr-04"
+      },
+      {
+        "level": 50,
+        "moveId": "m-cri-07"
+      }
+    ],
+    "moves": [
+      "m-cri-01",
+      "m-cri-05",
+      "m-cri-09",
+      "m-idr-07"
+    ],
+    "catchRate": 45,
+    "learnPool": [
+      "m-cri-01",
+      "m-cri-05",
+      "m-cri-09",
+      "m-idr-07",
+      "m-cri-02",
+      "m-cri-03",
+      "m-cri-04",
+      "m-cri-06",
+      "m-cri-07",
+      "m-cri-08",
+      "m-cri-10",
+      "m-idr-01",
+      "m-idr-02",
+      "m-idr-03"
     ]
   }
 ]
