@@ -111,7 +111,7 @@ const MainHub: React.FC = () => {
   const pendingMissions = missions.filter(m => !m.completed).length;
 
   return (
-    <div className="flex flex-col h-full bg-slate-950 p-6 pb-24 overflow-y-auto scrollbar-hide select-none transition-all duration-700 animate-in fade-in relative">
+    <div className="flex flex-col h-full bg-slate-950 px-3 py-6 pb-24 overflow-y-auto scrollbar-hide select-none transition-all duration-700 animate-in fade-in relative">
       
       {/* HUB HEADER: Solo visibile qui */}
       <div className="flex items-center justify-between mb-8 pt-4 animate-in slide-in-from-top-4 duration-500">
@@ -138,7 +138,7 @@ const MainHub: React.FC = () => {
       <div className="grid grid-cols-2 gap-4 mb-8">
         <button 
           onClick={() => {
-            setBattleContext({ kind: 'hub' });
+            setBattleContext({ kind: 'hub', mode: 'combat' });
             bumpBattleSession();
             setScreen('battle');
           }}
@@ -157,7 +157,7 @@ const MainHub: React.FC = () => {
 
         <button 
           onClick={() => {
-            setBattleContext({ kind: 'hub' });
+            setBattleContext({ kind: 'hub', mode: 'capture' });
             bumpBattleSession();
             setScreen('battle');
           }}
@@ -268,15 +268,14 @@ const MainHub: React.FC = () => {
                         <div className="h-1 w-full bg-black/70 rounded-full overflow-hidden border border-white/5">
                           <div
                             className={cn(
-                              'h-full rounded-full transition-all duration-300',
-                              hpCur / hpMax < 0.25 ? 'bg-rose-500' : hpCur / hpMax < 0.5 ? 'bg-yellow-400' : 'bg-cyan-400'
+                              'h-full rounded-full transition-all duration-300 bg-emerald-500'
                             )}
                             style={{ width: `${Math.min(100, (hpCur / hpMax) * 100)}%` }}
                           />
                         </div>
                         <div className="h-1 w-full bg-black/70 rounded-full overflow-hidden border border-white/5">
                           <div
-                            className="h-full rounded-full bg-emerald-400 transition-all duration-300"
+                            className="h-full rounded-full bg-yellow-400 transition-all duration-300"
                             style={{ width: `${Math.min(100, (spCur / spMax) * 100)}%` }}
                           />
                         </div>
@@ -292,15 +291,13 @@ const MainHub: React.FC = () => {
       </div>
 
       {/* Terminal Grid */}
-      <div className="grid grid-cols-2 gap-4">
+      <div className="grid grid-cols-3 gap-2">
          <TerminalIcon icon={ShoppingBag} label="Shop" color="border-cyan-400/40 text-cyan-400" onClick={() => setScreen('shop')} />
          <TerminalIcon icon={Shield} label="Squadra" color="border-purple-500/40 text-purple-500" onClick={() => { setBoxTab('team'); setScreen('box'); }} />
          <TerminalIcon icon={Dna} label="Link-Dex" color="border-pink-500/40 text-pink-500" onClick={() => setScreen('linkdex')} />
          <TerminalIcon icon={ScrollText} label="Quests" color="border-amber-400/40 text-amber-400" badge={pendingMissions} onClick={() => setShowMissions(true)} />
-      </div>
-      <div className="grid grid-cols-2 gap-4 mt-4">
-        <TerminalIcon icon={Map} label="Mappa" color="border-emerald-500/40 text-emerald-400" onClick={() => setScreen('worldmap')} />
-        <TerminalIcon icon={Hammer} label="Craft" color="border-orange-500/40 text-orange-400" onClick={() => setScreen('crafting')} />
+         <TerminalIcon icon={Map} label="Mappa" color="border-emerald-500/40 text-emerald-400" onClick={() => setScreen('worldmap')} />
+         <TerminalIcon icon={Hammer} label="Craft" color="border-orange-500/40 text-orange-400" onClick={() => setScreen('crafting')} />
       </div>
 
       {/* Debug Codes Drawer */}

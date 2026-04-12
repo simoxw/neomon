@@ -72,6 +72,30 @@ const STATUS_LABELS: Record<Exclude<StatusCondition, null>, string> = {
   confuse: '🌀 CNF',
 };
 
+const TYPE_BADGE_COLORS: Record<string, string> = {
+  [ElementType.Bio]: 'bg-emerald-500/20 text-emerald-300 border-emerald-500/40',
+  [ElementType.Incandescente]: 'bg-orange-500/20 text-orange-300 border-orange-500/40',
+  [ElementType.Idrico]: 'bg-sky-500/20 text-sky-300 border-sky-500/40',
+  [ElementType.Fulgido]: 'bg-yellow-500/20 text-yellow-200 border-yellow-500/40',
+  [ElementType.Tetro]: 'bg-violet-500/20 text-violet-200 border-violet-500/40',
+  [ElementType.Meccanico]: 'bg-slate-500/20 text-slate-200 border-slate-500/40',
+  [ElementType.Etereo]: 'bg-fuchsia-500/20 text-fuchsia-200 border-fuchsia-500/40',
+  [ElementType.Cinetico]: 'bg-rose-500/20 text-rose-200 border-rose-500/40',
+  [ElementType.Geologico]: 'bg-amber-800/30 text-amber-200 border-amber-600/40',
+  [ElementType.Aereo]: 'bg-sky-400/20 text-sky-100 border-sky-300/40',
+  [ElementType.Criogenico]: 'bg-cyan-400/20 text-cyan-100 border-cyan-300/40',
+  [ElementType.Prismatico]: 'bg-white/10 text-white border-white/30',
+};
+
+function TypeBadge({ type }: { type: ElementType | string }) {
+  const colorClass = TYPE_BADGE_COLORS[type] || 'bg-white/10 text-white border-white/30';
+  return (
+    <span className={cn('text-[7px] px-1.5 py-0.5 rounded border font-black uppercase tracking-tighter', colorClass)}>
+      {type}
+    </span>
+  );
+}
+
 function StatusBadge({ status }: { status?: StatusCondition | null }) {
   if (!status) return null;
   return (
@@ -316,25 +340,41 @@ const Arena: React.FC = () => {
           </div>
           <motion.div initial={{ x: -20, opacity: 0 }} animate={{ x: 0, opacity: 1 }} className="w-40 p-2 rounded-xl bg-black/70 backdrop-blur-md border border-white/10 shadow-2xl">
             <div className="flex justify-between items-baseline mb-1 gap-1">
-              <h2 className="text-[9px] font-black text-white uppercase italic tracking-tighter truncate">{opponentMon.name}</h2>
+              <div className="flex flex-col gap-1 min-w-0">
+                <h2 className="text-[9px] font-black text-white uppercase italic tracking-tighter truncate">{opponentMon.name}</h2>
+                <div className="flex gap-1">
+                  {opponentMon.types.map((t) => (
+                    <TypeBadge key={t} type={t} />
+                  ))}
+                </div>
+              </div>
               <span className="text-[7px] font-mono text-cyan-400 italic shrink-0">L.{opponentMon.level}</span>
             </div>
             <StatusBadge status={opponentMon.status ?? null} />
             <StageStrip stages={opponentMon.statStages} />
             <div className="space-y-1">
-              <StatBar
-                value={opponentMon.currentHp}
-                max={getMaxHp(opponentMon)}
-                label="HP"
-                variant="hp"
-              />
-              <div className="h-0.5 w-full bg-black/40 rounded-full overflow-hidden">
-                <div
-                  className="h-full bg-cyan-400 shadow-[0_0_8px_rgba(34,211,238,0.5)]"
-                  style={{
-                    width: `${Math.min(100, (opponentMon.currentStamina / Math.max(1, getMaxStamina(opponentMon))) * 100)}%`,
-                  }}
-                />
+              <div className="flex items-center gap-2">
+                <span className="text-[6px] font-black text-emerald-400 w-4">HP</span>
+                <div className="flex-1 h-1.5 bg-black/60 rounded-full overflow-hidden p-[1px] border border-white/5">
+                  <motion.div
+                    className="h-full bg-emerald-500 rounded-full"
+                    initial={{ width: '100%' }}
+                    animate={{ width: `${(opponentMon.currentHp / Math.max(1, getMaxHp(opponentMon))) * 100}%` }}
+                    transition={{ duration: 0.5 }}
+                  />
+                </div>
+              </div>
+              {/* SP BAR */}
+              <div className="flex items-center gap-2">
+                <span className="text-[6px] font-black text-yellow-400 w-4">SP</span>
+                <div className="flex-1 h-1 bg-black/40 rounded-full overflow-hidden">
+                  <motion.div
+                    className="h-full bg-yellow-400"
+                    initial={{ width: '100%' }}
+                    animate={{ width: `${(opponentMon.currentStamina / Math.max(1, getMaxStamina(opponentMon))) * 100}%` }}
+                    transition={{ duration: 0.5 }}
+                  />
+                </div>
               </div>
             </div>
           </motion.div>
@@ -423,25 +463,46 @@ const Arena: React.FC = () => {
           {/* Biometry Player (In basso a destra) */}
           <div className="flex-1 flex flex-col gap-2 pl-4 pb-4 animate-in slide-in-from-right-6 transition-all duration-700 max-w-[50%]">
             <div className="flex justify-between items-baseline mb-1 gap-1">
-              <span className="text-[13px] font-black uppercase text-white tracking-widest italic text-glow-white underline decoration-emerald-500/50 truncate">
-                {playerMon.name}
-              </span>
+              <div className="flex flex-col gap-1 min-w-0">
+                <span className="text-[13px] font-black uppercase text-white tracking-widest italic text-glow-white underline decoration-emerald-500/50 truncate">
+                  {playerMon.name}
+                </span>
+                <div className="flex gap-1">
+                  {playerMon.types.map((t) => (
+                    <TypeBadge key={t} type={t} />
+                  ))}
+                </div>
+              </div>
               <span className="text-[8px] text-emerald-400 font-mono italic shrink-0">LV.{playerMon.level}</span>
             </div>
             <StatusBadge status={playerMon.status ?? null} />
             <StageStrip stages={playerMon.statStages} />
-            <StatBar
-              value={playerMon.currentHp}
-              max={getMaxHp(playerMon)}
-              label="HP"
-              variant="hp"
-            />
-            <StatBar
-              value={playerMon.currentStamina}
-              max={getMaxStamina(playerMon)}
-              label="SP"
-              variant="sp"
-            />
+            {/* HP BAR PLAYER */}
+            <div className="flex flex-col gap-1 w-full max-w-[140px]">
+              <div className="flex items-center gap-2">
+                <span className="text-[6px] font-black text-emerald-400 w-4 italic">HP</span>
+                <div className="flex-1 h-2 bg-black/60 rounded-full overflow-hidden p-[1px] border border-white/5">
+                  <motion.div
+                    className="h-full bg-emerald-500 rounded-full shadow-[0_0_10px_rgba(16,185,129,0.4)]"
+                    initial={{ width: '100%' }}
+                    animate={{ width: `${(playerMon.currentHp / (playerMon.currentStats?.hp ?? playerMon.baseStats.hp)) * 100}%` }}
+                    transition={{ duration: 0.5 }}
+                  />
+                </div>
+              </div>
+              {/* SP BAR PLAYER */}
+              <div className="flex items-center gap-2">
+                <span className="text-[6px] font-black text-yellow-400 w-4 italic">SP</span>
+                <div className="flex-1 h-1 bg-black/40 rounded-full overflow-hidden">
+                  <motion.div
+                    className="h-full bg-yellow-400 shadow-[0_0_8px_rgba(234,179,8,0.3)]"
+                    initial={{ width: '100%' }}
+                    animate={{ width: `${(playerMon.currentStamina / (playerMon.currentStats?.stamina ?? playerMon.baseStats.stamina)) * 100}%` }}
+                    transition={{ duration: 0.5 }}
+                  />
+                </div>
+              </div>
+            </div>
           </div>
         </div>
 

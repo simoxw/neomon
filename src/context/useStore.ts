@@ -285,6 +285,8 @@ export const useStore = create<NeoState>()(
           set({ toastMessage: newToast });
           setTimeout(() => get().setToast(null), 3200);
         }
+        const p_after = get().player;
+        if (p_after) void db.player.update(p_after.id, { missionProgress: mp } as Partial<PlayerData>);
       },
 
       recordCapture: (types) => {
@@ -316,6 +318,8 @@ export const useStore = create<NeoState>()(
         } else {
           set({ missionProgress: mp });
         }
+        const p_after = get().player;
+        if (p_after) void db.player.update(p_after.id, { missionProgress: mp } as Partial<PlayerData>);
       },
 
       enterInventory: (opts) => {
@@ -430,6 +434,7 @@ export const useStore = create<NeoState>()(
           totalBattlesWon: player?.totalBattlesWon ?? 0,
           totalCaptures: player?.totalCaptures ?? 0,
           playtimeMs: player?.playtimeMs ?? 0,
+          missionProgress: player?.missionProgress ?? {},
           isLoading: false,
         });
         } catch (error) {

@@ -66,7 +66,7 @@ const TeamCard = ({ mon, index, total }: { mon: NeoMon; index: number; total: nu
       <div 
         onClick={handleClick}
         className={cn(
-          "relative w-full p-5 rounded-[2rem] border-l-[8px] transition-all duration-300 group cursor-pointer active:scale-[0.98]",
+          "relative w-full px-4 py-5 rounded-[2rem] border-l-[8px] transition-all duration-300 group cursor-pointer active:scale-[0.98]",
           "bg-slate-900/60 backdrop-blur-xl border border-white/5",
           "shadow-[0_8px_32px_rgba(0,0,0,0.4)] hover:shadow-[0_8px_40px_rgba(34,211,238,0.15)] hover:border-white/10",
           pendingItemToUse ? "ring-2 ring-cyan-400 ring-offset-4 ring-offset-slate-950 scale-[1.02]" : "",
@@ -76,9 +76,9 @@ const TeamCard = ({ mon, index, total }: { mon: NeoMon; index: number; total: nu
           "border-l-cyan-400"
         )}
       >
-        <div className="flex items-center gap-5">
+        <div className="flex items-center gap-4">
           {/* Avatar Area */}
-          <div className="relative w-24 h-24 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center shrink-0 shadow-inner group-hover:border-cyan-400/50 transition-colors">
+          <div className="relative w-20 h-20 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center shrink-0 shadow-inner group-hover:border-cyan-400/50 transition-colors">
              <img 
                src={getCreatureSprite(mon.id)} 
                alt={mon.name}
@@ -89,22 +89,27 @@ const TeamCard = ({ mon, index, total }: { mon: NeoMon; index: number; total: nu
              </div>
           </div>
 
-          <div className="flex-1">
-             <div className="flex justify-between items-start mb-1">
-               <div className="flex flex-col">
-                  <h3 className="text-xl font-black italic uppercase tracking-tighter text-white leading-none mb-1">{mon.name}</h3>
-                  <div className="flex gap-1">
-                    {mon.types.map((t: string) => (
-                      <span key={t} className="text-[7px] px-2 py-0.5 rounded-full bg-white/5 border border-white/10 uppercase font-black text-white/40 tracking-widest">
-                        {t}
-                      </span>
-                    ))}
-                  </div>
-               </div>
-               <div className="flex flex-col items-end">
-                  <span className="text-xs font-black text-cyan-400 text-glow-cyan font-mono">L.{mon.level}</span>
-                  <span className="text-[7px] font-mono text-white/20 uppercase tracking-widest mt-1">Status Active</span>
-               </div>
+          <div className="flex-1 min-w-0">
+             <div className="flex flex-col gap-1">
+                <div className="flex justify-between items-start">
+                   <h3 className="text-xl font-black italic uppercase tracking-tighter text-white leading-none whitespace-nowrap">{mon.name}</h3>
+                   <div className="p-1 text-white/20 group-hover:text-white transition-colors shrink-0 -mt-1 -mr-1">
+                      <MoreVertical className="w-4 h-4" />
+                   </div>
+                </div>
+                
+                <div className="flex items-center justify-between">
+                   <div className="flex gap-1">
+                     {mon.types.map((t: string) => (
+                       <span key={t} className="text-[7px] px-2 py-0.5 rounded-full bg-white/5 border border-white/10 uppercase font-black text-white/40 tracking-widest">
+                         {t}
+                       </span>
+                     ))}
+                   </div>
+                   <div className="flex flex-col items-end">
+                      <span className="text-xs font-black text-cyan-400 text-glow-cyan font-mono leading-none">L.{mon.level}</span>
+                   </div>
+                </div>
              </div>
              
              {/* EXPERIENCE BAR */}
@@ -124,10 +129,10 @@ const TeamCard = ({ mon, index, total }: { mon: NeoMon; index: number; total: nu
              {/* STATS BARS QUICKET */}
              <div className="grid grid-cols-1 gap-2 mt-4">
                 <div className="flex items-center gap-3">
-                   <span className="text-[7px] font-black text-rose-500 uppercase w-6">HP</span>
+                   <span className="text-[7px] font-black text-emerald-500 uppercase w-6">HP</span>
                    <div className="h-1 flex-1 bg-black/40 rounded-full overflow-hidden">
                       <div 
-                        className="h-full bg-rose-500 transition-all duration-500" 
+                        className="h-full bg-emerald-500 transition-all duration-500" 
                         style={{ width: `${Math.min(100, ((mon.currentHp ?? (mon.currentStats?.hp ?? mon.baseStats.hp)) / (mon.currentStats?.hp ?? mon.baseStats.hp)) * 100)}%` }} 
                       />
                    </div>
@@ -136,10 +141,10 @@ const TeamCard = ({ mon, index, total }: { mon: NeoMon; index: number; total: nu
                    </span>
                 </div>
                 <div className="flex items-center gap-3">
-                   <span className="text-[7px] font-black text-cyan-400 uppercase w-6">SP</span>
+                   <span className="text-[7px] font-black text-yellow-400 uppercase w-6">SP</span>
                    <div className="h-1 flex-1 bg-black/40 rounded-full overflow-hidden">
                       <div 
-                        className="h-full bg-cyan-400 transition-all duration-500" 
+                        className="h-full bg-yellow-400 transition-all duration-500" 
                         style={{ width: `${Math.min(100, ((mon.currentStamina ?? (mon.currentStats?.stamina ?? mon.baseStats.stamina)) / (mon.currentStats?.stamina ?? mon.baseStats.stamina)) * 100)}%` }} 
                       />
                    </div>
@@ -148,10 +153,6 @@ const TeamCard = ({ mon, index, total }: { mon: NeoMon; index: number; total: nu
                    </span>
                 </div>
              </div>
-          </div>
-
-          <div className="p-2 text-white/20 group-hover:text-white transition-colors">
-             <MoreVertical className="w-5 h-5" />
           </div>
         </div>
       </div>
@@ -216,7 +217,7 @@ const TeamManager: React.FC = () => {
   const pendingItem = itemsData.find(i => i.id === pendingItemToUse);
 
   return (
-    <div className="h-full w-full p-6 pb-32 overflow-y-auto scrollbar-hide">
+    <div className="h-full w-full px-2 py-6 pb-32 overflow-y-auto scrollbar-hide">
       {pendingItemToUse && (
         <div className="mb-6 p-4 rounded-2xl bg-cyan-500/10 border border-cyan-500/30 flex items-center justify-between animate-in slide-in-from-top duration-300">
           <div className="flex items-center gap-3">
@@ -236,27 +237,11 @@ const TeamManager: React.FC = () => {
           </button>
         </div>
       )}
-      <div className="mb-8 animate-in slide-in-from-left-10 duration-700">
-        <h2 className="text-4xl font-black italic uppercase tracking-tighter text-white text-glow-cyan">Active Squad</h2>
-        <div className="flex items-center gap-2 mt-2">
-           <div className="w-2 h-2 rounded-full bg-cyan-400 animate-pulse shadow-[0_0_8px_rgba(34,211,238,0.8)]" />
-           <p className="text-[10px] text-white/30 font-mono uppercase tracking-[0.3em]">{pendingItemToUse ? 'Seleziona un bersaglio' : 'Protocollo Sincronia Attivo'}</p>
-        </div>
-      </div>
 
       <div className="grid grid-cols-1 gap-6">
         {team.map((mon, index) => (
           <TeamCard key={mon.id} mon={mon} index={index} total={team.length} />
         ))}
-        {team.length === 0 && (
-          <div className="p-16 border-2 border-dashed border-white/5 rounded-[3rem] flex flex-col items-center justify-center text-white/10 gap-6 bg-white/2">
-            <Activity className="w-16 h-16 opacity-10 animate-pulse" />
-            <div className="text-center">
-               <span className="block font-black uppercase tracking-[0.3em] text-[11px] opacity-40 mb-1">Squadra Vuota</span>
-               <span className="text-[8px] uppercase tracking-[0.2em] opacity-30">Seleziona unità dal Box per iniziare</span>
-            </div>
-          </div>
-        )}
       </div>
     </div>
   );

@@ -12,9 +12,10 @@ function cn(...inputs: ClassValue[]) {
 interface MoveTooltipProps {
   move: Move;
   visible: boolean;
+  isFixed?: boolean;
 }
 
-const MoveTooltip: React.FC<MoveTooltipProps> = ({ move, visible }) => {
+const MoveTooltip: React.FC<MoveTooltipProps> = ({ move, visible, isFixed }) => {
   if (!visible) return null;
 
   const isPhysical = move.category === 'Physical' || String(move.category).toLowerCase() === 'physical';
@@ -29,7 +30,8 @@ const MoveTooltip: React.FC<MoveTooltipProps> = ({ move, visible }) => {
   return (
     <div
       className={cn(
-        'absolute bottom-full left-1/2 -translate-x-1/2 mb-4 w-64 p-3 rounded-lg border-2 z-50',
+        'w-64 p-3 rounded-lg border-2 z-50',
+        isFixed ? 'relative' : 'absolute bottom-full left-1/2 -translate-x-1/2 mb-4',
         'bg-gray-900/90 backdrop-blur-xl transition-all duration-300 animate-in fade-in zoom-in-95',
         isPhysical
           ? 'border-pink-500/50 shadow-[0_0_15px_rgba(236,72,153,0.3)] shadow-pink-500/20'
@@ -80,12 +82,14 @@ const MoveTooltip: React.FC<MoveTooltipProps> = ({ move, visible }) => {
         <div className="text-xs text-white/70 italic bg-black/30 p-2 rounded border border-white/5">{desc}</div>
       ) : null}
 
-      <div
-        className={cn(
-          'absolute top-full left-1/2 -translate-x-1/2 border-8 border-transparent',
-          isPhysical ? 'border-t-pink-500/50' : 'border-t-cyan-400/50'
-        )}
-      />
+      {!isFixed && (
+        <div
+          className={cn(
+            'absolute top-full left-1/2 -translate-x-1/2 border-8 border-transparent',
+            isPhysical ? 'border-t-pink-500/50' : 'border-t-cyan-400/50'
+          )}
+        />
+      )}
     </div>
   );
 };

@@ -256,14 +256,16 @@ export const useBattle = (_playerId: string, _opponentId: string) => {
         const wildLabel =
           ctx?.kind === 'trainer'
             ? `${(trainersData as TrainerData[]).find((t) => t.id === ctx.trainerId)?.name ?? 'Allenatore'}`
-            : 'selvatico';
+            : ctx?.mode === 'combat' 
+              ? 'simulazione'
+              : 'selvatico';
         
         setBattleLog([
           {
             text:
               ctx?.kind === 'trainer'
                 ? `Sfida! ${wildLabel} invia ${oppEntity.name}!`
-                : `Inizia la battaglia contro ${oppEntity.name} ${ctx?.kind === 'zone' ? 'nel distretto' : 'selvatico'}!`,
+                : `Inizia la battaglia contro ${oppEntity.name} ${wildLabel}!`,
             kind: 'neutral',
           },
         ]);

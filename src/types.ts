@@ -195,6 +195,7 @@ export interface PlayerData {
   totalBattlesWon?: number;
   totalCaptures?: number;
   playtimeMs?: number;
+  missionProgress?: Record<string, { completed?: boolean; count?: number }>;
 }
 
 /**

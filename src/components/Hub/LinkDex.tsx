@@ -14,6 +14,8 @@ import {
 import { clsx, type ClassValue } from 'clsx';
 import { twMerge } from 'tailwind-merge';
 import { motion } from 'framer-motion';
+import { ElementType } from '../../types';
+import { TYPE_CHART } from '../../logic/DamageCalc';
 
 function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -27,9 +29,8 @@ const LinkDex: React.FC = () => {
     return Array.from(new Set([...team.map(m => m.id), ...box.map(m => m.id)]));
   }, [team, box]);
 
-  const dexEntries = Array.from({ length: 20 }).map((_, i) => {
-    const id = `n-${(i + 1).toString().padStart(3, '0')}`;
-    const data = creaturesData.find(c => c.id === id);
+  const dexEntries = (creaturesData as any[]).map((data) => {
+    const id = data.id;
     const isCaptured = capturedIds.includes(id);
     const isSeen = seenIds.includes(id) || isCaptured;
 
@@ -46,6 +47,20 @@ const LinkDex: React.FC = () => {
     return dexEntries.find(e => e.id === selectedId);
   }, [selectedId, dexEntries]);
 
+  const weaknesses = useMemo(() => {
+    if (!selectedMon?.data) return [];
+    const defTypes = selectedMon.data.types as ElementType[];
+    const allTypes = Object.values(ElementType);
+    
+    return allTypes.filter(atkType => {
+      let multiplier = 1;
+      for (const defType of defTypes) {
+        multiplier *= (TYPE_CHART[atkType]?.[defType] ?? 1);
+      }
+      return multiplier > 1;
+    });
+  }, [selectedMon]);
+
   return (
     <div className="h-full w-full bg-slate-950 flex flex-col animate-in fade-in duration-500 overflow-hidden text-white">
       
@@ -57,43 +72,48 @@ const LinkDex: React.FC = () => {
          <h1 className="text-2xl font-black italic uppercase tracking-tighter shadow-cyan-400/20">Neo-Link Dex</h1>
          <div className="flex flex-col items-end">
             <span className="text-[8px] uppercase font-black text-white/30 tracking-widest leading-none mb-1">Neural Sync</span>
-            <span className="text-sm font-black text-cyan-400 leading-none">{Math.round((capturedIds.length/20)*100)}%</span>
+            <span className="text-sm font-black text-cyan-400 leading-none">{Math.round((capturedIds.length/creaturesData.length)*100)}%</span>
          </div>
       </div>
 
       <div className="flex-1 flex overflow-hidden">
         {/* Left: Entries Grid */}
-        <div className="w-5/12 border-r border-white/5 overflow-y-auto scrollbar-hide p-3 grid grid-cols-2 gap-2 bg-black/40 content-start">
-           {dexEntries.map((entry) => (
-             <button
-               key={entry.id}
-               disabled={!entry.isSeen}
-               onClick={() => setSelectedId(entry.id)}
-               className={cn(
-                 "aspect-square rounded-2xl border transition-all flex flex-col items-center justify-center text-center relative overflow-hidden group p-2",
-                 !entry.isSeen && "border-white/5 bg-transparent",
-                 entry.isCaptured && "border-cyan-400/20 bg-cyan-900/10",
-                 entry.isSeen && !entry.isCaptured && "border-white/10 bg-white/5",
-                 selectedId === entry.id && "ring-2 ring-cyan-400"
-               )}
-             >
-                {!entry.isSeen ? (
-                  <HelpCircle className="w-8 h-8 text-white/5 opacity-40 animate-pulse" />
-                ) : (
-                  <>
-                    <img 
-                      src={getCreatureSprite(entry.id)} 
-                      alt="" 
-                      className={cn(
-                        "w-full h-full object-contain mb-1 transition-all",
-                        entry.isCaptured ? "drop-shadow-[0_0_10px_rgba(34,211,238,0.3)]" : "brightness-0 opacity-20"
-                      )} 
-                    />
-                    <div className="absolute top-1 left-2 text-[6px] font-mono text-white/20">#{entry.id.split('-')[1]}</div>
-                  </>
-                )}
-             </button>
-           ))}
+        <div className="w-5/12 border-r border-white/5 overflow-y-auto scrollbar-hide p-2 bg-black/40">
+           <div className="grid grid-cols-2 gap-2 content-start pb-20">
+             {dexEntries.map((entry) => (
+               <button
+                 key={entry.id}
+                 disabled={!entry.isSeen}
+                 onClick={() => setSelectedId(entry.id)}
+                 className={cn(
+                   "aspect-square rounded-2xl border transition-all flex flex-col items-center justify-center text-center relative overflow-hidden group p-2",
+                   !entry.isSeen && "border-white/5 bg-transparent",
+                   entry.isCaptured && "border-cyan-400/20 bg-cyan-900/10 shadow-[inset_0_0_15px_rgba(34,211,238,0.05)]",
+                   entry.isSeen && !entry.isCaptured && "border-white/10 bg-white/5",
+                   selectedId === entry.id && "ring-2 ring-cyan-400 border-transparent shadow-[0_0_20px_rgba(34,211,238,0.3)]"
+                 )}
+               >
+                  {!entry.isSeen ? (
+                    <HelpCircle className="w-6 h-6 text-white/5 opacity-40" />
+                  ) : (
+                    <>
+                      <img 
+                        src={getCreatureSprite(entry.id)} 
+                        alt="" 
+                        className={cn(
+                          "w-12 h-12 object-contain transition-all duration-500",
+                          entry.isCaptured ? "drop-shadow-[0_0_8px_rgba(34,211,238,0.4)] group-hover:scale-110" : "brightness-0 opacity-20"
+                        )} 
+                      />
+                      <div className="absolute top-1.5 left-2 text-[6px] font-mono text-white/20 font-black">#{entry.id.split('-')[1]}</div>
+                      {entry.isCaptured && (
+                        <div className="absolute top-1.5 right-2 w-1.5 h-1.5 rounded-full bg-cyan-400 shadow-[0_0_5px_rgba(34,211,238,0.8)]" />
+                      )}
+                    </>
+                  )}
+               </button>
+             ))}
+           </div>
         </div>
 
         {/* Right: Detailed View */}
@@ -120,7 +140,7 @@ const LinkDex: React.FC = () => {
 
                <h2 className="text-4xl font-black italic uppercase tracking-tighter text-white mb-1">{selectedMon.name}</h2>
                <div className="flex gap-2 mb-8">
-                 {selectedMon.data?.types.map(t => (
+                 {selectedMon.data?.types.map((t: string) => (
                    <span key={t} className="text-[9px] px-3 py-1 rounded-lg bg-cyan-400 text-black font-black tracking-widest uppercase">{t}</span>
                  ))}
                </div>
@@ -146,7 +166,9 @@ const LinkDex: React.FC = () => {
                           </div>
                           <div>
                              <div className="text-[8px] uppercase font-black text-white/30 tracking-widest">Protocol Vulnerability</div>
-                             <div className="text-[11px] font-bold text-white uppercase italic">Anomalia Bio, Flusso Termico</div>
+                             <div className="text-[11px] font-bold text-white uppercase italic">
+                               {weaknesses.length > 0 ? weaknesses.join(', ') : 'Nessuna vulnerabilità critica'}
+                             </div>
                           </div>
                        </div>
                     </div>

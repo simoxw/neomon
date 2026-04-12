@@ -40,9 +40,10 @@ export interface TrainerData {
 }
 
 export type BattleContext =
-  | { kind: 'hub' }
+  | { kind: 'hub'; mode?: 'combat' | 'capture' }
   | {
       kind: 'zone';
+      mode?: 'combat' | 'capture';
       zoneId: string;
       encounterPool: string[];
       encounterRates: number[];
