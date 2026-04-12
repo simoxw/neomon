@@ -110,6 +110,8 @@ interface NeoState {
   grantInventoryItem: (itemId: string, qty: number) => Promise<void>;
 }
 
+let isAlreadyLoading = false;
+
 export const useStore = create<NeoState>()(
   persist(
     (set, get) => ({
@@ -290,6 +292,9 @@ export const useStore = create<NeoState>()(
       },
 
       loadData: async () => {
+        if (get().isLoading === false && get().player !== null) return; // Già caricato
+        if (isAlreadyLoading) return;
+        isAlreadyLoading = true;
         console.log('[Store] loadData starting...');
         
         try {
@@ -400,6 +405,8 @@ export const useStore = create<NeoState>()(
             playtimeMs: 0,
             isLoading: false,
           });
+        } finally {
+          isAlreadyLoading = false;
         }
       },
 

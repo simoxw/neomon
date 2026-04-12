@@ -39,6 +39,7 @@ const SettingsMenu: React.FC = () => {
 
   const handleReset = async () => {
     if (confirm("⚠️ SEI SICURO? Tutti i Neo-Mon e i progressi verranno cancellati permanentemente.")) {
+      localStorage.removeItem('neomon-storage');
       await db.resetAllData();
       window.location.reload();
     }

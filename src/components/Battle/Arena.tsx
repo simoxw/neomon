@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo, useRef } from 'react';
-import { useBattle } from '../../hooks/useBattle';
+import { useBattle, type DamageFloat } from '../../hooks/useBattle';
 import { Zap, RefreshCw, Package, Users, LogOut } from 'lucide-react';
 import { useStore } from '../../context/useStore';
 import { clsx, type ClassValue } from 'clsx';
@@ -177,7 +177,6 @@ const Arena: React.FC = () => {
   const [showSwitch, setShowSwitch] = useState(false);
   const [inventoryPrisms, setInventoryPrisms] = useState<any[]>([]);
   const [catchAttempt, setCatchAttempt] = useState<{ success: boolean; shakes: number } | null>(null);
-  const [screenShake, setScreenShake] = useState<'light' | 'heavy' | null>(null);
   const [floatingDamage, setFloatingDamage] = useState<Array<{ id: string; value: number; type: 'damage' | 'heal' | 'status'; position: { x: number; y: number } }>>([]);
   const { team } = useStore();
   const catchMetaRef = useRef<{ result: { success: boolean; shakes: number }; prismId: string } | null>(null);
@@ -193,12 +192,6 @@ const Arena: React.FC = () => {
   }, [opponentMon]);
 
   const enemyGlow = opponentMon?.types?.[0] ? TYPE_GLOW[opponentMon.types[0]] || 'rgba(34,211,238,0.7)' : 'rgba(34,211,238,0.7)';
-
-  // Game Feel Helpers - Screen Shake, Floating Damage, Sprite Hit
-  const triggerScreenShake = (intensity: 'light' | 'heavy') => {
-    setScreenShake(intensity);
-    setTimeout(() => setScreenShake(null), 250);
-  };
 
   const getHPColor = (current: number, max: number): string => {
     const pct = current / max;
@@ -235,26 +228,12 @@ const Arena: React.FC = () => {
 
 
   useEffect(() => {
-    // Trigger screen shake and sprite hit when damage is taken
+    // Trigger sprite hit when damage is taken
     if (damageFloats.length > 0) {
-      damageFloats.forEach(f => {
+      damageFloats.forEach((f: DamageFloat) => {
         if (f.side === 'enemy') {
-          const dmg = f.amount;
-          const oppMaxHp = opponentMon?.currentStats?.hp || opponentMon?.baseStats?.hp || 100;
-          if (dmg > oppMaxHp * 0.3) {
-            triggerScreenShake('heavy');
-          } else if (dmg > 0) {
-            triggerScreenShake('light');
-          }
           triggerSpriteHit('enemy');
         } else if (f.side === 'player') {
-          const dmg = f.amount;
-          const playerMaxHp = playerMon?.currentStats?.hp || playerMon?.baseStats?.hp || 100;
-          if (dmg > playerMaxHp * 0.3) {
-            triggerScreenShake('heavy');
-          } else if (dmg > 0) {
-            triggerScreenShake('light');
-          }
           triggerSpriteHit('player');
         }
       });
@@ -303,10 +282,7 @@ const Arena: React.FC = () => {
 
   return (
     <motion.div 
-      className={cn("relative h-full w-full bg-gradient-to-b from-emerald-800 via-emerald-950 to-slate-950 flex flex-col overflow-hidden select-none animate-in fade-in duration-700",
-        screenShake === 'light' && 'shake-light',
-        screenShake === 'heavy' && 'shake-heavy'
-      )}
+      className="relative h-full w-full bg-gradient-to-b from-emerald-800 via-emerald-950 to-slate-950 flex flex-col overflow-hidden select-none animate-in fade-in duration-700"
     >
 
       {/* Background Accent */}
@@ -368,8 +344,8 @@ const Arena: React.FC = () => {
         <div className="relative w-[45%] aspect-square">
           <AnimatePresence>
             {damageFloats
-              .filter((f) => f.side === 'enemy' && f.amount > 0)
-              .map((f) => (
+              .filter((f: DamageFloat) => f.side === 'enemy' && f.amount > 0)
+              .map((f: DamageFloat) => (
                 <motion.span
                   key={f.id}
                   initial={{ opacity: 0, y: 0 }}
@@ -418,8 +394,8 @@ const Arena: React.FC = () => {
           <div className="w-[45%] aspect-square relative -mb-10 z-40 transform translate-y-[-15px] -ml-6">
             <AnimatePresence>
               {damageFloats
-                .filter((f) => f.side === 'player' && (f.amount > 0 || f.variant === 'status'))
-                .map((f) => (
+                .filter((f: DamageFloat) => f.side === 'player' && (f.amount > 0 || f.variant === 'status'))
+                .map((f: DamageFloat) => (
                   <motion.span
                     key={f.id}
                     initial={{ opacity: 0, y: 0 }}

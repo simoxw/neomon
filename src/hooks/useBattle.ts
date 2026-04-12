@@ -165,16 +165,16 @@ export const useBattle = (_playerId: string, _opponentId: string) => {
     let isCancelled = false;
 
     const initBattle = async () => {
-      setStatus('idle');
-      setIsTurnInProgress(false);
-      setBattleLog([]);
-      setDamageFloats([]);
-      setPlayerMon(null);
-      setOpponentMon(null);
-      syncPartySlotsRef([]);
-      setActiveSlot(0);
-
       try {
+        setStatus('idle');
+        setIsTurnInProgress(false);
+        setBattleLog([]);
+        setDamageFloats([]);
+        setPlayerMon(null);
+        setOpponentMon(null);
+        syncPartySlotsRef([]);
+        setActiveSlot(0);
+
         const flattenedMoves: Move[] = (movesData as unknown as Move[][]).flat();
         if (isCancelled) return;
         setAllMoves(flattenedMoves);
@@ -185,6 +185,8 @@ export const useBattle = (_playerId: string, _opponentId: string) => {
         if (team.length === 0) {
           setBattleLog([{ text: '⚠ Nessun Neo-Mon in squadra!', kind: 'system' }]);
           setStatus('lost');
+          setPlayerMon({} as any);
+          setOpponentMon({} as any);
           return;
         }
 
@@ -193,6 +195,9 @@ export const useBattle = (_playerId: string, _opponentId: string) => {
         if (firstIdx === null) {
           setBattleLog([{ text: '⚠ Tutta la squadra è esausta!', kind: 'system' }]);
           setStatus('lost');
+          const raw = team[0];
+          setPlayerMon(buildPlayerEntity(raw, slots[0]));
+          setOpponentMon(buildPlayerEntity(raw, slots[0]));
           return;
         }
 
@@ -240,32 +245,37 @@ export const useBattle = (_playerId: string, _opponentId: string) => {
         if (isCancelled) return;
 
         const opp = ensureBattleFields(generatedOpponent as any) as NeoMon;
-        setOpponentMon({
+        const oppEntity = {
           ...(opp as BattleEntity),
           moves: opp.moves ?? [...DEFAULT_MOVE_IDS],
           currentHp: opp.currentStats!.hp,
           currentStamina: opp.currentStats!.stamina,
-        });
+        };
+        setOpponentMon(oppEntity);
 
-        setStatus('fighting');
         const wildLabel =
           ctx?.kind === 'trainer'
             ? `${(trainersData as TrainerData[]).find((t) => t.id === ctx.trainerId)?.name ?? 'Allenatore'}`
             : 'selvatico';
+        
         setBattleLog([
           {
             text:
               ctx?.kind === 'trainer'
-                ? `Sfida! ${wildLabel} invia ${generatedOpponent.name}!`
-                : `Inizia la battaglia contro ${generatedOpponent.name} ${ctx?.kind === 'zone' ? 'nel distretto' : 'selvatico'}!`,
+                ? `Sfida! ${wildLabel} invia ${oppEntity.name}!`
+                : `Inizia la battaglia contro ${oppEntity.name} ${ctx?.kind === 'zone' ? 'nel distretto' : 'selvatico'}!`,
             kind: 'neutral',
           },
         ]);
+
+        setStatus('fighting');
       } catch (err) {
-        console.error('Errore inizializzazione battaglia:', err);
+        console.error('[useBattle] initBattle error:', err);
         if (!isCancelled) {
-          setBattleLog([{ text: '⚠ Errore durante il caricamento della battaglia.', kind: 'system' }]);
+          setBattleLog([{ text: '⚠ Errore critico inizializzazione battaglia.', kind: 'system' }]);
           setStatus('lost');
+          if (!playerMonRef.current) setPlayerMon({} as any);
+          if (!opponentMonRef.current) setOpponentMon({} as any);
         }
       }
     };

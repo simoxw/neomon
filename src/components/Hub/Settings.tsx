@@ -79,7 +79,8 @@ const Settings: React.FC = () => {
   };
 
   const resetAllData = async () => {
-    await db.delete();
+    localStorage.removeItem('neomon-storage');
+    await db.resetAllData();
     window.location.reload();
   };
 

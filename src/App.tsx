@@ -16,8 +16,14 @@ import { Crafting } from './components/Hub/Crafting';
 import EvolutionModal from './components/Common/EvolutionModal';
 
 const App: React.FC = () => {
-  const { currentScreen, loadData, evolutionQueue, lastBattleSummary, toastMessage, addPlaytime, inventoryOverlayOpen, isLoading } =
-    useStore();
+  const currentScreen = useStore(s => s.currentScreen);
+  const loadData = useStore(s => s.loadData);
+  const evolutionQueue = useStore(s => s.evolutionQueue);
+  const lastBattleSummary = useStore(s => s.lastBattleSummary);
+  const toastMessage = useStore(s => s.toastMessage);
+  const addPlaytime = useStore(s => s.addPlaytime);
+  const inventoryOverlayOpen = useStore(s => s.inventoryOverlayOpen);
+  const isLoading = useStore(s => s.isLoading);
 
   useEffect(() => {
     const load = async () => {
@@ -56,6 +62,27 @@ const App: React.FC = () => {
 
   const showEvolutionModal =
     currentScreen === 'hub' && evolutionQueue.length > 0 && !lastBattleSummary;
+
+  if (isLoading) {
+    return (
+      <div className="h-screen w-screen bg-slate-950 flex flex-col items-center justify-center text-white font-sans">
+        <div className="w-24 h-24 relative mb-8">
+          <div className="absolute inset-0 border-4 border-cyan-500/20 rounded-full" />
+          <div className="absolute inset-0 border-4 border-cyan-400 border-t-transparent rounded-full animate-spin shadow-[0_0_15px_rgba(34,211,238,0.5)]" />
+          <div className="absolute inset-4 border-4 border-fuchsia-500/20 rounded-full" />
+          <div className="absolute inset-4 border-4 border-fuchsia-400 border-b-transparent rounded-full animate-spin-slow shadow-[0_0_15px_rgba(217,70,239,0.5)]" />
+        </div>
+        <div className="flex flex-col items-center gap-2">
+          <h2 className="text-xl font-black italic uppercase tracking-[0.3em] text-cyan-400 animate-pulse">
+            Neural Link
+          </h2>
+          <div className="text-[10px] font-mono text-white/30 uppercase tracking-[0.5em] animate-pulse delay-700">
+            Initializing Dexie Protocol...
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div 

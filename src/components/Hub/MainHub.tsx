@@ -51,7 +51,17 @@ const TerminalIcon = ({ icon: Icon, label, color, onClick, badge }: { icon: any,
 );
 
 const MainHub: React.FC = () => {
-  const { player, team, box, setScreen, setBoxTab, updateCoins, grantExperience, healTeam, setBattleContext, bumpBattleSession } = useStore();
+  const player = useStore(s => s.player);
+  const team = useStore(s => s.team);
+  const box = useStore(s => s.box);
+  const coins = useStore(s => s.coins);
+  const setScreen = useStore(s => s.setScreen);
+  const setBoxTab = useStore(s => s.setBoxTab);
+  const updateCoins = useStore(s => s.updateCoins);
+  const grantExperience = useStore(s => s.grantExperience);
+  const healTeam = useStore(s => s.healTeam);
+  const setBattleContext = useStore(s => s.setBattleContext);
+  const bumpBattleSession = useStore(s => s.bumpBattleSession);
   const [showMissions, setShowMissions] = React.useState(false);
   const [showCodes, setShowCodes] = React.useState(false);
   const [inputCode, setInputCode] = React.useState('');
@@ -89,7 +99,7 @@ const MainHub: React.FC = () => {
                <span className="font-black italic uppercase tracking-[0.2em] text-[10px] text-white">{player?.name || "LINKER"}</span>
             </div>
             <div className="flex items-center gap-2 bg-black/40 px-3 py-1.5 rounded-full border border-white/5 self-start shadow-inner">
-               <span className="text-amber-400 font-black text-xs">{useStore.getState().coins.toLocaleString()}</span>
+               <span className="text-amber-400 font-black text-xs">{coins.toLocaleString()}</span>
                <div className="w-3 h-3 rounded-full bg-amber-400 shadow-[0_0_10px_rgba(251,191,36,0.6)]" />
             </div>
          </div>
