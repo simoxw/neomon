@@ -17,6 +17,8 @@ const Inventory: React.FC = () => {
     inventoryReturnTarget,
     returnToBattleFromInventory,
     requestBattleConsumable,
+    setPendingItemToUse,
+    setBoxTab,
   } = useStore();
   const invRows = useStore((s) => s.inventory);
   const [activeTab, setActiveTab] = useState<TabType>('cure');
@@ -47,6 +49,12 @@ const Inventory: React.FC = () => {
     setTimeout(() => {
       returnToBattleFromInventory();
     }, 0);
+  };
+
+  const startUsingItem = (itemId: string) => {
+    setPendingItemToUse(itemId);
+    setBoxTab('team');
+    setScreen('box');
   };
 
   const tabs = [
@@ -120,11 +128,25 @@ const Inventory: React.FC = () => {
                 <p className="text-[10px] text-white/40 leading-relaxed max-w-[180px]">{item.description}</p>
               </div>
 
-              {inventoryReturnTarget === 'battle' && item.type === 'curative' && item.quantity > 0 ? (
+              {inventoryReturnTarget === 'battle' ? (
+                item.type === 'curative' && item.quantity > 0 ? (
+                  <button
+                    type="button"
+                    onClick={() => useItemInBattle(item.id)}
+                    className="shrink-0 px-4 py-2 rounded-xl bg-emerald-600/80 border border-emerald-400/50 text-white text-[10px] font-black uppercase tracking-widest hover:bg-emerald-500 active:scale-95"
+                  >
+                    Usa
+                  </button>
+                ) : (
+                  <button type="button" className="p-2 text-white/10 hover:text-cyan-400 transition-colors shrink-0" aria-hidden>
+                    <ChevronRight className="w-6 h-6" />
+                  </button>
+                )
+              ) : item.type === 'curative' && item.quantity > 0 ? (
                 <button
                   type="button"
-                  onClick={() => useItemInBattle(item.id)}
-                  className="shrink-0 px-4 py-2 rounded-xl bg-emerald-600/80 border border-emerald-400/50 text-white text-[10px] font-black uppercase tracking-widest hover:bg-emerald-500 active:scale-95"
+                  onClick={() => startUsingItem(item.id)}
+                  className="shrink-0 px-4 py-2 rounded-xl bg-cyan-600/80 border border-cyan-400/50 text-white text-[10px] font-black uppercase tracking-widest hover:bg-cyan-500 active:scale-95"
                 >
                   Usa
                 </button>

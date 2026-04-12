@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useStore } from '../../context/useStore';
 import { Trash2, ChevronUp, ChevronDown, X, Activity, MoreVertical } from 'lucide-react';
 import { NeoMon } from '../../types';
+import itemsData from '../../data/items.json';
 import { clsx, type ClassValue } from 'clsx';
 import { twMerge } from 'tailwind-merge';
 import { getCreatureSprite } from '../../utils/imageLoader';
@@ -30,9 +31,21 @@ const StatRow = ({ label, value, color, iv }: { label: string; value: number; co
 );
 
 const TeamCard = ({ mon, index, total }: { mon: NeoMon; index: number; total: number }) => {
-  const { removeFromTeam, swapPositions, team } = useStore();
+  const { removeFromTeam, swapPositions, team, pendingItemToUse, applyItemToNeoMon, setPendingItemToUse } = useStore();
   const [showMenu, setShowMenu] = useState(false);
   const [showStats, setShowStats] = useState(false);
+
+  const handleClick = () => {
+    if (pendingItemToUse) {
+      applyItemToNeoMon(pendingItemToUse, mon.id).then((success) => {
+        if (success) {
+          setPendingItemToUse(null);
+        }
+      });
+    } else {
+      setShowMenu(true);
+    }
+  };
 
   const moveUp = (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -51,11 +64,12 @@ const TeamCard = ({ mon, index, total }: { mon: NeoMon; index: number; total: nu
   return (
     <div className="relative">
       <div 
-        onClick={() => setShowMenu(true)}
+        onClick={handleClick}
         className={cn(
           "relative w-full p-5 rounded-[2rem] border-l-[8px] transition-all duration-300 group cursor-pointer active:scale-[0.98]",
           "bg-slate-900/60 backdrop-blur-xl border border-white/5",
           "shadow-[0_8px_32px_rgba(0,0,0,0.4)] hover:shadow-[0_8px_40px_rgba(34,211,238,0.15)] hover:border-white/10",
+          pendingItemToUse ? "ring-2 ring-cyan-400 ring-offset-4 ring-offset-slate-950 scale-[1.02]" : "",
           mon.types[0] === 'Bio' ? "border-l-green-500" : 
           mon.types[0] === 'Incandescente' ? "border-l-orange-500" :
           mon.types[0] === 'Idrico' ? "border-l-blue-500" :
@@ -112,14 +126,26 @@ const TeamCard = ({ mon, index, total }: { mon: NeoMon; index: number; total: nu
                 <div className="flex items-center gap-3">
                    <span className="text-[7px] font-black text-rose-500 uppercase w-6">HP</span>
                    <div className="h-1 flex-1 bg-black/40 rounded-full overflow-hidden">
-                      <div className="h-full bg-rose-500" style={{ width: '100%' }} />
+                      <div 
+                        className="h-full bg-rose-500 transition-all duration-500" 
+                        style={{ width: `${Math.min(100, ((mon.currentHp ?? (mon.currentStats?.hp ?? mon.baseStats.hp)) / (mon.currentStats?.hp ?? mon.baseStats.hp)) * 100)}%` }} 
+                      />
                    </div>
+                   <span className="text-[8px] font-mono text-white/40 w-12 text-right">
+                     {Math.floor(mon.currentHp ?? (mon.currentStats?.hp ?? mon.baseStats.hp))}/{mon.currentStats?.hp ?? mon.baseStats.hp}
+                   </span>
                 </div>
                 <div className="flex items-center gap-3">
                    <span className="text-[7px] font-black text-cyan-400 uppercase w-6">SP</span>
                    <div className="h-1 flex-1 bg-black/40 rounded-full overflow-hidden">
-                      <div className="h-full bg-cyan-400" style={{ width: '100%' }} />
+                      <div 
+                        className="h-full bg-cyan-400 transition-all duration-500" 
+                        style={{ width: `${Math.min(100, ((mon.currentStamina ?? (mon.currentStats?.stamina ?? mon.baseStats.stamina)) / (mon.currentStats?.stamina ?? mon.baseStats.stamina)) * 100)}%` }} 
+                      />
                    </div>
+                   <span className="text-[8px] font-mono text-white/40 w-12 text-right">
+                     {Math.floor(mon.currentStamina ?? (mon.currentStats?.stamina ?? mon.baseStats.stamina))}/{mon.currentStats?.stamina ?? mon.baseStats.stamina}
+                   </span>
                 </div>
              </div>
           </div>
@@ -186,15 +212,35 @@ const TeamCard = ({ mon, index, total }: { mon: NeoMon; index: number; total: nu
 };
 
 const TeamManager: React.FC = () => {
-  const { team } = useStore();
+  const { team, pendingItemToUse, setPendingItemToUse } = useStore();
+  const pendingItem = itemsData.find(i => i.id === pendingItemToUse);
 
   return (
     <div className="h-full w-full p-6 pb-32 overflow-y-auto scrollbar-hide">
+      {pendingItemToUse && (
+        <div className="mb-6 p-4 rounded-2xl bg-cyan-500/10 border border-cyan-500/30 flex items-center justify-between animate-in slide-in-from-top duration-300">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-xl bg-cyan-500/20 flex items-center justify-center">
+               <Activity className="w-6 h-6 text-cyan-400" />
+            </div>
+            <div>
+              <p className="text-[10px] font-black uppercase text-cyan-400 tracking-widest">Uso Oggetto</p>
+              <p className="text-sm font-black text-white uppercase italic">{pendingItem?.name || 'Oggetto Sconosciuto'}</p>
+            </div>
+          </div>
+          <button 
+            onClick={() => setPendingItemToUse(null)}
+            className="px-4 py-2 rounded-xl bg-white/5 border border-white/10 text-white text-[10px] font-black uppercase tracking-widest hover:bg-red-500 transition-colors"
+          >
+            Annulla
+          </button>
+        </div>
+      )}
       <div className="mb-8 animate-in slide-in-from-left-10 duration-700">
         <h2 className="text-4xl font-black italic uppercase tracking-tighter text-white text-glow-cyan">Active Squad</h2>
         <div className="flex items-center gap-2 mt-2">
            <div className="w-2 h-2 rounded-full bg-cyan-400 animate-pulse shadow-[0_0_8px_rgba(34,211,238,0.8)]" />
-           <p className="text-[10px] text-white/30 font-mono uppercase tracking-[0.3em]">Protocollo Sincronia Attivo</p>
+           <p className="text-[10px] text-white/30 font-mono uppercase tracking-[0.3em]">{pendingItemToUse ? 'Seleziona un bersaglio' : 'Protocollo Sincronia Attivo'}</p>
         </div>
       </div>
 

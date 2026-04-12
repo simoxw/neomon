@@ -121,9 +121,15 @@ export interface NeoMon {
   /** Potenziale genetico (IVs equivalent) tra 0 e 31 */
   potential: number; 
   
-  /** Statistiche attuali calcolate in base a livello e potenziale */
+  /** Statistiche attuali calcolate in base a livello e potenziale (i.e. Massimali) */
   currentStats?: Stats;
   
+  /** HP attuali (rimanenti dopo i danni) */
+  currentHp?: number;
+
+  /** Stamina attuale (rimanente dopo l'uso di mosse) */
+  currentStamina?: number;
+
   /** Flag per l'attivazione dell'evoluzione */
   canEvolve?: boolean;
 

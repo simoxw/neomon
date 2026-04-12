@@ -26,6 +26,15 @@ Ogni vittoria nel Nexus conferisce **100 XP** al Neo-Mon attivo.
 - **Quick Manage**: Clicca direttamente sull'icona di un Neo-Mon nella squadra per aprire istantaneamente il menu di gestione.
 - **Status Check**: La barra XP azzurra ti permette di sapere chi è vicino a potenziarsi senza dover aprire il Box.
 
+### 🛠️ Codici Terminale (Debug)
+Per i tester o per chi desidera una progressione rapida, è possibile inserire dei codici nel terminale dell'Hub (icona `>_` in alto a destra).
+- **1111**: Aggiunge **1000 EXP** al primo Neo-Mon in squadra.
+- **2222**: Aggiunge **9999 Crediti** istantaneamente.
+- **3333**: Ripristina completamente **HP e Stamina** di tutta la squadra.
+- **4444**: Sincronizzazione totale del **Link-Dex** (tutte le voci sbloccate).
+- **5555**: Fornisce un **Pacchetto Risorse** (Prismi di vari tipi).
+- **9999**: Porta il primo Neo-Mon in squadra direttamente al **Livello 100**.
+
 ---
 
 ## ⚡ Tabella delle Efficacie Elementali

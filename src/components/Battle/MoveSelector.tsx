@@ -56,6 +56,7 @@ const MoveSelector: React.FC<MoveSelectorProps> = ({
 }) => {
   const [tooltipMove, setTooltipMove] = useState<Move | null>(null);
   const pressTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const isLongPress = useRef(false);
 
   const clearPress = useCallback(() => {
     if (pressTimer.current) {
@@ -63,6 +64,23 @@ const MoveSelector: React.FC<MoveSelectorProps> = ({
       pressTimer.current = null;
     }
   }, []);
+
+  const handlePointerDown = (move: Move) => {
+    clearPress();
+    isLongPress.current = false;
+    pressTimer.current = setTimeout(() => {
+      setTooltipMove(move);
+      isLongPress.current = true;
+    }, 300); // 300ms per il long press
+  };
+
+  const handlePointerUp = (move: Move, cant: boolean) => {
+    clearPress();
+    setTooltipMove(null);
+    if (!isLongPress.current && !disabled && !cant) {
+      onSelectMove(move);
+    }
+  };
 
   const catIcon = (m: Move) => {
     if (isStatusCategory(m.category) && (m.power ?? 0) === 0) return '🔮';
@@ -72,7 +90,14 @@ const MoveSelector: React.FC<MoveSelectorProps> = ({
   };
 
   return (
-    <div className="space-y-3">
+    <div className="relative space-y-3">
+      {/* Tooltip Fisso Centrale */}
+      {tooltipMove && (
+        <div className="absolute left-1/2 -translate-x-1/2 -top-4 w-full flex justify-center z-[60] pointer-events-none">
+          <MoveTooltip move={tooltipMove} visible={!!tooltipMove} isFixed />
+        </div>
+      )}
+
       <div className="grid grid-cols-2 gap-3 min-h-[8.5rem]">
         {moves.slice(0, 4).map((move) => {
           const cant = currentSP < (move.staminaCost ?? 0);
@@ -83,15 +108,12 @@ const MoveSelector: React.FC<MoveSelectorProps> = ({
               <button
                 type="button"
                 disabled={disabled || cant}
-                onClick={() => !cant && onSelectMove(move)}
-                onMouseEnter={() => setTooltipMove(move)}
-                onMouseLeave={() => setTooltipMove(null)}
-                onPointerDown={() => {
+                onPointerDown={() => handlePointerDown(move)}
+                onPointerUp={() => handlePointerUp(move, cant)}
+                onPointerLeave={() => {
                   clearPress();
-                  pressTimer.current = setTimeout(() => setTooltipMove(move), 500);
+                  setTooltipMove(null);
                 }}
-                onPointerUp={() => clearPress()}
-                onPointerLeave={() => clearPress()}
                 className={cn(
                   'relative w-full h-full min-h-[4rem] rounded-xl border-l-[3px] bg-black/50 backdrop-blur-sm pl-2 pr-2 py-2 text-left transition-all',
                   border,
@@ -115,7 +137,6 @@ const MoveSelector: React.FC<MoveSelectorProps> = ({
                   <span className="text-emerald-300/90 font-orbitron tabular-nums">SP {move.staminaCost}</span>
                 </div>
               </button>
-              <MoveTooltip move={move} visible={tooltipMove?.id === move.id} />
             </div>
           );
         })}

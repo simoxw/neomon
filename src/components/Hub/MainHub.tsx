@@ -19,6 +19,7 @@ import {
 import { clsx, type ClassValue } from 'clsx';
 import { twMerge } from 'tailwind-merge';
 import missionsData from '../../data/missions.json';
+import creaturesData from '../../data/creatures.json';
 import { getCreatureSprite } from '../../utils/imageLoader';
 import NeoMonDetailModal from '../Common/NeoMonDetailModal';
 import type { NeoMon } from '../../types';
@@ -81,6 +82,27 @@ const MainHub: React.FC = () => {
       updateCoins(9999);
     } else if (inputCode === '3333') {
       await healTeam();
+    } else if (inputCode === '4444') {
+      // Sblocca tutto il Link-Dex
+      const allIds = (creaturesData as { id: string }[]).map(c => c.id);
+      useStore.setState({ seenIds: allIds });
+    } else if (inputCode === '5555') {
+      // Pacchetto Risorse Starter
+      const { grantInventoryItem } = useStore.getState();
+      await grantInventoryItem('i-prism-01', 3);
+      await grantInventoryItem('i-prism-02', 3);
+      await grantInventoryItem('i-prism-03', 1);
+    } else if (inputCode === '9999') {
+      // Livello 100 istantaneo
+      if (team[0]) {
+        const currentLevel = team[0].level;
+        const targetLevel = 100;
+        if (currentLevel < targetLevel) {
+          // Calcoliamo l'exp necessaria approssimativa (Livello^3)
+          const needed = Math.pow(targetLevel, 3);
+          await grantExperience(team[0].id, needed);
+        }
+      }
     }
     setInputCode('');
     setShowCodes(false);
@@ -315,10 +337,13 @@ const MainHub: React.FC = () => {
                 </button>
              </form>
 
-             <div className="mt-8 grid grid-cols-1 gap-2 opacity-20 text-[8px] font-mono uppercase text-red-500">
+             <div className="mt-8 grid grid-cols-2 gap-x-4 gap-y-2 opacity-20 text-[8px] font-mono uppercase text-red-500">
                 <p>1111: NEURAL EXP BOOST (+1000)</p>
                 <p>2222: DATABASE OVERFLOW (+9999 CREDITS)</p>
                 <p>3333: REPAIR CORE PROTOCOL (HEAL ALL)</p>
+                <p>4444: LINK-DEX FULL SYNC (ALL ENTRIES)</p>
+                <p>5555: STARTER RESOURCE PACK (PRISMS)</p>
+                <p>9999: OVERCLOCK LEVEL (LV. 100)</p>
              </div>
           </motion.div>
         )}

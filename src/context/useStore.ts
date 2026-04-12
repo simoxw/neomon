@@ -9,6 +9,7 @@ import { EvolutionSystem } from '../logic/EvolutionSystem';
 import type { BattleContext } from '../types/world';
 import type { BattleSummaryPayload } from '../types/battleSummary';
 import missionsData from '../data/missions.json';
+import itemsData from '../data/items.json';
 import { getMaxHp, getMaxStamina } from '../logic/battleParty';
 
 /**
@@ -60,10 +61,14 @@ interface NeoState {
   toastMessage: string | null;
   /** Richiesta uso oggetto da Zaino in lotta (processata da useBattle) */
   battleConsumableRequest: { itemId: string } | null;
+  /** Oggetto selezionato dallo zaino fuori lotta, in attesa di scegliere il bersaglio in Squadra */
+  pendingItemToUse: string | null;
   isLoading: boolean;
 
   // Actions
   loadData: () => Promise<void>;
+  setPendingItemToUse: (itemId: string | null) => void;
+  applyItemToNeoMon: (itemId: string, monId: string) => Promise<boolean>;
   enterInventory: (opts?: { fromBattle?: boolean }) => void;
   returnToBattleFromInventory: () => void;
   requestBattleConsumable: (itemId: string) => void;
@@ -144,12 +149,62 @@ export const useStore = create<NeoState>()(
       playtimeMs: 0,
       toastMessage: null,
       battleConsumableRequest: null,
+      pendingItemToUse: null,
       isLoading: true,
 
       setBattleContext: (ctx) => set({ battleContext: ctx }),
       bumpBattleSession: () => set((s) => ({ battleSessionKey: s.battleSessionKey + 1 })),
       setPendingTrainerId: (id) => set({ pendingTrainerId: id }),
       setPendingTrainerZone: (zoneId) => set({ pendingTrainerZone: zoneId }),
+      setPendingItemToUse: (itemId) => set({ pendingItemToUse: itemId }),
+
+      applyItemToNeoMon: async (itemId, monId) => {
+        const { team, box, consumeInventoryItem, updateInventory, setToast } = get();
+        const item = itemsData.find(i => i.id === itemId);
+        if (!item) return false;
+
+        const allMons = [...team, ...box];
+        const mon = allMons.find(m => m.id === monId);
+        if (!mon) return false;
+
+        const maxHp = getMaxHp(mon);
+        const maxStamina = getMaxStamina(mon);
+        const currentHp = mon.currentHp ?? maxHp;
+        const currentStamina = mon.currentStamina ?? maxStamina;
+
+        let healed = false;
+        let nextHp = currentHp;
+        let nextStamina = currentStamina;
+
+        if (item.type === 'curative') {
+          if (item.target === 'hp' || item.target === 'both') {
+            if (currentHp < maxHp) {
+              nextHp = Math.min(maxHp, currentHp + (item.value || 0));
+              healed = true;
+            }
+          }
+          if (item.target === 'stamina' || item.target === 'both') {
+            if (currentStamina < maxStamina) {
+              nextStamina = Math.min(maxStamina, currentStamina + (item.value || 0));
+              healed = true;
+            }
+          }
+        }
+
+        if (!healed) {
+          setToast("Questo Neo-Mon non ne ha bisogno!");
+          setTimeout(() => setToast(null), 2000);
+          return false;
+        }
+
+        const updatedMon = { ...mon, currentHp: nextHp, currentStamina: nextStamina };
+        await get().persistNeoMon(updatedMon);
+        await consumeInventoryItem(itemId);
+        
+        setToast(`${item.name} usato su ${mon.name}!`);
+        setTimeout(() => setToast(null), 2000);
+        return true;
+      },
 
       setLastBattleSummary: (s) => set({ lastBattleSummary: s }),
       dequeueEvolution: () =>
@@ -658,14 +713,12 @@ export const useStore = create<NeoState>()(
         const { team } = get();
         
         const healedTeam = team.map(mon => {
-          const maxStats = mon.currentStats || mon.baseStats;
+          const maxHp = getMaxHp(mon);
+          const maxStamina = getMaxStamina(mon);
           return {
             ...mon,
-            currentStats: {
-              ...maxStats,
-              hp: maxStats.hp,
-              stamina: maxStats.stamina,
-            }
+            currentHp: maxHp,
+            currentStamina: maxStamina
           };
         });
 
