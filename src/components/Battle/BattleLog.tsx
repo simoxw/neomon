@@ -16,6 +16,26 @@ const KIND_CLASS: Record<BattleLogKind, string> = {
   neutral: 'text-white/90',
 };
 
+const formatText = (text: string) => {
+  if (!text) return text;
+
+  const parts = text.split(/( È superefficace!| Non è molto efficace...| Non ha effetto...)/);
+  if (parts.length === 1) return text;
+
+  return parts.map((part, i) => {
+    if (part === ' È superefficace!') {
+      return <span key={i} className="text-emerald-400 font-black">{part}</span>;
+    }
+    if (part === ' Non è molto efficace...') {
+      return <span key={i} className="text-rose-500 italic">{part}</span>;
+    }
+    if (part === ' Non ha effetto...') {
+      return <span key={i} className="text-gray-400 font-bold">{part}</span>;
+    }
+    return <span key={i}>{part}</span>;
+  });
+};
+
 const BattleLog: React.FC<BattleLogProps> = ({ messages }) => {
   const scrollRef = useRef<HTMLDivElement>(null);
 
@@ -28,11 +48,7 @@ const BattleLog: React.FC<BattleLogProps> = ({ messages }) => {
   const visible = messages.slice(-5);
 
   return (
-    <div className="flex-1 flex flex-col bg-black/40 border-l border-white/10 overflow-hidden min-h-0">
-      <div className="p-2 border-b border-white/5 bg-gray-800/40 text-[8px] font-black uppercase text-white/30 tracking-widest text-center shrink-0">
-        Neural Feed Active
-      </div>
-
+    <div className="flex-1 flex flex-col overflow-hidden min-h-0">
       <div
         ref={scrollRef}
         className="flex-1 overflow-y-auto p-2 font-rajdhani text-[11px] leading-snug space-y-1.5 scrollbar-hide min-h-0 max-h-[5.5rem]"
@@ -46,7 +62,7 @@ const BattleLog: React.FC<BattleLogProps> = ({ messages }) => {
               className="flex gap-2"
             >
               <span className="text-cyan-400/80 shrink-0">▶</span>
-              <span className={KIND_CLASS[entry.kind]}>{entry.text}</span>
+              <span className={KIND_CLASS[entry.kind]}>{formatText(entry.text)}</span>
             </motion.div>
           ))}
         </AnimatePresence>

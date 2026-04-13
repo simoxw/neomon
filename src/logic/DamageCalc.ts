@@ -26,23 +26,53 @@ export const getEffectiveness = (attackType: ElementType, defenderTypes: Element
   }, 1);
 };
 
-export const calculateDamage = (attacker: NeoMon, defender: NeoMon, move: Move): number => {
-  if (!move.power || move.power <= 0) return 0;
+export interface DamageResult {
+  damage: number;
+  isCrit: boolean;
+  isStab: boolean;
+  effectiveness: number;
+}
+
+export const calculateDamage = (attacker: NeoMon, defender: NeoMon, move: Move): DamageResult => {
+  if (!move.power || move.power <= 0) return { damage: 0, isCrit: false, isStab: false, effectiveness: 1 };
+
+  const isCrit = Math.random() < 0.0625; // 1/16 base
+  const critMultiplier = isCrit ? 1.5 : 1.0;
 
   const physical = isPhysicalCategory(move.category);
-  let atk = physical
-    ? attacker.baseStats.potenza * getStageMultiplier(attacker.statStages?.attack ?? 0)
-    : attacker.baseStats.sintonia * getStageMultiplier(attacker.statStages?.specialAtk ?? 0);
-  if (attacker.status === 'burn' && physical) atk *= 0.75;
-  const def = physical
-    ? defender.baseStats.resistenza * getStageMultiplier(defender.statStages?.defense ?? 0)
-    : defender.baseStats.spirito * getStageMultiplier(defender.statStages?.specialDef ?? 0);
+  
+  // Se critico: ignorare i malus di stat stage del difensore nel calcolo
+  const atkStage = physical ? (attacker.statStages?.attack ?? 0) : (attacker.statStages?.specialAtk ?? 0);
+  const defStage = physical ? (defender.statStages?.defense ?? 0) : (defender.statStages?.specialDef ?? 0);
 
-  const stab = attacker.types.includes(move.type) ? 1.5 : 1;
+  // Comportamento critico: ignora i malus dell'attaccante e i bonus del difensore
+  const finalAtkStage = isCrit ? Math.max(0, atkStage) : atkStage;
+  const finalDefStage = isCrit ? Math.min(0, defStage) : defStage;
+
+  let atk = physical
+    ? attacker.baseStats.potenza * getStageMultiplier(finalAtkStage)
+    : attacker.baseStats.sintonia * getStageMultiplier(finalAtkStage);
+  
+  if (attacker.status === 'burn' && physical) atk *= 0.75;
+  
+  const def = physical
+    ? defender.baseStats.resistenza * getStageMultiplier(finalDefStage)
+    : defender.baseStats.spirito * getStageMultiplier(finalDefStage);
+
+  const isStab = attacker.types.includes(move.type);
+  const stab = isStab ? 1.5 : 1;
   const effectiveness = getEffectiveness(move.type, defender.types);
   const randomFactor = Math.random() * (1 - 0.85) + 0.85;
+  
   const baseDamage = (((2 * attacker.level) / 5 + 2) * move.power * (atk / Math.max(1, def)) / 50) + 2;
-  return Math.floor(baseDamage * stab * effectiveness * randomFactor);
+  const finalDamage = Math.floor(baseDamage * stab * effectiveness * critMultiplier * randomFactor);
+
+  return {
+    damage: finalDamage,
+    isCrit,
+    isStab,
+    effectiveness
+  };
 };
 
 /** Calcola se c'è un colpo critico (1/16 base chance) */

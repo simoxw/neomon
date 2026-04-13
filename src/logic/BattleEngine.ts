@@ -14,7 +14,14 @@ export interface BattleAction {
   move?: Move;
 }
 
-export type FloatEvent = { side: 'player' | 'enemy'; amount: number; variant: 'damage' | 'heal' | 'status' };
+export type FloatEvent = { 
+  side: 'player' | 'enemy'; 
+  amount: number; 
+  variant: 'damage' | 'heal' | 'status';
+  isCrit?: boolean;
+  isStab?: boolean;
+  effectiveness?: number;
+};
 
 export interface TurnExecutionResult {
   playerId: string;
@@ -25,6 +32,8 @@ export interface TurnExecutionResult {
   isStaminaFailure: boolean;
   isKO: boolean;
   effectiveness: number;
+  isCrit?: boolean;
+  isStab?: boolean;
   message: string;
   floatEvents?: FloatEvent[];
 }
@@ -231,11 +240,18 @@ export class BattleEngine {
     return { type: 'rest' };
   }
 
-  private static calculateEstimatedDamage(attacker: NeoMon, defender: NeoMon, move: Move): number {
-    return calculateDamage(attacker, defender, move);
+  private static calculateEstimatedDamage(attacker: NeoMon, defender: NeoMon, move: Move, battleMode?: 'combat' | 'capture'): number {
+    return calculateDamage(attacker, defender, move).damage;
   }
 
-  static executeTurn(playerMon: any, aiMon: any, playerAction: BattleAction, aiAction: BattleAction, allMoves: Move[]): FullTurnResult {
+  static executeTurn(
+    playerMon: any, 
+    aiMon: any, 
+    playerAction: BattleAction, 
+    aiAction: BattleAction, 
+    allMoves: Move[],
+    battleMode?: 'combat' | 'capture'
+  ): FullTurnResult {
     playerAction = this.enrichAction(playerAction, allMoves);
     aiAction = this.enrichAction(aiAction, allMoves);
 
@@ -283,7 +299,7 @@ export class BattleEngine {
     };
 
     const targetOfFirst = firstActor === 'player' ? aiMon : playerMon;
-    const firstResult = this.resolveAction(actors[firstActor].mon, targetOfFirst, actors[firstActor].action, firstActor);
+    const firstResult = this.resolveAction(actors[firstActor].mon, targetOfFirst, actors[firstActor].action, firstActor, battleMode);
     targetOfFirst.currentHp -= firstResult.damage;
     actors[firstActor].mon.currentStamina = Math.min(
       maxStamina(actors[firstActor].mon),
@@ -307,7 +323,7 @@ export class BattleEngine {
         message: `${actors[secondActor].mon.name} è esausto e non può agire!`,
       };
     } else {
-      secondResult = this.resolveAction(actors[secondActor].mon, targetOfSecond, actors[secondActor].action, secondActor);
+      secondResult = this.resolveAction(actors[secondActor].mon, targetOfSecond, actors[secondActor].action, secondActor, battleMode);
       targetOfSecond.currentHp -= secondResult.damage;
       actors[secondActor].mon.currentStamina = Math.min(
         maxStamina(actors[secondActor].mon),
@@ -342,12 +358,20 @@ export class BattleEngine {
     };
   }
 
-  private static resolveAction(attacker: any, defender: any, action: BattleAction, actorId: string): TurnExecutionResult {
+  private static resolveAction(
+    attacker: any, 
+    defender: any, 
+    action: BattleAction, 
+    actorId: string,
+    battleMode?: 'combat' | 'capture'
+  ): TurnExecutionResult {
     let damage = 0;
     let consumed = 0;
     let recovered = 0;
     let isStaminaFailure = false;
     let effectiveness = 1;
+    let isCrit = false;
+    let isStab = false;
     let message = '';
     const floatEvents: FloatEvent[] = [];
 
@@ -476,19 +500,28 @@ export class BattleEngine {
       }
 
       if ((move.power ?? 0) > 0) {
-        damage = calculateDamage(attacker, defender, move);
-        const isCritical = checkCriticalHit(attacker, move);
-        if (isCritical) {
-          damage = Math.floor(damage * 1.5);
-        }
-        effectiveness = getEffectiveness(move.type, defender.types);
+        const result = calculateDamage(attacker, defender, move);
+        damage = result.damage;
+        isCrit = result.isCrit;
+        isStab = result.isStab;
+        effectiveness = result.effectiveness;
+
         let effMsg = '';
         if (effectiveness > 1) effMsg = ' È superefficace!';
         if (effectiveness < 1 && effectiveness > 0) effMsg = ' Non è molto efficace...';
         if (effectiveness === 0) effMsg = ' Non ha effetto...';
-        const critMsg = isCritical ? ' 💥 Colpo Critico!' : '';
-        message = `${attacker.name} usa ${move.name}!${effMsg}${critMsg}`;
-        floatEvents.push({ side, amount: damage, variant: 'damage' });
+        
+        const critMsg = isCrit ? ' 💥 Colpo Critico!' : '';
+        
+        message = `${attacker.name} usa ${move.name}!${effMsg}${critMsg} → ${damage} danni`;
+        floatEvents.push({ 
+          side, 
+          amount: damage, 
+          variant: 'damage',
+          isCrit,
+          isStab,
+          effectiveness
+        });
 
         if (eff?.drainPercent && damage > 0) {
           const heal = Math.floor((damage * eff.drainPercent) / 100);
@@ -553,9 +586,11 @@ export class BattleEngine {
       damage,
       consumedStamina: consumed,
       recoveredStamina: recovered,
-      isStaminaFailure,
+      isStaminaFailure: false,
       isKO: false,
       effectiveness,
+      isCrit,
+      isStab,
       message,
       floatEvents,
     };

@@ -102,7 +102,7 @@ const LinkDex: React.FC = () => {
                         alt="" 
                         className={cn(
                           "w-12 h-12 object-contain transition-all duration-500",
-                          entry.isCaptured ? "drop-shadow-[0_0_8px_rgba(34,211,238,0.4)] group-hover:scale-110" : "brightness-0 opacity-20"
+                          entry.isCaptured ? "drop-shadow-[0_0_8px_rgba(34,211,238,0.4)] group-hover:scale-110" : "opacity-40 grayscale group-hover:opacity-70"
                         )} 
                       />
                       <div className="absolute top-1.5 left-2 text-[6px] font-mono text-white/20 font-black">#{entry.id.split('-')[1]}</div>
@@ -126,16 +126,16 @@ const LinkDex: React.FC = () => {
                   "w-56 h-56 rounded-[2.5rem] flex items-center justify-center mb-8 relative bg-black/40 border border-white/5",
                   selectedMon.isCaptured && "shadow-[inset_0_0_50px_rgba(34,211,238,0.1)]"
                 )}>
-                   <motion.img 
-                      initial={{ scale: 0.8 }}
-                      animate={{ scale: 1 }}
-                      src={getCreatureSprite(selectedMon.id)} 
-                      alt="" 
-                      className={cn(
-                        "w-44 h-44 object-contain transition-all duration-1000",
-                        selectedMon.isCaptured ? "drop-shadow-[0_0_30px_rgba(34,211,238,0.5)]" : "brightness-0 opacity-10"
-                      )}
-                   />
+                      <motion.img 
+                         initial={{ scale: 0.8 }}
+                         animate={{ scale: 1 }}
+                         src={getCreatureSprite(selectedMon.id)} 
+                         alt="" 
+                         className={cn(
+                           "w-44 h-44 object-contain transition-all duration-1000",
+                           selectedMon.isCaptured ? "drop-shadow-[0_0_30px_rgba(34,211,238,0.5)]" : "opacity-40 grayscale"
+                         )}
+                      />
                 </div>
 
                <h2 className="text-4xl font-black italic uppercase tracking-tighter text-white mb-1">{selectedMon.name}</h2>

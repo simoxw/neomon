@@ -122,6 +122,7 @@ export const useBattle = (_playerId: string, _opponentId: string) => {
     markTrainerDefeated,
     addBadge,
     grantInventoryItem,
+    markAsSeen,
   } = useStore();
   const battleConsumableRequest = useStore((s) => s.battleConsumableRequest);
 
@@ -236,7 +237,7 @@ export const useBattle = (_playerId: string, _opponentId: string) => {
             .map((c) => c.id)
             .filter((id) => {
               const num = parseInt(id.split('-')[1], 10);
-              return num <= 36;
+              return num <= 40;
             });
           const randomId = availableCreatureIds[Math.floor(Math.random() * availableCreatureIds.length)];
           generatedOpponent = generateWildMon(randomId, raw.level);
@@ -252,6 +253,7 @@ export const useBattle = (_playerId: string, _opponentId: string) => {
           currentStamina: opp.currentStats!.stamina,
         };
         setOpponentMon(oppEntity);
+        markAsSeen(oppEntity.id);
 
         const wildLabel =
           ctx?.kind === 'trainer'
@@ -379,6 +381,7 @@ export const useBattle = (_playerId: string, _opponentId: string) => {
         try {
           const nextEnt = buildTrainerOpponent(trainer, next, allMoves);
           setOpponentMon(nextEnt);
+          markAsSeen(nextEnt.id);
           addLog(`${trainer.name} manda in campo ${nextEnt.name}!`, 'system');
           setStatus('fighting');
         } catch (e) {
@@ -633,8 +636,16 @@ export const useBattle = (_playerId: string, _opponentId: string) => {
             addLog(`${opponentMon.name} usa ${aiAction.move.name}!`, 'damageIn');
             const move = resolveMoveById(aiAction.moveId!, allMoves);
             const pIncoming = buildPlayerEntity(newMonRaw, { ...slotSlice, currentHp, currentStamina });
-            const dmg = Math.max(1, Math.floor(calculateDamage(oClone, pIncoming, move)));
-            pushFloats([{ side: 'player', amount: dmg, variant: 'damage' }]);
+            const result = calculateDamage(oClone, pIncoming, move);
+            const dmg = result.damage;
+            pushFloats([{ 
+              side: 'player', 
+              amount: dmg, 
+              variant: 'damage',
+              isCrit: result.isCrit,
+              isStab: result.isStab,
+              effectiveness: result.effectiveness
+            }]);
             currentHp = Math.max(0, currentHp - dmg);
             const nextOppStam = Math.max(0, opponentMon.currentStamina - move.staminaCost);
             setOpponentMon((prev) => (prev ? { ...prev, currentStamina: nextOppStam } : null));
@@ -680,7 +691,8 @@ export const useBattle = (_playerId: string, _opponentId: string) => {
       oClone.currentStamina = opponentMon.currentStamina;
       oClone.currentHp = opponentMon.currentHp;
 
-      const turnResult = BattleEngine.executeTurn(pClone, oClone, playerAction, aiAction, allMoves);
+      const ctx = useStore.getState().battleContext;
+      const turnResult = BattleEngine.executeTurn(pClone, oClone, playerAction, aiAction, allMoves, ctx?.mode);
 
       const shouldPersistEnd = await processTurnResults(turnResult, pClone, oClone);
 
@@ -833,7 +845,7 @@ export const useBattle = (_playerId: string, _opponentId: string) => {
       pClone.currentHp = healed.currentHp;
       pClone.currentStamina = healed.currentStamina;
 
-      const dmg = Math.max(1, Math.floor(calculateDamage(oClone, pClone, move)));
+      const dmg = Math.max(1, Math.floor(calculateDamage(oClone, pClone, move).damage));
       addLog(`${o.name} reagisce con ${move.name}!`, 'damageIn');
       pushFloats([{ side: 'player', amount: dmg, variant: 'damage' }]);
       const hpAfter = Math.max(0, healed.currentHp - dmg);
@@ -885,7 +897,7 @@ export const useBattle = (_playerId: string, _opponentId: string) => {
     pClone.currentHp = p.currentHp;
     pClone.currentStamina = p.currentStamina;
 
-    const dmg = Math.max(1, Math.floor(calculateDamage(oClone, pClone, move)));
+    const dmg = Math.max(1, Math.floor(calculateDamage(oClone, pClone, move).damage));
     addLog(`${o.name} contrattacca con ${move.name}!`, 'damageIn');
     pushFloats([{ side: 'player', amount: dmg, variant: 'damage' }]);
     const nextHp = Math.max(0, p.currentHp - dmg);

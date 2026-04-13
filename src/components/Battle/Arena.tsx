@@ -254,17 +254,44 @@ const Arena: React.FC = () => {
 
 
   useEffect(() => {
-    // Trigger sprite hit when damage is taken
+    // Trigger sprite hit and add floating damage when damage is taken
     if (damageFloats.length > 0) {
       damageFloats.forEach((f: DamageFloat) => {
-        if (f.side === 'enemy') {
+        const side = f.side;
+        if (side === 'enemy') {
           triggerSpriteHit('enemy');
-        } else if (f.side === 'player') {
+        } else if (side === 'player') {
           triggerSpriteHit('player');
+        }
+
+        // Aggiungi alla lista dei numeri flottanti con posizione
+        const sprite = side === 'player' ? playerSpriteRef.current : enemySpriteRef.current;
+        if (sprite) {
+          const rect = sprite.getBoundingClientRect();
+          const id = f.id;
+          const newDamage = {
+            id,
+            value: f.amount,
+            type: f.variant,
+            isCrit: f.isCrit,
+            isStab: f.isStab,
+            effectiveness: f.effectiveness,
+            position: { 
+              x: rect.left + rect.width / 2 + (Math.random() * 40 - 20), 
+              y: rect.top + rect.height / 3 + (Math.random() * 20 - 10) 
+            }
+          };
+          setFloatingDamage(prev => {
+            if (prev.some(d => d.id === id)) return prev;
+            return [...prev, newDamage];
+          });
+          setTimeout(() => {
+            setFloatingDamage(prev => prev.filter(d => d.id !== id));
+          }, 1200);
         }
       });
     }
-  }, [damageFloats, opponentMon, playerMon]);
+  }, [damageFloats]);
 
   useEffect(() => {
     const loadInventory = async () => {
@@ -319,28 +346,9 @@ const Arena: React.FC = () => {
       {/* HEADER AREA: Symmetrically mirrored (Opponent Stats on Left, Sprite on Right) */}
       <div className="pt-6 px-6 flex justify-between items-start relative z-20 h-40">
 
-        {/* LEFT TOP: Flee + Backpack + Opponent Stats */}
-        <div className="flex flex-col gap-4">
-          <div className="flex gap-2">
-            {canCatch && (
-              <button
-                type="button"
-                onClick={() => handleFlee()}
-                disabled={isTurnInProgress || status !== 'fighting'}
-                className="px-4 py-2 bg-rose-950/60 border border-rose-500/40 rounded-full text-rose-200 text-[10px] font-black uppercase tracking-widest hover:bg-rose-600 hover:text-white flex items-center gap-1 disabled:opacity-40"
-              >
-                <LogOut className="w-3 h-3" /> Fuga
-              </button>
-            )}
-            <button
-              type="button"
-              onClick={() => enterInventory({ fromBattle: true })}
-              className="px-5 py-2 bg-blue-900/40 border border-blue-500/40 rounded-full text-blue-400 text-[10px] font-black uppercase tracking-widest hover:bg-blue-500 hover:text-white transition-all shadow-lg active:scale-95"
-            >
-              Zaino
-            </button>
-          </div>
-          <motion.div initial={{ x: -20, opacity: 0 }} animate={{ x: 0, opacity: 1 }} className="w-40 p-2 rounded-xl bg-black/70 backdrop-blur-md border border-white/10 shadow-2xl">
+        {/* LEFT TOP: Opponent Stats */}
+        <div className="flex flex-col">
+          <motion.div initial={{ x: -20, opacity: 0 }} animate={{ x: 0, opacity: 1 }} className="w-44 p-2.5 rounded-xl bg-black/70 backdrop-blur-md border border-white/10 shadow-2xl">
             <div className="flex justify-between items-baseline mb-1 gap-1">
               <div className="flex flex-col gap-1 min-w-0">
                 <h2 className="text-[9px] font-black text-white uppercase italic tracking-tighter truncate">{opponentMon.name}</h2>
@@ -354,10 +362,15 @@ const Arena: React.FC = () => {
             </div>
             <StatusBadge status={opponentMon.status ?? null} />
             <StageStrip stages={opponentMon.statStages} />
-            <div className="space-y-1">
-              <div className="flex items-center gap-2">
-                <span className="text-[6px] font-black text-emerald-400 w-4">HP</span>
-                <div className="flex-1 h-1.5 bg-black/60 rounded-full overflow-hidden p-[1px] border border-white/5">
+            <div className="space-y-1.5 mt-2">
+              <div className="flex flex-col gap-0.5">
+                <div className="flex justify-between items-center text-[7px] font-black tracking-tighter uppercase">
+                  <span className="text-emerald-400">HP</span>
+                  <span className="text-white/80 font-mono">
+                    {Math.ceil(opponentMon.currentHp)} / {getMaxHp(opponentMon)}
+                  </span>
+                </div>
+                <div className="h-2 w-full bg-black/60 rounded-full overflow-hidden p-[1px] border border-white/5">
                   <motion.div
                     className="h-full bg-emerald-500 rounded-full"
                     initial={{ width: '100%' }}
@@ -367,9 +380,14 @@ const Arena: React.FC = () => {
                 </div>
               </div>
               {/* SP BAR */}
-              <div className="flex items-center gap-2">
-                <span className="text-[6px] font-black text-yellow-400 w-4">SP</span>
-                <div className="flex-1 h-1 bg-black/40 rounded-full overflow-hidden">
+              <div className="flex flex-col gap-0.5">
+                <div className="flex justify-between items-center text-[7px] font-black tracking-tighter uppercase">
+                  <span className="text-yellow-400">SP</span>
+                  <span className="text-white/80 font-mono">
+                    {Math.ceil(opponentMon.currentStamina)} / {getMaxStamina(opponentMon)}
+                  </span>
+                </div>
+                <div className="h-1.5 w-full bg-black/40 rounded-full overflow-hidden">
                   <motion.div
                     className="h-full bg-yellow-400"
                     initial={{ width: '100%' }}
@@ -384,25 +402,6 @@ const Arena: React.FC = () => {
 
         {/* RIGHT TOP: Opponent Sprite (Grande come il Player) */}
         <div className="relative w-[45%] aspect-square">
-          <AnimatePresence>
-            {damageFloats
-              .filter((f: DamageFloat) => f.side === 'enemy' && f.amount > 0)
-              .map((f: DamageFloat) => (
-                <motion.span
-                  key={f.id}
-                  initial={{ opacity: 0, y: 0 }}
-                  animate={{ opacity: 1, y: -40 }}
-                  exit={{ opacity: 0 }}
-                  transition={{ duration: 1, ease: 'easeOut' }}
-                  className={cn(
-                    'absolute left-1/2 -translate-x-1/2 top-1/4 z-30 font-orbitron font-black text-lg pointer-events-none',
-                    f.variant === 'heal' ? 'text-emerald-300' : f.variant === 'status' ? 'text-yellow-300' : 'text-rose-400'
-                  )}
-                >
-                  {f.variant === 'damage' ? `-${f.amount}` : f.variant === 'heal' ? `+${f.amount}` : '!'}
-                </motion.span>
-              ))}
-          </AnimatePresence>
           <motion.div className="absolute inset-0 rounded-full blur-3xl opacity-20 bg-emerald-400" animate={{ scale: [1, 1.2, 1] }} transition={{ duration: 3, repeat: Infinity }} />
           <div ref={enemySpriteRef} className="w-full h-full">
             <motion.img
@@ -420,8 +419,8 @@ const Arena: React.FC = () => {
       {/* Battlefield Main View: Only Log here now */}
       <div className="flex-1 relative flex flex-col items-center justify-center">
         {/* Battle Log: Central Horizontal - Auto-scroll gestito internamente */}
-        <div className="w-full px-6 h-28 relative z-[100] transform -translate-y-8 flex items-center justify-center">
-          <div className="w-full max-w-[300px] h-full bg-black/85 backdrop-blur-3xl border border-white/10 flex flex-col overflow-hidden rounded-2xl shadow-2xl">
+        <div className="w-full px-6 h-28 relative z-[100] transform translate-y-2 flex items-center justify-center">
+          <div className="w-full max-w-[300px] h-full border border-black/80 flex flex-col overflow-hidden rounded-2xl">
             <BattleLog messages={battleLog} />
           </div>
         </div>
@@ -431,28 +430,9 @@ const Arena: React.FC = () => {
       <div className="bg-slate-950/98 border-t border-white/10 flex flex-col backdrop-blur-3xl pb-10">
 
         {/* Footer Header: Sprite a Sinistra, Biometria a Destra - Alzato di 20px */}
-        <div className="px-6 py-2 flex items-end justify-between bg-emerald-950/10 h-36 relative overflow-visible border-b border-white/5 transform translate-y-[-25px]">
+        <div className="px-6 py-2 flex items-end justify-between bg-emerald-950/10 h-40 relative overflow-visible border-b border-white/5 transform translate-y-[-25px]">
           {/* Sprite Player (In basso a sinistra) */}
           <div className="w-[45%] aspect-square relative -mb-10 z-40 transform translate-y-[-15px] -ml-6">
-            <AnimatePresence>
-              {damageFloats
-                .filter((f: DamageFloat) => f.side === 'player' && (f.amount > 0 || f.variant === 'status'))
-                .map((f: DamageFloat) => (
-                  <motion.span
-                    key={f.id}
-                    initial={{ opacity: 0, y: 0 }}
-                    animate={{ opacity: 1, y: -40 }}
-                    exit={{ opacity: 0 }}
-                    transition={{ duration: 1, ease: 'easeOut' }}
-                    className={cn(
-                      'absolute left-1/2 -translate-x-1/2 top-1/4 z-30 font-orbitron font-black text-lg pointer-events-none',
-                      f.variant === 'heal' ? 'text-emerald-300' : f.variant === 'status' ? 'text-yellow-300' : 'text-rose-400'
-                    )}
-                  >
-                    {f.variant === 'damage' ? `-${f.amount}` : f.variant === 'heal' ? `+${f.amount}` : '!'}
-                  </motion.span>
-                ))}
-            </AnimatePresence>
             <div ref={playerSpriteRef} className="w-full h-full">
               <motion.img
                 src={getCreatureSprite(playerMon.id)}
@@ -466,7 +446,7 @@ const Arena: React.FC = () => {
           <div className="flex-1 flex flex-col gap-2 pl-4 pb-4 animate-in slide-in-from-right-6 transition-all duration-700 max-w-[50%]">
             <div className="flex justify-between items-baseline mb-1 gap-1">
               <div className="flex flex-col gap-1 min-w-0">
-                <span className="text-[13px] font-black uppercase text-white tracking-widest italic text-glow-white underline decoration-emerald-500/50 truncate">
+                <span className="text-[11px] font-black uppercase text-white tracking-widest italic text-glow-white underline decoration-emerald-500/50 truncate">
                   {playerMon.name}
                 </span>
                 <div className="flex gap-1">
@@ -481,9 +461,14 @@ const Arena: React.FC = () => {
             <StageStrip stages={playerMon.statStages} />
             {/* HP BAR PLAYER */}
             <div className="flex flex-col gap-1 w-full max-w-[140px]">
-              <div className="flex items-center gap-2">
-                <span className="text-[6px] font-black text-emerald-400 w-4 italic">HP</span>
-                <div className="flex-1 h-2 bg-black/60 rounded-full overflow-hidden p-[1px] border border-white/5">
+              <div className="flex flex-col gap-0.5">
+                <div className="flex justify-between items-center text-[8px] font-black tracking-tighter uppercase">
+                  <span className="text-emerald-400 italic">HP</span>
+                  <span className="text-white font-mono">
+                    {Math.ceil(playerMon.currentHp)} / {playerMon.currentStats?.hp ?? playerMon.baseStats.hp}
+                  </span>
+                </div>
+                <div className="h-2 w-full bg-black/60 rounded-full overflow-hidden p-[1px] border border-white/5">
                   <motion.div
                     className="h-full bg-emerald-500 rounded-full shadow-[0_0_10px_rgba(16,185,129,0.4)]"
                     initial={{ width: '100%' }}
@@ -493,9 +478,14 @@ const Arena: React.FC = () => {
                 </div>
               </div>
               {/* SP BAR PLAYER */}
-              <div className="flex items-center gap-2">
-                <span className="text-[6px] font-black text-yellow-400 w-4 italic">SP</span>
-                <div className="flex-1 h-1 bg-black/40 rounded-full overflow-hidden">
+              <div className="flex flex-col gap-0.5">
+                <div className="flex justify-between items-center text-[8px] font-black tracking-tighter uppercase">
+                  <span className="text-yellow-400 italic">SP</span>
+                  <span className="text-white/90 font-mono">
+                    {Math.ceil(playerMon.currentStamina)} / {playerMon.currentStats?.stamina ?? playerMon.baseStats.stamina}
+                  </span>
+                </div>
+                <div className="h-1.5 w-full bg-black/40 rounded-full overflow-hidden">
                   <motion.div
                     className="h-full bg-yellow-400 shadow-[0_0_8px_rgba(234,179,8,0.3)]"
                     initial={{ width: '100%' }}
@@ -547,6 +537,25 @@ const Arena: React.FC = () => {
                 Prisma
               </button>
             )}
+          </div>
+          <div className="flex gap-2 h-10">
+            {canCatch && (
+              <button
+                type="button"
+                onClick={() => handleFlee()}
+                disabled={isTurnInProgress || status !== 'fighting'}
+                className="flex-1 bg-rose-950/60 border border-rose-500/40 rounded-xl text-rose-200 text-[10px] font-black uppercase tracking-widest hover:bg-rose-600 hover:text-white flex items-center justify-center gap-1 disabled:opacity-40 transition-all active:scale-95 shadow-md"
+              >
+                <LogOut className="w-3 h-3" /> Fuga
+              </button>
+            )}
+            <button
+              type="button"
+              onClick={() => enterInventory({ fromBattle: true })}
+              className="flex-1 bg-blue-900/40 border border-blue-500/40 rounded-xl text-blue-400 text-[10px] font-black uppercase tracking-widest hover:bg-blue-500 hover:text-white transition-all shadow-md active:scale-95"
+            >
+              Zaino
+            </button>
           </div>
         </div>
       </div>
