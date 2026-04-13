@@ -22,6 +22,14 @@ Benvenuti nell'universo di **Neo-Mon Link**, un gioco di addestramento creature 
 - **Dual Battle Modes**: Differenziazione tra modalità "Lotte" (Combat Link) per allenamento intensivo (+50% EXP, x2 Coins, cattura disabilitata) e modalità "Cattura" (Freq. Scan) per completare la collezione.
 - **Link-Dex Dinamico**: Enciclopedia automatizzata che supporta l'intera lista di Neo-Mon (36+ entries) con calcolo automatico delle debolezze (Neural Analysis) basato sulla tabella dei tipi.
 - **Ottimizzazione UI Terminale**: Nuova griglia compatta a 3 colonne per le funzioni dell'Hub e ottimizzazione degli spazi per la visualizzazione di nomi lunghi e statistiche vitali.
+- **Daily Challenge & Streak (P24)**: Sistema di sfide quotidiane con ricompense in Crediti e Frammenti Nexus. Include un login streak con milestone premianti a 3, 7, 14 e 30 giorni.
+- **Link Quality System (P25)**: Ogni Neo-Mon possiede una "Qualità del Link" (es. Overclock, Berserker) che influenza permanentemente i modificatori delle statistiche, aggiungendo profondità alla personalizzazione.
+- **Team Synergy Bonus (P26)**: Meccanica di sinergia basata sui tipi. Avere più creature dello stesso elemento in squadra sblocca bonus passivi (HP, Attacco, Velocità) durante i combattimenti.
+- **Share Team Base64 (P27)**: Funzione di condivisione della propria squadra tramite codifica Base64. Permette di generare URL o codici testuali per mostrare il proprio team ad altri giocatori.
+- **Profilo & Hall of Fame (P28)**: Tracciamento avanzato delle statistiche (vittorie, KO subiti, danno massimo) e registro storico delle vittorie contro i Boss del Nexus.
+- **Rango Giocatore Dinamico (P29)**: Sistema di progressione del profilo da "Novice Link" a "Ghost Protocol" basato sui badge ottenuti e sul livello massimo raggiunto, con animazioni dedicate al cambio rango.
+- **Battle Log Avanzato**: Registro di battaglia migliorato con colorazione dinamica per l'efficacia dei colpi (verde per superefficace, rosso per poco efficace, grigio per nessun effetto) e rimozione dei log ridondanti (STAB).
+- **Link-Dex Visuale**: Ora il Dex mostra le immagini in bianco e nero dei Neo-Mon solo avvistati, sbloccando la versione a colori e il pallino azzurro solo dopo la cattura effettiva.
 
 ### Aggiornamenti recenti (documentazione)
 - **Battaglia a squadra (multi-slot)**: In lotta l’ordine della squadra coincide con quello impostato nell’Hub/Box. Ogni slot tiene traccia di **HP e Stamina** in battaglia; se il Neo-Mon attivo va K.O., entra il **successivo ancora valido** senza fine partita immediata: la sconfitta arriva solo se **tutti** i membri sono esausti. Lo **switch** consuma il turno, salva chi esce nello slot e applica danni/costi coerenti al motore (`BattleEngine` + `DamageCalc`).

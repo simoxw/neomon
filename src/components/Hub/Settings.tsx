@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useStore } from '../../context/useStore';
 import { db } from '../../db';
+import { encodeTeam, generateShareURL } from '../../utils/teamShare';
 import { 
   Download, 
   Upload, 
@@ -11,10 +12,14 @@ import {
   Save, 
   ShieldAlert,
   Volume2,
-  VolumeX 
+  VolumeX,
+  Copy,
+  Link,
+  Share2 
 } from 'lucide-react';
 import { clsx, type ClassValue } from 'clsx';
 import { twMerge } from 'tailwind-merge';
+import { motion, AnimatePresence } from 'framer-motion';
 
 function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -84,9 +89,33 @@ const Settings: React.FC = () => {
     window.location.reload();
   };
 
+  const copyToClipboard = (text: string, msg: string) => {
+    navigator.clipboard.writeText(text);
+    setShowSuccess(msg);
+    setTimeout(() => setShowSuccess(null), 2500);
+  };
+
+  const team = useStore(s => s.team);
+  const teamCode = encodeTeam(team);
+  const shareURL = generateShareURL(team);
+
   return (
     <div className="h-full w-full bg-slate-950 flex flex-col animate-in fade-in duration-500 overflow-hidden text-white">
       
+      {/* Success Notification */}
+      <AnimatePresence>
+        {showSuccess && (
+          <motion.div 
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -20 }}
+            className="fixed top-8 left-1/2 -translate-x-1/2 z-[2000] px-6 py-3 bg-emerald-500 text-black font-black text-[10px] uppercase tracking-widest rounded-full shadow-2xl flex items-center gap-2"
+          >
+            <CheckCircle2 className="w-4 h-4" /> {showSuccess}
+          </motion.div>
+        )}
+      </AnimatePresence>
+
       {/* Header */}
       <div className="p-6 pt-10 flex items-center justify-between border-b border-white/5 bg-gray-900/40 backdrop-blur-md">
          <button onClick={() => setScreen('hub')} className="w-10 h-10 flex items-center justify-center rounded-full bg-white/5 border border-white/10 hover:bg-white/10 active:scale-90 transition-all">
@@ -173,6 +202,39 @@ const Settings: React.FC = () => {
                   </div>
                   <input type="file" className="hidden" accept=".json" onChange={importData} />
                </label>
+            </div>
+         </div>
+
+         {/* Share Section */}
+         <div className="space-y-4">
+            <h3 className="text-[10px] uppercase font-black tracking-[0.4em] text-white/30 italic px-2">Link Sharing & Transmission</h3>
+            <div className="p-6 rounded-[2rem] bg-white/5 border border-white/10 space-y-6">
+               <div className="flex gap-3">
+                  <button 
+                    onClick={() => copyToClipboard(shareURL, "URL Copiato negli appunti!")}
+                    className="flex-1 flex flex-col items-center gap-3 p-4 rounded-2xl bg-cyan-500/10 border border-cyan-500/20 hover:bg-cyan-500 hover:text-black transition-all group"
+                  >
+                     <Link className="w-5 h-5 group-hover:scale-110 transition-transform" />
+                     <span className="text-[8px] font-black uppercase tracking-widest">Copia URL</span>
+                  </button>
+                  <button 
+                    onClick={() => copyToClipboard(teamCode, "Codice Copiato!")}
+                    className="flex-1 flex flex-col items-center gap-3 p-4 rounded-2xl bg-purple-500/10 border border-purple-500/20 hover:bg-purple-500 hover:text-white transition-all group"
+                  >
+                     <Share2 className="w-5 h-5 group-hover:scale-110 transition-transform" />
+                     <span className="text-[8px] font-black uppercase tracking-widest">Copia Codice</span>
+                  </button>
+               </div>
+               
+               <div className="space-y-2">
+                  <div className="text-[8px] font-black uppercase text-white/20 tracking-widest flex justify-between">
+                     <span>Anteprima Codice</span>
+                     <span className="font-mono">{teamCode.length} chars</span>
+                  </div>
+                  <div className="p-3 bg-black/40 border border-white/5 rounded-xl font-mono text-[8px] text-white/40 break-all select-all">
+                     {teamCode.substring(0, 40)}...
+                  </div>
+               </div>
             </div>
          </div>
 

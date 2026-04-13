@@ -1,10 +1,11 @@
-import { NeoMon, Move, MoveEffect, StatusCondition } from '../types';
+import { NeoMon, Move, MoveEffect, StatusCondition, ElementType } from '../types';
 import { calculateDamage, getEffectiveness, calculateFlatNeutralDamage, checkCriticalHit } from './DamageCalc.ts';
 import { getMaxStamina } from './battleParty';
 import { restAction, passiveRecovery, canUseMove, BASE_RECOVERY } from './StaminaManager.ts';
 import { resolveMoveById } from './moveLookup';
 import { getStructuredMoveEffect, getMoveAccuracy } from './moveEffectHelpers';
 import { applyStatStageDelta, createDefaultStatStages, getStageMultiplier } from './statStages';
+import { LINK_QUALITIES } from '../data/linkQualities';
 
 export type BattleActionType = 'move' | 'rest' | 'switch';
 
@@ -124,11 +125,40 @@ function checkPreMove(attacker: any, move: Move): { skip: boolean; confuseSelf?:
 }
 
 export class BattleEngine {
+  static calculateTeamSynergy(team: NeoMon[]) {
+    const typeCounts: Record<string, number> = {};
+    team.forEach(c => {
+      c.types.forEach(t => { typeCounts[t] = (typeCounts[t] || 0) + 1; });
+    });
+
+    let hpBonus = 0, attackBonus = 0, speedBonus = 0;
+    Object.values(typeCounts).forEach(count => {
+      if (count === 2) hpBonus += 0.05;
+      if (count === 3) { hpBonus += 0.10; attackBonus += 0.05; }
+      if (count === 4) { hpBonus += 0.15; attackBonus += 0.10; speedBonus += 0.05; }
+    });
+
+    const dominantTypeEntry = Object.entries(typeCounts).sort((a, b) => b[1] - a[1])[0];
+    const synergyLabel = dominantTypeEntry && dominantTypeEntry[1] >= 2 
+      ? `Sinergia ${dominantTypeEntry[0]} (${dominantTypeEntry[1]}x)` 
+      : null;
+
+    return { hpBonus, attackBonus, speedBonus, synergyLabel };
+  }
+
   static effectiveSpeed(mon: any): number {
     const flux = mon.currentStats?.flusso ?? mon.baseStats?.flusso ?? 0;
     const iv = typeof mon.potential === 'number' ? mon.potential : 0;
     const stage = mon.statStages?.speed ?? 0;
-    let spd = (flux + iv * 2) * getStageMultiplier(stage);
+    
+    let qualityMod = 1.0;
+    if (mon.linkQuality) {
+      const q = LINK_QUALITIES.find(x => x.id === mon.linkQuality);
+      if (q?.boostedStat === 'speed') qualityMod = 1.1;
+      if (q?.nerfedStat === 'speed') qualityMod = 0.9;
+    }
+
+    let spd = (flux + iv * 2) * getStageMultiplier(stage) * qualityMod * (1 + (mon.synergyBonus?.speed ?? 0));
     if (mon.status === 'paralysis') spd *= 0.5;
     return spd;
   }

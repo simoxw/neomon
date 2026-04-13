@@ -178,6 +178,18 @@ export interface NeoMon {
 
   evolutionLevel?: number;
   evolvesTo?: string | { creatureId: string; level: number };
+
+  /** Qualità del Link (Prompt 25) */
+  linkQuality?: string;
+  /** Nome personalizzato (Prompt 25) */
+  nickname?: string;
+
+  /** Bonus sinergia temporaneo in battaglia (Prompt 26) */
+  synergyBonus?: {
+    hp: number;
+    attack: number;
+    speed: number;
+  };
 }
 
 /**
@@ -196,6 +208,44 @@ export interface PlayerData {
   totalCaptures?: number;
   playtimeMs?: number;
   missionProgress?: Record<string, { completed?: boolean; count?: number }>;
+}
+
+/**
+ * Progressi e Streak Giornalieri (Prompt 24)
+ */
+export interface PlayerProgress {
+  id: string; // 'main'
+  lastLoginDate: string;
+  streak: number;
+  dailyChallengeDate: string;
+  dailyChallengeCompleted: boolean;
+}
+
+/**
+ * Statistiche Avanzate e Hall of Fame (Prompt 28)
+ */
+export interface HallOfFameEntry {
+  date: string;
+  bossName: string;
+  team: {
+    name: string;
+    nickname?: string;
+    level: number;
+    spriteId: string;
+  }[];
+}
+
+export interface PlayerStats {
+  id: string; // 'main'
+  totalBattles: number;
+  totalWins: number;
+  totalCaptures: number;
+  totalKOs: number;
+  defeatedTrainers: string[];
+  badges: string[];
+  hallOfFame: HallOfFameEntry[];
+  maxDamageDealt: number;
+  longestBattle: number;
 }
 
 /**

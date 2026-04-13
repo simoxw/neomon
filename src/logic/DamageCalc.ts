@@ -1,8 +1,27 @@
 import { ElementType, NeoMon, Move } from '../types';
 import { getStageMultiplier } from './statStages';
 import { isPhysicalCategory, isSpecialCategory } from './moveEffectHelpers';
+import { LINK_QUALITIES } from '../data/linkQualities';
 
 type EffectivenessMap = Partial<Record<ElementType, number>>;
+
+const getQualityModifier = (mon: NeoMon, statName: string): number => {
+  if (!mon.linkQuality) return 1.0;
+  const quality = LINK_QUALITIES.find(q => q.id === mon.linkQuality);
+  if (!quality) return 1.0;
+  
+  const mapping: Record<string, string> = {
+    'attack': 'potenza',
+    'defense': 'resistenza',
+    'speed': 'velocita',
+    'specialAtk': 'sintonia',
+    'specialDef': 'spirito'
+  };
+
+  if (quality.boostedStat === statName) return 1.1;
+  if (quality.nerfedStat === statName) return 0.9;
+  return 1.0;
+};
 
 export const TYPE_CHART: Record<ElementType, EffectivenessMap> = {
   [ElementType.Incandescente]: { [ElementType.Bio]: 2, [ElementType.Criogenico]: 2, [ElementType.Meccanico]: 2, [ElementType.Idrico]: 0.5, [ElementType.Geologico]: 0.5, [ElementType.Incandescente]: 0.5 },
@@ -50,14 +69,14 @@ export const calculateDamage = (attacker: NeoMon, defender: NeoMon, move: Move):
   const finalDefStage = isCrit ? Math.min(0, defStage) : defStage;
 
   let atk = physical
-    ? attacker.baseStats.potenza * getStageMultiplier(finalAtkStage)
-    : attacker.baseStats.sintonia * getStageMultiplier(finalAtkStage);
+    ? attacker.baseStats.potenza * getStageMultiplier(finalAtkStage) * getQualityModifier(attacker, 'attack') * (1 + (attacker.synergyBonus?.attack ?? 0))
+    : attacker.baseStats.sintonia * getStageMultiplier(finalAtkStage) * getQualityModifier(attacker, 'specialAtk') * (1 + (attacker.synergyBonus?.attack ?? 0));
   
   if (attacker.status === 'burn' && physical) atk *= 0.75;
   
   const def = physical
-    ? defender.baseStats.resistenza * getStageMultiplier(finalDefStage)
-    : defender.baseStats.spirito * getStageMultiplier(finalDefStage);
+    ? defender.baseStats.resistenza * getStageMultiplier(finalDefStage) * getQualityModifier(defender, 'defense')
+    : defender.baseStats.spirito * getStageMultiplier(finalDefStage) * getQualityModifier(defender, 'specialDef');
 
   const isStab = attacker.types.includes(move.type);
   const stab = isStab ? 1.5 : 1;

@@ -139,6 +139,9 @@ export const useBattle = (_playerId: string, _opponentId: string) => {
   const activeSlotRef = useRef(0);
   const playerMonRef = useRef<BattleEntity | null>(null);
   const opponentMonRef = useRef<BattleEntity | null>(null);
+  const synergyRef = useRef<{ hpBonus: number, attackBonus: number, speedBonus: number, synergyLabel: string | null }>({ hpBonus: 0, attackBonus: 0, speedBonus: 0, synergyLabel: null });
+  const turnCountRef = useRef(0);
+  const maxDamageRef = useRef(0);
   playerMonRef.current = playerMon;
   opponentMonRef.current = opponentMon;
 
@@ -213,8 +216,29 @@ export const useBattle = (_playerId: string, _opponentId: string) => {
 
         syncPartySlotsRef(slots.map((s) => ({ ...s })));
         setActiveSlot(firstIdx);
+        turnCountRef.current = 0;
+        maxDamageRef.current = 0;
 
-        setPlayerMon(buildPlayerEntity(raw, slots[firstIdx]));
+        const synergy = BattleEngine.calculateTeamSynergy(team);
+        synergyRef.current = synergy;
+
+        const pEnt = buildPlayerEntity(raw, slots[firstIdx]);
+         const playerEntity = {
+           ...pEnt,
+           currentHp: Math.floor(pEnt.currentHp * (1 + synergy.hpBonus)),
+           synergyBonus: {
+             hp: synergy.hpBonus,
+             attack: synergy.attackBonus,
+             speed: synergy.speedBonus,
+           }
+         };
+         setPlayerMon(playerEntity);
+
+        if (synergy.synergyLabel) {
+          setTimeout(() => {
+            addLog(`⚡ Sinergia: ${synergy.synergyLabel} (+${Math.round(synergy.hpBonus * 100)}% HP)`, 'system');
+          }, 1000);
+        }
 
         const ctx = useStore.getState().battleContext;
         let generatedOpponent: NeoMon;
@@ -340,7 +364,12 @@ export const useBattle = (_playerId: string, _opponentId: string) => {
       await grantExperience(ref.id, xp);
       if (rewards.itemDrop) await grantInventoryItem(rewards.itemDrop, 1);
 
-      recordBattleWin({ foeTypes: oClone.types.map(String), zoneId: ctx?.kind === 'zone' ? ctx.zoneId : undefined });
+      recordBattleWin({ 
+        foeTypes: oClone.types.map(String), 
+        zoneId: ctx?.kind === 'zone' ? ctx.zoneId : undefined,
+        turns: turnCountRef.current,
+        maxDamage: maxDamageRef.current,
+      });
 
       const live = useStore.getState().team.find((m) => m.id === ref.id);
       const levelUp =
@@ -398,7 +427,13 @@ export const useBattle = (_playerId: string, _opponentId: string) => {
       }
       if (trainer.reward.badge) await addBadge(trainer.reward.badge);
       await markTrainerDefeated(trainer.id);
-      recordBattleWin({ foeTypes: oClone.types.map(String) });
+      recordBattleWin({ 
+        foeTypes: oClone.types.map(String), 
+        isTrainer: true, 
+        trainerId: trainer.id,
+        turns: turnCountRef.current,
+        maxDamage: maxDamageRef.current,
+      });
 
       openSummary({
         foeName: trainer.name,
@@ -473,6 +508,10 @@ export const useBattle = (_playerId: string, _opponentId: string) => {
 
   const processTurnResults = useCallback(
     async (result: FullTurnResult, pClone: BattleEntity, oClone: BattleEntity): Promise<boolean> => {
+      turnCountRef.current++;
+      const maxDmgInTurn = Math.max(result.first.damage, result.second.damage);
+      if (maxDmgInTurn > maxDamageRef.current) maxDamageRef.current = maxDmgInTurn;
+
       const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
       const executeAndLog = async (res: TurnExecutionResult) => {

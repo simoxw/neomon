@@ -45,27 +45,31 @@ NEO-MON LINK
 │   ├── data/                   # Database Statici (JSON)
 │   │   ├── creatures.json          # Registro anagrafico dei 120 Neo-Mon
 │   │   ├── items.json              # Listino prezzi e moltiplicatori Prismi
+│   │   ├── linkQualities.ts        # Database delle 25 Qualità del Link (P25)
 │   │   ├── missions.json           # Database delle Neural Missions
-│   │   └── moves.json              # Libreria di tutte le 120 tecniche di lotta
+│   │   ├── moves.json              # Libreria di tutte le 120 tecniche di lotta
+│   │   └── ranks.ts                # Definizioni dei Ranghi Linker (P29)
 │   ├── db/                     # Persistenza Dati Locale
-│   │   └── index.ts                # Schema Dexie.js (IndexedDB) per salvataggi permanenti
+│   │   └── index.ts                # Schema Dexie.js aggiornato con playerProgress e playerStats (P24/28)
 │   ├── hooks/                  # Logiche React Riutilizzabili
-│   │   ├── useBattle.ts            # Hook orchestratore del flusso di battaglia e XP
+│   │   ├── useBattle.ts            # Orchestratore battaglia: XP, Sinergie, tracciamento stats
 │   │   └── useInventory.ts         # Hook per la manipolazione rapida degli oggetti
 │   ├── logic/                  # Motori Logici (Processori TypeScript)
-│   │   ├── BattleEngine.ts         # Cervello dei combattimenti e Intelligenza Artificiale
-│   │   ├── CatchSystem.ts          # Formula matematica sincronia e shakes prisma
-│   │   ├── DamageCalc.ts           # Calcolo danni basato su Tipi e Stats
+│   │   ├── BattleEngine.ts         # IA, calcolo turni e Sinergie Team (P26)
+│   │   ├── CatchSystem.ts          # Formula sincronia con assegnazione Link Quality (P25)
+│   │   ├── DailySystem.ts          # Gestione Sfida Giornaliera e Streak Login (P24)
+│   │   ├── DamageCalc.ts           # Calcolo danni con modificatori Quality e Sinergia
 │   │   ├── EvolutionSystem.ts      # Monitoraggio livelli e soglie evolutive
 │   │   └── StaminaManager.ts       # Gestione energia, costi mosse e riposo
 │   ├── store/                  # Risorse aggiuntive dello store (se presenti)
 │   ├── styles/                 # Estetica e Layer Visivi
 │   │   └── index.css               # Design System: Tailwind, Neon Glow e Fonts
 │   ├── utils/                  # Utility di Supporto
-│   │   └── imageLoader.ts          # Caricamento dinamico e intelligente degli sprite
-│   ├── App.tsx                 # Root Component (Layout 8/80/12 e Orchestrazione)
+│   │   ├── imageLoader.ts          # Caricamento dinamico e intelligente degli sprite
+│   │   └── teamShare.ts            # Codifica/Decodifica Base64 per condivisione team (P27)
+│   ├── App.tsx                 # Root: Layout, caricamento streak, import team e Rank Up (P29)
 │   ├── main.tsx                # Punto di ingresso dell'applicazione (DOM Render)
-│   └── types.ts                # Definizioni globali delle interfacce TypeScript
+│   └── types.ts                # Definizioni: NeoMon, PlayerProgress, PlayerStats, TeamShareData
 ├── index.html                  # Template base con Meta-tag PWA e SEO
 ├── package.json                # Gestione dipendenze e script di esecuzione
 ├── postcss.config.js           # Ottimizzazione CSS per la build
@@ -92,7 +96,7 @@ NEO-MON LINK (root)
 │   ├── components/
 │   │   ├── Battle/
 │   │   │   ├── Arena.tsx
-│   │   │   ├── BattleLog.tsx
+│   │   │   ├── BattleLog.tsx       # Log colorato per efficacia (Verde/Rosso/Grigio)
 │   │   │   ├── BattleScreen.tsx
 │   │   │   ├── BattleSummary.tsx
 │   │   │   ├── CatchAnimation.tsx
@@ -108,16 +112,18 @@ NEO-MON LINK (root)
 │   │   ├── Common/
 │   │   │   ├── Button.tsx
 │   │   │   ├── EvolutionModal.tsx
+│   │   │   ├── LoadingScreen.tsx   # Schermata caricamento con messaggi casuali (P29)
 │   │   │   ├── Modal.tsx
-│   │   │   ├── NeoMonDetailModal.tsx
-│   │   │   └── ProgressBar.tsx
+│   │   │   ├── NeoMonDetailModal.tsx # Report con Link Quality e Nickname (P25)
+│   │   │   ├── ProgressBar.tsx
+│   │   │   └── TeamPreviewModal.tsx # Anteprima per importazione team condivisi (P27)
 │   │   ├── Hub/
 │   │   │   ├── Crafting.tsx
-│   │   │   ├── Inventory.tsx      # Zaino; da battaglia: “Indietro alla lotta” (anche sticky in basso)
-│   │   │   ├── LinkDex.tsx
-│   │   │   ├── MainHub.tsx
+│   │   │   ├── Inventory.tsx
+│   │   │   ├── LinkDex.tsx         # Dex visuale (Immagini grayscale per avvistati)
+│   │   │   ├── MainHub.tsx         # Hub con Daily Challenge, Streak e Analisi Sinergia
 │   │   │   ├── MissionTerminal.tsx
-│   │   │   ├── Settings.tsx
+│   │   │   ├── Settings.tsx        # Settings con Share Team Base64 (P27)
 │   │   │   ├── SettingsMenu.tsx
 │   │   │   └── Shop.tsx
 │   │   ├── Navigation/
@@ -190,11 +196,9 @@ NEO-MON LINK (root)
 ## 📜 Analisi Dettagliata per File
 
 ### 📐 Logica e Motori (`src/logic/`)
-- **`BattleEngine.ts`**: Il processore principale dei turni. Decide l'ordine di attacco, gestisce i messaggi di log e contiene l'IA tattica nemica.
-- **`CatchSystem.ts`**: Cuore del collezionismo. Calcola le probabilità di successo basandosi su HP nemici, tipo di Prisma e Bonus Stato.
-- **`DamageCalc.ts`**: Contiene la matrice delle resistenze/debolezze e la formula matematica del danno (Attacco vs Difesa).
-- **`EvolutionSystem.ts`**: Gestisce i dati di crescita e segnala quando un Neo-Mon è pronto per il NEXT-GEN stadiuù.
-- **`StaminaManager.ts`**: Regola il flusso di energia. Gestisce il recupero dal riposo o la penalità per esaurimento.
+- **`BattleEngine.ts`**: Il processore principale dei turni. Gestisce le **Sinergie di Team** (P26) basate sulla composizione elementale della squadra attiva.
+- **`DailySystem.ts`**: (P24) Gestisce la generazione della **Sfida Giornaliera** deterministica e il calcolo del **Login Streak** con relative milestone.
+- **`CatchSystem.ts`**: Formula di cattura che ora assegna una **Link Quality** casuale ad ogni nuovo Neo-Mon sincronizzato (P25).
 
 ### 🧠 Stato e Database (`src/context/`, `src/db/`)
 - **`useStore.ts`**: Fondamentale. Unisce lo stato di React con la persistenza di IndexedDB. Gestisce la cattura, gli XP e il cambio schermo.
@@ -206,10 +210,9 @@ NEO-MON LINK (root)
 - **`MoveTooltip.tsx`**: Componente UX che descrive i dati tecnici delle mosse al passaggio dell'utente.
 
 ### 🏢 Componenti Hub (`src/components/Hub/`)
-- **`MainHub.tsx`**: Dashboard principale. Mostra la squadrattiva, le barre XP dinamiche e i lanci rapidi per le missioni.
-- **`LinkDex.tsx`**: Registro visivo. Mostra sprite pieni per i catturati e silhouette per quelli solo avvistati.
-- **`Shop.tsx`**: Interfaccia di acquisto oggetti con scalamento automatico delle monete.
-- **`Settings.tsx`**: Console di controllo per l'esportazione/importazione dei salvataggi in formato JSON.
+- **`MainHub.tsx`**: Dashboard centrale arricchita con le card **Presenza Nexus** (Streak) e **Sfida Giornaliera**. Include la sezione espandibile **Analisi Sinergia**.
+- **`LinkDex.tsx`**: Registro visivo aggiornato. Mostra le immagini in bianco e nero dei Neo-Mon solo avvistati, sbloccando i colori dopo la cattura.
+- **`Settings.tsx`**: Aggiunta sezione **Link Sharing** per generare URL di condivisione team (P27).
 
 ### 📦 Gestione Box & Team (`src/components/Box/`)
 - **`CreatureGrid.tsx`**: Archivio massivo. Gestisce filtri per tipo, ordinamenti, paginazione e **Team Swap** (sostituzione Box↔Squadra anche a team pieno tramite `replaceInTeam`).
@@ -219,11 +222,15 @@ NEO-MON LINK (root)
 - **`Button.tsx`**: Bottone React con supporto varianti grafiche (`outline`, `ghost`, `rose`, `cyan`, `fuchsia`) per coerenza UI.
 - **`NeoMonDetailModal.tsx`**: Modale condiviso per la visualizzazione completa di un Neo-Mon. Usato sia dal Box che dalla Squadra. Include: barre statistiche con colori differenziati, IV/EV per ogni parametro, moveset completo (nome, tipo colorato, categoria, PWR, SP), barra XP e sezione Development opzionale.
 
+### 👤 Profilo e Social
+- **`ProfileModal` (in MainHub.tsx)**: (P28) Visualizza il **Rango Linker**, le statistiche avanzate (Record Danno, KO), la bacheca dei badge e la **Hall of Fame** dei boss sconfitti.
+- **`teamShare.ts`**: (P27) Utility per comprimere i dati del team in una stringa Base64 sicura per l'URL.
+- **`TeamPreviewModal.tsx`**: (P27) Interfaccia di anteprima per i team ricevuti tramite link esterno.
+
 ### 🏗️ Infrastruttura e Utility
-- **`App.tsx`**: Il telaio dell'applicazione. Definisce la ripartizione dello schermo e il sistema di switch tra i vari moduli.
-- **`types.ts`**: La pietra angolare del codice. Definisce la struttura di `NeoMon`, `Move` e `PlayerData` per evitare errori di dato.
-- **`imageLoader.ts`**: Utility fondamentale che mappa gli ID delle creature sui file .webp nella cartella assets.
-- **`manifest.json`**: Fornisce al browser le istruzioni per trattare il sito come un'app mobile (Splash screen, icone, colori).
+- **`ranks.ts`**: (P29) Definisce la scala gerarchica dei Linker basata su badge e livelli.
+- **`linkQualities.ts`**: (P25) Catalogo delle 25 varianti genetiche che personalizzano le statistiche di ogni creatura.
+- **`LoadingScreen.tsx`**: (P29) Schermata di transizione immersiva con messaggi di sistema cyberpunk.
 
 ### Appendice — File e moduli aggiuntivi (cosa fanno)
 

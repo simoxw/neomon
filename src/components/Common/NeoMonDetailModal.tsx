@@ -1,11 +1,12 @@
 import React, { useMemo, useState } from 'react';
-import { X, Zap, Activity, Shield, Brain } from 'lucide-react';
+import { X, Zap, Activity, Shield, Brain, Edit2, Save, Info } from 'lucide-react';
 import { NeoMon, Move, Stats } from '../../types';
 import { getCreatureSprite } from '../../utils/imageLoader';
 import allMovesData from '../../data/moves.json';
 import { useStore } from '../../context/useStore';
 import { isPhysicalCategory, isSpecialCategory, isStatusCategory } from '../../logic/moveEffectHelpers';
 import { motion, AnimatePresence } from 'framer-motion';
+import { LINK_QUALITIES } from '../../data/linkQualities';
 
 const allMoves = (allMovesData as unknown as any[]).flat() as Move[];
 
@@ -55,16 +56,33 @@ const NeoMonDetailModal: React.FC<Props> = ({ mon: monProp, onClose }) => {
     () => team.find((m) => m.id === monProp.id) ?? box.find((m) => m.id === monProp.id) ?? monProp,
     [team, box, monProp]
   );
-  const { coins, installNeuralMove } = useStore();
+  const { coins, installNeuralMove, renameNeoMon } = useStore();
   const [tab, setTab] = useState<TabId>('stats');
   const [toast, setToast] = useState<string | null>(null);
   const [pendingInstall, setPendingInstall] = useState<Move | null>(null);
   const [overlayOpen, setOverlayOpen] = useState(false);
+  const [isEditingNickname, setIsEditingNickname] = useState(false);
+  const [newNickname, setNewNickname] = useState(mon.nickname || mon.name);
+  const [showQualityTooltip, setShowQualityTooltip] = useState(false);
 
   const stats = mon.currentStats || mon.baseStats;
   const expNeeded = Math.pow(mon.level, 3);
   const expPercent = Math.min(100, (mon.exp / expNeeded) * 100);
   const totalDev = Object.values(mon.development).reduce((a, b) => a + b, 0);
+
+  const quality = useMemo(() => 
+    LINK_QUALITIES.find(q => q.id === mon.linkQuality) || LINK_QUALITIES[0],
+    [mon.linkQuality]
+  );
+
+  const handleRename = async () => {
+    if (!newNickname.trim()) return;
+    const cleanName = newNickname.trim().substring(0, 12).replace(/[^a-zA-Z0-9\s-]/g, '');
+    await renameNeoMon(mon.id, cleanName);
+    setIsEditingNickname(false);
+    setToast('Identificatore aggiornato');
+    setTimeout(() => setToast(null), 2000);
+  };
 
   const learnPool = mon.learnPool || [];
   const uplinkRows = useMemo(() => {
@@ -112,8 +130,67 @@ const NeoMonDetailModal: React.FC<Props> = ({ mon: monProp, onClose }) => {
             />
           </div>
           <div className="flex-1 min-w-0">
-            <h4 className="text-2xl font-black italic uppercase tracking-tighter text-white leading-none">{mon.name}</h4>
-            <div className="flex gap-1 mt-1 flex-wrap">
+            <div className="flex items-center gap-2 group relative">
+              {isEditingNickname ? (
+                <div className="flex items-center gap-1">
+                  <input
+                    autoFocus
+                    value={newNickname}
+                    onChange={(e) => setNewNickname(e.target.value)}
+                    onKeyDown={(e) => e.key === 'Enter' && handleRename()}
+                    className="bg-black/40 border border-cyan-500/50 rounded px-2 py-0.5 text-sm font-black uppercase text-white outline-none w-32"
+                  />
+                  <button onClick={handleRename} className="p-1 bg-cyan-500 rounded hover:bg-cyan-400 transition-colors">
+                    <Save className="w-3 h-3 text-black" />
+                  </button>
+                </div>
+              ) : (
+                <>
+                  <h4 className="text-2xl font-black italic uppercase tracking-tighter text-white leading-none truncate max-w-[140px]">
+                    {mon.nickname || mon.name}
+                  </h4>
+                  <button 
+                    onClick={() => setIsEditingNickname(true)}
+                    className="opacity-0 group-hover:opacity-100 p-1 hover:bg-white/10 rounded transition-all"
+                  >
+                    <Edit2 className="w-3 h-3 text-cyan-400" />
+                  </button>
+                </>
+              )}
+            </div>
+
+            <div className="flex items-center gap-2 mt-1 relative">
+              <div 
+                className="flex items-center gap-1.5 cursor-help group/q"
+                onClick={() => setShowQualityTooltip(!showQualityTooltip)}
+              >
+                <span className="text-[10px] font-orbitron font-black text-cyan-400 tracking-tighter bg-cyan-950/30 px-1.5 py-0.5 rounded border border-cyan-500/20">
+                  LINK: {quality.name.toUpperCase()}
+                </span>
+                <div className="flex gap-1 text-[8px] font-black uppercase">
+                  <span className="text-emerald-400">{quality.boostedStat.substring(0,3)}↑</span>
+                  <span className="text-rose-400">{quality.nerfedStat.substring(0,3)}↓</span>
+                </div>
+                
+                <AnimatePresence>
+                  {(showQualityTooltip) && (
+                    <motion.div 
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: 10 }}
+                      className="absolute top-full left-0 mt-2 w-48 p-3 bg-slate-900 border border-white/10 rounded-xl shadow-2xl z-50 text-[10px] leading-relaxed text-white/70"
+                    >
+                      <div className="font-black text-cyan-400 mb-1 flex items-center gap-1 uppercase tracking-widest">
+                        <Info className="w-3 h-3" /> {quality.name}
+                      </div>
+                      {quality.description}
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </div>
+            </div>
+
+            <div className="flex gap-1 mt-1.5 flex-wrap">
               {mon.types.map((t) => (
                 <span
                   key={t}

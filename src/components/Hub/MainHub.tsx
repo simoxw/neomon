@@ -29,17 +29,37 @@ import itemsCatalog from '../../data/items.json';
 import { getCreatureSprite } from '../../utils/imageLoader';
 import NeoMonDetailModal from '../Common/NeoMonDetailModal';
 import type { NeoMon } from '../../types';
+import { getDailyChallenge } from '../../logic/DailySystem';
+import { BattleEngine } from '../../logic/BattleEngine';
+import { PLAYER_RANKS, getCurrentRank } from '../../data/ranks';
+import { ElementType } from '../../types';
+import EvolutionModal from '../Common/EvolutionModal';
 
 function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
 
+const TYPE_COLORS: Record<string, string> = {
+  [ElementType.Bio]: 'bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)]',
+  [ElementType.Incandescente]: 'bg-rose-500 shadow-[0_0_8px_rgba(244,63,94,0.5)]',
+  [ElementType.Idrico]: 'bg-cyan-500 shadow-[0_0_8px_rgba(6,182,212,0.5)]',
+  [ElementType.Fulgido]: 'bg-yellow-400 shadow-[0_0_8px_rgba(250,204,21,0.5)]',
+  [ElementType.Tetro]: 'bg-indigo-600 shadow-[0_0_8px_rgba(79,70,229,0.5)]',
+  [ElementType.Meccanico]: 'bg-slate-400 shadow-[0_0_8px_rgba(148,163,184,0.5)]',
+  [ElementType.Etereo]: 'bg-fuchsia-500 shadow-[0_0_8px_rgba(217,70,239,0.5)]',
+  [ElementType.Cinetico]: 'bg-pink-600 shadow-[0_0_8px_rgba(219,39,119,0.5)]',
+  [ElementType.Geologico]: 'bg-stone-600 shadow-[0_0_8px_rgba(120,113,108,0.5)]',
+  [ElementType.Aereo]: 'bg-sky-300 shadow-[0_0_8px_rgba(125,211,252,0.5)]',
+  [ElementType.Criogenico]: 'bg-blue-200 shadow-[0_0_8px_rgba(191,219,254,0.5)]',
+  [ElementType.Prismatico]: 'bg-white shadow-[0_0_8px_rgba(255,255,255,0.5)]',
+};
+
 const ProfileModal = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) => {
-  const { player, coins, totalBattles, totalBattlesWon, totalCaptures, team, box } = useStore();
+  const { player, coins, team, box, playerStats } = useStore();
   const [isEditingName, setIsEditingName] = React.useState(false);
   const [newName, setNewName] = React.useState(player?.name || '');
 
-  if (!isOpen) return null;
+  if (!isOpen || !playerStats) return null;
 
   const handleSaveName = async () => {
     if (!newName.trim() || !player) return;
@@ -49,16 +69,27 @@ const ProfileModal = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => voi
     setIsEditingName(false);
   };
 
-  const winRate = totalBattles > 0 ? Math.round((totalBattlesWon / totalBattles) * 100) : 0;
+  const maxLevel = team.length > 0 ? Math.max(...team.map(m => m.level)) : 0;
+  const currentRank = getCurrentRank(playerStats.badges, maxLevel);
+  const nextRankIdx = PLAYER_RANKS.findIndex(r => r.id === currentRank.id) + 1;
+  const nextRank = PLAYER_RANKS[nextRankIdx];
+  
+  const winRate = playerStats.totalBattles > 0 ? Math.round((playerStats.totalWins / playerStats.totalBattles) * 100) : 0;
   const totalMons = team.length + box.length;
-  const playerLevel = Math.floor(Math.sqrt((totalBattlesWon * 10 + totalCaptures * 20) / 100)) + 1;
 
   return (
-    <motion.div 
-      initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-      className="fixed inset-0 z-[1000] bg-black/95 backdrop-blur-3xl flex flex-col p-6 overflow-y-auto"
-    >
-      <div className="flex justify-between items-center mb-10 pt-6">
+    <div className="fixed inset-0 z-[1000] flex flex-col">
+      <motion.div 
+        initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+        className="absolute inset-0 bg-black/95 backdrop-blur-3xl"
+        onClick={onClose}
+      />
+      <motion.div 
+        initial={{ y: '100%' }} animate={{ y: 0 }} exit={{ y: '100%' }}
+        transition={{ type: 'spring', damping: 25, stiffness: 200 }}
+        className="relative flex-1 flex flex-col p-6 overflow-y-auto scrollbar-hide"
+      >
+      <div className="flex justify-between items-center mb-10 pt-6 shrink-0">
         <div className="flex items-center gap-4">
           <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-cyan-500 to-blue-600 flex items-center justify-center shadow-[0_0_20px_rgba(34,211,238,0.3)]">
             <User className="w-8 h-8 text-white" />
@@ -82,7 +113,9 @@ const ProfileModal = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => voi
                 </div>
               )}
             </div>
-            <div className="text-[10px] font-mono text-cyan-400/60 uppercase tracking-widest">Neural Link Rank: {playerLevel}</div>
+            <div className={cn("text-[10px] font-orbitron font-black uppercase tracking-widest", currentRank.color)}>
+               ◈ {currentRank.name}
+            </div>
           </div>
         </div>
         <button onClick={onClose} className="p-3 bg-white/10 rounded-full text-white hover:bg-white/20 transition-all">
@@ -90,56 +123,131 @@ const ProfileModal = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => voi
         </button>
       </div>
 
-      <div className="grid grid-cols-2 gap-4 mb-8">
+      {/* Rango Section */}
+      <div className="mb-8 p-5 rounded-[2rem] bg-white/5 border border-white/10">
+         <div className="flex justify-between items-end mb-3">
+            <div className="flex flex-col">
+               <span className="text-[8px] font-black text-white/30 uppercase tracking-[0.2em] mb-1">Status Protocollo</span>
+               <span className={cn("text-lg font-black font-orbitron italic uppercase", currentRank.color)}>{currentRank.name}</span>
+            </div>
+            <div className="text-[9px] font-mono text-white/40">
+               {nextRank ? `Prossimo: ${nextRank.name}` : 'Rango Massimo'}
+            </div>
+         </div>
+         {nextRank && (
+            <div className="space-y-2">
+               <div className="h-1.5 w-full bg-black/40 rounded-full overflow-hidden border border-white/5">
+                  <div 
+                     className={cn("h-full bg-gradient-to-r rounded-full transition-all duration-1000", currentRank.color.replace('text-', 'from-').replace('400', '600') + ' to-' + currentRank.color.replace('text-', ''))}
+                     style={{ width: `${Math.min(100, (playerStats.badges.length / nextRank.minBadges) * 100)}%` }}
+                  />
+               </div>
+               <div className="flex justify-between text-[7px] font-black uppercase text-white/20 tracking-tighter">
+                  <span>Badges: {playerStats.badges.length}/{nextRank.minBadges}</span>
+                  <span>Livello Max: {maxLevel}/{nextRank.minLevel}</span>
+               </div>
+            </div>
+         )}
+         <p className="mt-4 text-[9px] text-white/60 italic leading-relaxed">"{currentRank.greeting}"</p>
+      </div>
+
+      {/* Statistiche Section */}
+      <h3 className="text-[10px] font-black uppercase tracking-[0.3em] text-white/20 mb-4 px-2">Nexus Statistics</h3>
+      <div className="grid grid-cols-2 gap-3 mb-8">
         <div className="p-4 rounded-3xl bg-white/5 border border-white/10">
           <div className="flex items-center gap-2 mb-2 text-white/40">
-            <Trophy className="w-4 h-4" />
-            <span className="text-[10px] font-black uppercase tracking-widest">Battaglie</span>
+            <Trophy className="w-3 h-3" />
+            <span className="text-[8px] font-black uppercase tracking-widest">Performance</span>
           </div>
-          <div className="text-2xl font-black text-white italic">{totalBattlesWon} <span className="text-xs text-white/20">Vinte</span></div>
-          <div className="text-[10px] font-mono text-cyan-400/60 mt-1">Win Rate: {winRate}%</div>
+          <div className="text-xl font-black text-white italic">{playerStats.totalWins} <span className="text-[10px] text-white/20">Vinte</span></div>
+          <div className="text-[9px] font-mono text-cyan-400/60 mt-1">Rate: {winRate}% | Tot: {playerStats.totalBattles}</div>
         </div>
         <div className="p-4 rounded-3xl bg-white/5 border border-white/10">
           <div className="flex items-center gap-2 mb-2 text-white/40">
-            <Activity className="w-4 h-4" />
-            <span className="text-[10px] font-black uppercase tracking-widest">Catture</span>
+            <Activity className="w-3 h-3" />
+            <span className="text-[8px] font-black uppercase tracking-widest">Catture</span>
           </div>
-          <div className="text-2xl font-black text-white italic">{totalCaptures}</div>
-          <div className="text-[10px] font-mono text-cyan-400/60 mt-1">Totali: {totalMons}</div>
+          <div className="text-xl font-black text-white italic">{playerStats.totalCaptures}</div>
+          <div className="text-[9px] font-mono text-cyan-400/60 mt-1">Archiviate: {totalMons}</div>
+        </div>
+        <div className="p-4 rounded-3xl bg-white/5 border border-white/10">
+          <div className="flex items-center gap-2 mb-2 text-white/40">
+            <Zap className="w-3 h-3 text-orange-400" />
+            <span className="text-[8px] font-black uppercase tracking-widest">Record Danno</span>
+          </div>
+          <div className="text-xl font-black text-orange-400 italic">{playerStats.maxDamageDealt}</div>
+          <div className="text-[9px] font-mono text-white/20 mt-1 uppercase">In un colpo</div>
+        </div>
+        <div className="p-4 rounded-3xl bg-white/5 border border-white/10">
+          <div className="flex items-center gap-2 mb-2 text-white/40">
+            <Shield className="w-3 h-3 text-rose-400" />
+            <span className="text-[8px] font-black uppercase tracking-widest">KO Subiti</span>
+          </div>
+          <div className="text-xl font-black text-rose-400 italic">{playerStats.totalKOs}</div>
+          <div className="text-[9px] font-mono text-white/20 mt-1 uppercase">Neo-Mon persi</div>
         </div>
       </div>
 
+      {/* Badge Section */}
       <div className="mb-8">
-        <h3 className="text-[10px] font-black uppercase tracking-[0.3em] text-white/20 mb-4 px-2">Badge Conseguiti</h3>
-        <div className="grid grid-cols-4 gap-4">
-          {['badge-01', 'badge-02', 'badge-03', 'badge-04'].map((bId) => {
-            const hasBadge = player?.badges?.includes(bId);
+        <h3 className="text-[10px] font-black uppercase tracking-[0.3em] text-white/20 mb-4 px-2">Nexus Badges</h3>
+        <div className="grid grid-cols-4 gap-3">
+          {['badge-01', 'badge-02', 'badge-03', 'badge-04', 'badge-05', 'badge-06'].map((bId) => {
+            const hasBadge = playerStats.badges.includes(bId);
             return (
               <div key={bId} className={cn(
-                "aspect-square rounded-2xl border flex items-center justify-center transition-all duration-500",
+                "aspect-square rounded-2xl border flex flex-col items-center justify-center transition-all duration-500 gap-1",
                 hasBadge ? "bg-cyan-500/10 border-cyan-400/50 shadow-[0_0_15px_rgba(34,211,238,0.2)]" : "bg-black/40 border-white/5 grayscale opacity-20"
               )}>
-                <Award className={cn("w-8 h-8", hasBadge ? "text-cyan-400" : "text-white/20")} />
+                <Award className={cn("w-6 h-6", hasBadge ? "text-cyan-400" : "text-white/20")} />
+                <span className="text-[6px] font-black uppercase text-white/40">{hasBadge ? `ZONA ${bId.split('-')[1]}` : '???'}</span>
               </div>
             );
           })}
         </div>
       </div>
 
-      <div className="mt-auto p-6 rounded-[2.5rem] bg-gradient-to-br from-cyan-900/20 to-blue-900/20 border border-cyan-500/20">
-        <div className="flex justify-between items-center mb-4">
+      {/* Hall of Fame Section */}
+      <div className="mb-8">
+         <h3 className="text-[10px] font-black uppercase tracking-[0.3em] text-white/20 mb-4 px-2">Hall of Fame</h3>
+         <div className="space-y-3">
+            {playerStats.hallOfFame.length === 0 ? (
+               <div className="p-6 rounded-3xl bg-white/5 border border-dashed border-white/10 text-center">
+                  <p className="text-[9px] text-white/30 italic">Nessun boss sconfitto ancora. Esplora il Nexus!</p>
+               </div>
+            ) : (
+               playerStats.hallOfFame.map((entry, i) => (
+                  <div key={i} className="p-4 rounded-3xl bg-gradient-to-br from-white/5 to-transparent border border-white/10">
+                     <div className="flex justify-between items-center mb-3">
+                        <span className="text-[10px] font-black text-cyan-400 uppercase italic">{entry.bossName}</span>
+                        <span className="text-[8px] font-mono text-white/20">{entry.date}</span>
+                     </div>
+                     <div className="flex gap-2">
+                        {entry.team.map((m, j) => (
+                           <img key={j} src={getCreatureSprite(m.spriteId)} className="w-8 h-8 object-contain" alt={m.name} title={`${m.nickname || m.name} L.${m.level}`} />
+                        ))}
+                     </div>
+                  </div>
+               ))
+            )}
+         </div>
+      </div>
+
+      <div className="p-6 rounded-[2.5rem] bg-gradient-to-br from-cyan-900/20 to-blue-900/20 border border-cyan-500/20 mb-10 shrink-0">
+        <div className="flex justify-between items-center">
           <div className="flex items-center gap-3">
             <Wallet className="w-5 h-5 text-amber-400" />
             <span className="text-xs font-black uppercase tracking-widest text-white">Crediti Totali</span>
           </div>
           <span className="text-2xl font-black text-amber-400 tabular-nums">{coins.toLocaleString()}</span>
         </div>
-        <div className="h-2 w-full bg-black/40 rounded-full overflow-hidden">
-          <div className="h-full bg-cyan-400" style={{ width: `${(playerLevel % 1) * 100}%` }} />
+        <div className="mt-6 h-2 w-full bg-black/40 rounded-full overflow-hidden">
+          <div className="h-full bg-cyan-400" style={{ width: `${(maxLevel % 1) * 100}%` }} />
         </div>
         <div className="mt-2 text-[8px] font-mono text-white/20 text-center uppercase tracking-widest">Next Rank Progress</div>
       </div>
-    </motion.div>
+      </motion.div>
+    </div>
   );
 };
 
@@ -171,7 +279,12 @@ const MainHub: React.FC = () => {
   const team = useStore(s => s.team);
   const box = useStore(s => s.box);
   const coins = useStore(s => s.coins);
+  const playerStats = useStore(s => s.playerStats);
   const setScreen = useStore(s => s.setScreen);
+  
+  const maxLevel = team.length > 0 ? Math.max(...team.map(m => m.level)) : 0;
+  const currentRank = playerStats ? getCurrentRank(playerStats.badges, maxLevel) : PLAYER_RANKS[0];
+
   const setBoxTab = useStore(s => s.setBoxTab);
   const updateCoins = useStore(s => s.updateCoins);
   const grantExperience = useStore(s => s.grantExperience);
@@ -179,11 +292,58 @@ const MainHub: React.FC = () => {
   const setBattleContext = useStore(s => s.setBattleContext);
   const bumpBattleSession = useStore(s => s.bumpBattleSession);
   const missionProgress = useStore(s => s.missionProgress);
+  const playerProgress = useStore(s => s.playerProgress);
+  const evolutionQueue = useStore(s => s.evolutionQueue);
   const [showMissions, setShowMissions] = React.useState(false);
   const [showCodes, setShowCodes] = React.useState(false);
   const [showProfile, setShowProfile] = React.useState(false);
   const [inputCode, setInputCode] = React.useState('');
   const [detailMon, setDetailMon] = React.useState<NeoMon | null>(null);
+  const [timeLeft, setTimeLeft] = React.useState('');
+
+  const daily = React.useMemo(() => getDailyChallenge(), []);
+
+  const playerLevel = team.length > 0 ? Math.max(...team.map(m => m.level)) : 1;
+
+  React.useEffect(() => {
+    const timer = setInterval(() => {
+      const now = new Date();
+      const tomorrow = new Date(now);
+      tomorrow.setDate(tomorrow.getDate() + 1);
+      tomorrow.setHours(0, 0, 0, 0);
+      const diff = tomorrow.getTime() - now.getTime();
+      
+      const h = Math.floor(diff / 3600000).toString().padStart(2, '0');
+      const m = Math.floor((diff % 3600000) / 60000).toString().padStart(2, '0');
+      const s = Math.floor((diff % 60000) / 1000).toString().padStart(2, '0');
+      setTimeLeft(`${h}:${m}:${s}`);
+    }, 1000);
+    return () => clearInterval(timer);
+  }, []);
+
+  const handleDailyChallenge = async () => {
+    if (!daily) return;
+    const { db } = await import('../../db');
+    const record = await db.playerProgress.get('main');
+    if (record?.dailyChallengeDate === daily.date && record.dailyChallengeCompleted) return;
+
+    // Trigger battle with daily creature
+    const enemyData = (creaturesData as any[]).find(c => c.id === daily.creatureId);
+    if (!enemyData) return;
+
+    setBattleContext({ 
+      kind: 'zone', // Use zone kind to allow custom enemy data
+      mode: 'combat',
+      zoneId: 'daily',
+      encounterPool: [daily.creatureId],
+      encounterRates: [1.0],
+      minLevel: daily.level,
+      maxLevel: daily.level
+    });
+    
+    bumpBattleSession();
+    setScreen('battle');
+  };
 
   const redeemMission = async (id: string, reward: number) => {
     const { updateCoins, missionProgress } = useStore.getState();
@@ -237,6 +397,8 @@ const MainHub: React.FC = () => {
 
   const pendingMissions = (missionsData as any[]).filter(m => !missionProgress[m.id]?.completed).length;
 
+  const showEvolutionModal = evolutionQueue.length > 0;
+
   return (
     <div className="flex flex-col h-full bg-slate-950 px-3 py-6 pb-24 overflow-y-auto scrollbar-hide select-none transition-all duration-700 animate-in fade-in relative">
       
@@ -252,12 +414,17 @@ const MainHub: React.FC = () => {
             <div className="flex flex-col items-start">
                <div className="flex items-center gap-2">
                   <span className="font-black italic uppercase tracking-tighter text-xs text-white">{player?.name || "LINKER"}</span>
-                  <div className="flex items-center gap-1 bg-amber-400/10 px-1.5 py-0.5 rounded-full border border-amber-400/20">
-                     <span className="text-amber-400 font-black text-[9px]">{coins.toLocaleString()}</span>
-                     <div className="w-2 h-2 rounded-full bg-amber-400 shadow-[0_0_5px_rgba(251,191,36,0.6)]" />
+                  <div className={cn("text-[8px] font-orbitron font-black uppercase tracking-widest", currentRank.color)}>
+                     ◈ {currentRank.name}
                   </div>
                </div>
-               <span className="text-[7px] font-mono text-cyan-400/60 uppercase tracking-widest leading-none">Visualizza Profilo</span>
+               <div className="flex items-center gap-1.5 mt-0.5">
+                  <div className="flex items-center gap-1 bg-amber-400/10 px-1.5 py-0.5 rounded-full border border-amber-400/20">
+                     <span className="text-amber-400 font-black text-[8px]">{coins.toLocaleString()}</span>
+                     <div className="w-1.5 h-1.5 rounded-full bg-amber-400 shadow-[0_0_5px_rgba(251,191,36,0.6)]" />
+                  </div>
+                  <span className="text-[6px] font-mono text-white/20 uppercase tracking-[0.2em]">Protocol v1.1.0</span>
+               </div>
             </div>
          </button>
 
@@ -425,6 +592,121 @@ const MainHub: React.FC = () => {
          </div>
       </div>
 
+      {/* DAILY & STREAK CARDS */}
+      <div className="grid grid-cols-2 gap-3 mb-10 animate-in slide-in-from-bottom-4 duration-700 delay-200">
+         {/* STREAK CARD */}
+         <div className="p-4 rounded-3xl bg-gradient-to-br from-orange-950/40 to-black/60 border border-orange-500/20 flex flex-col justify-between h-36 relative overflow-hidden group">
+            <div className="absolute -top-4 -right-4 opacity-10 group-hover:scale-110 transition-transform duration-700">
+               <Zap className="w-20 h-20 text-orange-400" />
+            </div>
+            <div>
+               <h4 className="text-[8px] font-black uppercase tracking-[0.2em] text-orange-400 mb-1">🔥 Presenza Nexus</h4>
+               <div className="flex items-baseline gap-1">
+                  <span className="text-3xl font-black font-orbitron text-white italic">{playerProgress?.streak || 0}</span>
+                  <span className="text-[10px] font-black text-orange-400/60 uppercase italic">Gg</span>
+               </div>
+            </div>
+            <div>
+               <div className="text-[7px] text-white/40 uppercase font-bold mb-1">
+                  {playerProgress?.streak === 0 ? "Torna domani per iniziare!" : `Prossima: Giorno ${playerProgress?.streak! < 3 ? 3 : playerProgress?.streak! < 7 ? 7 : playerProgress?.streak! < 14 ? 14 : 30}`}
+               </div>
+               <div className="h-1 w-full bg-black/40 rounded-full overflow-hidden">
+                  <div className="h-full bg-orange-500" style={{ width: `${((playerProgress?.streak || 0) % 7) * 14.2}%` }} />
+               </div>
+            </div>
+         </div>
+
+         {/* DAILY CHALLENGE CARD */}
+         <div className="p-4 rounded-3xl bg-gradient-to-br from-cyan-950/40 to-black/60 border border-cyan-500/20 flex flex-col justify-between h-36 group relative overflow-hidden">
+            <div className="absolute -top-4 -right-4 opacity-10 group-hover:scale-110 transition-transform duration-700">
+               <Shield className="w-20 h-20 text-cyan-400" />
+            </div>
+            <div>
+               <h4 className="text-[8px] font-black uppercase tracking-[0.2em] text-cyan-400 mb-2">⚡ Sfida Giornaliera</h4>
+               <div className="flex items-center gap-2">
+                  <img src={getCreatureSprite(daily.creatureId)} className="w-8 h-8 object-contain drop-shadow-lg" alt="" />
+                  <div className="flex flex-col">
+                     <span className="text-[9px] font-black text-white uppercase truncate w-20">{daily.creatureName}</span>
+                     <span className="text-[7px] font-mono text-cyan-400/60 uppercase">LV.{daily.level}</span>
+                  </div>
+               </div>
+            </div>
+            
+            {playerProgress?.dailyChallengeDate === daily.date && playerProgress.dailyChallengeCompleted ? (
+               <div className="flex flex-col gap-1">
+                  <div className="flex items-center gap-1 text-[8px] font-black text-emerald-400 uppercase italic">
+                     <div className="w-1.5 h-1.5 rounded-full bg-emerald-400 shadow-[0_0_5px_rgba(52,211,153,0.8)]" />
+                     Completata
+                  </div>
+                  <div className="text-[7px] font-mono text-white/20 uppercase tracking-tighter italic">Reset in {timeLeft}</div>
+               </div>
+            ) : (
+               <button 
+                  onClick={handleDailyChallenge}
+                  className="w-full py-2 bg-cyan-500/10 hover:bg-cyan-500 border border-cyan-500/40 text-cyan-400 hover:text-black text-[8px] font-black uppercase rounded-xl transition-all shadow-lg active:scale-95"
+               >
+                  Affronta
+               </button>
+            )}
+         </div>
+      </div>
+
+      {/* TEAM SYNERGY ANALYSIS */}
+      <div className="mb-10 px-2 animate-in slide-in-from-bottom-4 duration-700 delay-300">
+         <details className="group bg-white/5 border border-white/10 rounded-2xl overflow-hidden transition-all duration-300">
+            <summary className="flex items-center justify-between p-4 cursor-pointer hover:bg-white/5 list-none">
+               <div className="flex items-center gap-3">
+                  <div className="p-2 bg-emerald-500/10 rounded-lg">
+                     <Zap className="w-4 h-4 text-emerald-400" />
+                  </div>
+                  <div>
+                     <h4 className="text-[10px] font-black uppercase tracking-widest text-white">Analisi Sinergia Team</h4>
+                     <p className="text-[8px] text-white/40 font-medium">Scopri i bonus attivi in battaglia</p>
+                  </div>
+               </div>
+               <div className="text-white/20 group-open:rotate-180 transition-transform duration-300">
+                  <Activity className="w-4 h-4" />
+               </div>
+            </summary>
+            
+            <div className="p-4 pt-0 border-t border-white/5 space-y-3">
+               {(() => {
+                  const synergy = BattleEngine.calculateTeamSynergy(team);
+                  const typeCounts: Record<string, number> = {};
+                  team.forEach(c => c.types.forEach(t => { typeCounts[t] = (typeCounts[t] || 0) + 1; }));
+                  
+                  const bonuses = Object.entries(typeCounts)
+                     .filter(([_, count]) => count >= 2)
+                     .map(([type, count]) => ({
+                        type,
+                        count,
+                        bonus: count === 2 ? '+5% HP' : count === 3 ? '+10% HP, +5% ATK' : '+15% HP, +10% ATK, +5% SPD'
+                     }));
+
+                  if (bonuses.length === 0) {
+                     return (
+                        <div className="py-2 text-center">
+                           <p className="text-[9px] text-white/30 italic">Team eterogeneo — potenzia un tipo specifico per sbloccare sinergie.</p>
+                        </div>
+                     );
+                  }
+
+                  return bonuses.map((b, i) => (
+                     <div key={i} className="flex items-center justify-between py-2 border-b border-white/5 last:border-0">
+                        <div className="flex items-center gap-2">
+                           <div className={`w-1.5 h-1.5 rounded-full ${TYPE_COLORS[b.type]?.split(' ')[0] || 'bg-white'}`} />
+                           <span className="text-[10px] font-black text-white uppercase">{b.type} × {b.count}</span>
+                        </div>
+                        <span className="text-[9px] font-mono text-emerald-400 font-bold uppercase tracking-tighter">
+                           {b.bonus}
+                        </span>
+                     </div>
+                  ));
+               })()}
+            </div>
+         </details>
+      </div>
+
       {/* Terminal Grid */}
       <div className="grid grid-cols-3 gap-2">
          <TerminalIcon icon={ShoppingBag} label="Shop" color="border-cyan-400/40 text-cyan-400" onClick={() => setScreen('shop')} />
@@ -515,11 +797,14 @@ const MainHub: React.FC = () => {
         )}
       </AnimatePresence>
 
+      {showEvolutionModal && <EvolutionModal />}
       {detailMon && <NeoMonDetailModal mon={detailMon} onClose={() => setDetailMon(null)} />}
       
       <AnimatePresence>
         {showProfile && <ProfileModal isOpen={showProfile} onClose={() => setShowProfile(false)} />}
       </AnimatePresence>
+
+      {showEvolutionModal && <EvolutionModal />}
     </div>
   );
 };

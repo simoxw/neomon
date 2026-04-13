@@ -38,21 +38,31 @@ Per i tester o per chi desidera una progressione rapida, è possibile inserire d
 ### 👤 Profilo Giocatore
 Cliccando sul tuo nome o sull'icona dell'utente nell'Hub, accederai al tuo profilo:
 - **Personalizzazione**: Clicca sull'icona delle impostazioni affianco al nome per cambiarlo.
-- **Rank**: Il tuo livello di Linker aumenta in base alle vittorie e alle catture effettuate.
+- **Rank**: Il tuo livello di Linker aumenta in base alle vittorie e alle catture effettuate. Ora integrato con il sistema di **PLAYER RANKS** (da Novice a Ghost Protocol) che sblocca nuovi permessi e saluti nel Nexus.
 - **Bacheca Badge**: Visualizza i badge ottenuti sconfiggendo i boss delle varie zone.
-- **Statistiche**: Tieni d'occhio la tua Win Rate e il numero totale di catture.
+- **Statistiche Avanzate**: Tieni d'occhio la tua Win Rate, il numero totale di catture, il record di danno inflitto in un colpo e la durata della lotta più lunga.
+- **Hall of Fame**: Un registro storico che immortala il team utilizzato per sconfiggere ogni Boss del Nexus.
 
-### 🧪 Gestione Oggetti & Cure
-Puoi curare i tuoi Neo-Mon direttamente dallo **Zaino** fuori dalla lotta:
-1. Apri lo **Zaino** dall'Hub o dalla barra di navigazione.
-2. Seleziona un oggetto curativo (Cellule, Batterie, Kit).
-3. Verrai indirizzato alla squadra: clicca sul Neo-Mon che vuoi curare.
-4. L'oggetto verrà consumato solo se il Neo-Mon ne ha effettivamente bisogno.
+### 🧬 Link Quality & Personalizzazione (P25)
+Ogni Neo-Mon catturato riceve una **Qualità del Link** unica:
+- **Modificatori**: Le qualità (es. *Overclock*, *Fortress*) aumentano una statistica del 10% e ne riducono un'altra del 10%.
+- **Nickname**: Puoi rinominare i tuoi Neo-Mon dal menu dei dettagli (sezione "Identificatore") per rendere la tua squadra unica.
 
-### ⚔️ Modalità di Battaglia nell'Hub
-Dall'Hub principale puoi accedere a due tipi di link neurali:
-- **Lotte (Combat Link)**: Simulazioni di combattimento puro. Non puoi catturare creature, ma ricevi **+50% EXP** e **x2 Crediti**. Ideale per livellare e guadagnare.
-- **Cattura (Freq. Scan)**: Scansione dell'area per trovare nuove creature. Il pulsante Prisma è attivo per permetterti di espandere la tua collezione.
+### ⚡ Sinergia di Squadra (P26)
+Il tuo team non è solo una somma di individui. Avere più Neo-Mon dello stesso tipo attiva bonus passivi:
+- **2x Stesso Tipo**: +5% HP.
+- **3x Stesso Tipo**: +10% HP, +5% Attacco.
+- **4x Stesso Tipo**: +15% HP, +10% Attacco, +5% Velocità.
+*Controlla l'Analisi Sinergia nell'Hub per vedere i bonus attivi.*
+
+### 📅 Sfide e Costanza (P24)
+- **Sfida Giornaliera**: Affronta ogni giorno una creatura selvatica di alto livello per ottenere Crediti bonus e Frammenti Nexus.
+- **Presenza Nexus (Streak)**: Effettua il login ogni giorno per aumentare la tua serie. Raggiungi le milestone (3, 7, 14, 30 giorni) per ricevere Prismi rari e risorse.
+
+### 🔗 Condivisione Team (P27)
+Vuoi mostrare la tua squadra?
+- Vai nelle **Impostazioni** e usa **Copia URL Team** o **Copia Codice**.
+- Inviando il link a un altro Linker, questi potrà visualizzare l'anteprima del tuo team e importarlo come riferimento nel suo Nexus.
 
 ---
 
